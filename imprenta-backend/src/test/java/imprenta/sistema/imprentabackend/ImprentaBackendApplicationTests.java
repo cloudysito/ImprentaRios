@@ -1,4 +1,4 @@
-package imprenta.rios.imprentabackend;
+package imprenta.sistema.imprentabackend;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
