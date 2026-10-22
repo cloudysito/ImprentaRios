@@ -15,4 +15,5 @@ public class Material {
     private String id;
     private String nombre;
     private int gramaje;
+    private String insumoId;
 }

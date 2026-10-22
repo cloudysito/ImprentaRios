@@ -5,7 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
-import java.util.Date;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
@@ -16,6 +16,8 @@ public class Actividad {
     private String id;
     private String nombreActividad;
     private String descripcion;
-    private Date fechaHoraInicio;
-    private Date fechaHoraFin;
+    private LocalDateTime fechaHoraInicio;
+    private LocalDateTime fechaHoraFin;
+    private String pedidoId;
+    private String empleadoId;
 }
