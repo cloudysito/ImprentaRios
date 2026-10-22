@@ -9,13 +9,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class ActividadService implements IActividadService {
 
     private final ActividadRepository actividadRepository;
 
     @Override
-    public Actividad agregarActividad(Actividad actividad, int id) throws Exception {
+    public Actividad agregarActividad(Actividad actividad, String id) throws Exception {
         if (actividadRepository.existsById(String.valueOf(id))) {
             throw new Exception("Empleado ya existe");
         }
@@ -23,7 +22,7 @@ public class ActividadService implements IActividadService {
     }
 
     @Override
-    public void eliminarActividad(int id) throws Exception {
+    public void eliminarActividad(String id) throws Exception {
         if (!actividadRepository.existsById(String.valueOf(id))) {
             throw new Exception("Actividad no encontrada");
         }
@@ -33,8 +32,8 @@ public class ActividadService implements IActividadService {
     }
 
     @Override
-    public Actividad actualizarActividad(int id, Actividad actividad) throws Exception {
-        if (!actividadRepository.existsById(String.valueOf(id))) {
+    public Actividad actualizarActividad(String id, Actividad actividad) throws Exception {
+        if (!actividadRepository.existsById(id)) {
             throw new Exception("Actividad no encontrada");
         }
         actividad.setNombreActividad(actividad.getNombreActividad().trim());
@@ -46,11 +45,11 @@ public class ActividadService implements IActividadService {
     }
 
     @Override
-    public Actividad buscarActividad(int id) throws Exception {
+    public Actividad buscarActividad(String id) throws Exception {
         if (!actividadRepository.existsById(String.valueOf(id))) {
             throw new Exception("Actividad no encontrada");
         }
         System.out.println("Actividad encontrada");
-        return actividadRepository.findById(String.valueOf(id)).orElse(null);
+        return actividadRepository.findById(id).orElse(null);
     }
 }

@@ -16,7 +16,6 @@ import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class PedidoService implements IPedidoService {
     private final PedidoRepository pedidoRepository;
     private final ClienteRepository clienteRepository;

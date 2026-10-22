@@ -12,13 +12,12 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class EmpleadoService implements IEmpleadoService {
 
     private final EmpleadoRepository empleadoRepository;
 
     @Override
-    public Empleado agregarEmpleado(Empleado empleado, int id) throws Exception {
+    public Empleado agregarEmpleado(Empleado empleado, String id) throws Exception {
         if (empleadoRepository.existsById(String.valueOf(id))) {
             throw new Exception("Empleado ya existe");
         }
@@ -26,7 +25,7 @@ public class EmpleadoService implements IEmpleadoService {
     }
 
     @Override
-    public void eliminarEmpleado(int id) throws Exception {
+    public void eliminarEmpleado(String id) throws Exception {
         if (!empleadoRepository.existsById(String.valueOf(id))) {
             throw new Exception("Empleado no encontrado");
         }

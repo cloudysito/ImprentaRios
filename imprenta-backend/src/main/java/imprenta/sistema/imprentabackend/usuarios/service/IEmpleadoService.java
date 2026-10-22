@@ -6,8 +6,8 @@ import java.util.List;
 
 public interface IEmpleadoService {
 
-    Empleado agregarEmpleado(Empleado empleado, int id) throws Exception;
-    void eliminarEmpleado(int id) throws Exception;
+    Empleado agregarEmpleado(Empleado empleado, String id) throws Exception;
+    void eliminarEmpleado(String id) throws Exception;
     Empleado obtenerEmpleado(String id) throws Exception;
     List<Empleado> listarEmpleados() throws Exception;
     Empleado actualizarEmpleado(Empleado empleado, String id) throws Exception;
