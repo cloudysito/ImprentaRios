@@ -1,4 +1,4 @@
-package imprenta.sistema.imprentabackend.pedidos.service;
+package imprenta.sistema.imprentabackend.pedidos.service.impl;
 
 import imprenta.sistema.imprentabackend.pedidos.model.Producto;
 import imprenta.sistema.imprentabackend.pedidos.repository.ProductoRepository;
