@@ -1,6 +1,6 @@
 package imprenta.sistema.imprentabackend.pedidos.service.impl;
 
-import imprenta.sistema.imprentabackend.inventario.service.InsumoService;
+import imprenta.sistema.imprentabackend.inventario.service.impl.InsumoService;
 import imprenta.sistema.imprentabackend.pedidos.model.Cliente;
 import imprenta.sistema.imprentabackend.pedidos.model.EstadoPedido;
 import imprenta.sistema.imprentabackend.pedidos.model.Pedido;

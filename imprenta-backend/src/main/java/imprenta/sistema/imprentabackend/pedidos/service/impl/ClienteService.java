@@ -2,16 +2,16 @@ package imprenta.sistema.imprentabackend.pedidos.service.impl;
 
 import imprenta.sistema.imprentabackend.pedidos.model.Cliente;
 import imprenta.sistema.imprentabackend.pedidos.repository.ClienteRepository;
+import imprenta.sistema.imprentabackend.pedidos.service.IClienteService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ClienteService {
+@RequiredArgsConstructor
+public class ClienteService implements IClienteService {
     private final ClienteRepository clienteRepository;
 
-    public ClienteService(ClienteRepository clienteRepository) {
-        this.clienteRepository = clienteRepository;
-    }
-
+    @Override
     public Cliente crearCliente(Cliente cliente){
 
         //Validaciones

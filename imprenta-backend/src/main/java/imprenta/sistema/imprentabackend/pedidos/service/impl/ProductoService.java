@@ -2,16 +2,16 @@ package imprenta.sistema.imprentabackend.pedidos.service.impl;
 
 import imprenta.sistema.imprentabackend.pedidos.model.Producto;
 import imprenta.sistema.imprentabackend.pedidos.repository.ProductoRepository;
+import imprenta.sistema.imprentabackend.pedidos.service.IProductoService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
-public class ProductoService {
+@RequiredArgsConstructor
+public class ProductoService implements IProductoService {
     private final ProductoRepository productoRepository;
 
-    public ProductoService(ProductoRepository productoRepository) {
-        this.productoRepository = productoRepository;
-    }
-
+    @Override
     public Producto registrarProducto(Producto producto, String pedidoId){
 
         //Validaciones

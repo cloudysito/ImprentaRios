@@ -1,20 +1,22 @@
-package imprenta.sistema.imprentabackend.inventario.service;
+package imprenta.sistema.imprentabackend.inventario.service.impl;
 
 import imprenta.sistema.imprentabackend.inventario.model.Insumo;
 import imprenta.sistema.imprentabackend.inventario.repository.InsumoRepository;
 import imprenta.sistema.imprentabackend.inventario.repository.MaterialRepository;
+import imprenta.sistema.imprentabackend.inventario.service.IInsumoService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 
 @Service
-public class InsumoService {
+@Transactional
+@RequiredArgsConstructor
+public class InsumoService implements IInsumoService {
     private final InsumoRepository insumoRepository;
     private final MaterialRepository materialRepository;
 
-    public InsumoService(InsumoRepository insumoRepository, MaterialRepository materialRepository) {
-        this.insumoRepository = insumoRepository;
-        this.materialRepository = materialRepository;
-    }
-
+    @Override
     public boolean verificaExistencias(String insumoId, int cantidadRequerida){
 
         //Verificar existencias
@@ -25,6 +27,7 @@ public class InsumoService {
     }
 
     //Metodo que actualiza el inventario
+    @Override
     public void descontarInventario(String insumoId, int cantidadUsada){
         Insumo insumo = insumoRepository.findById(insumoId)
                 .orElseThrow(() -> new RuntimeException("ERROR: Insumo no encontrado"));
@@ -40,5 +43,9 @@ public class InsumoService {
 
         //se actualiza
         insumoRepository.save(insumo);
+    }
+    @Override
+    public Insumo agregarInsumo(Insumo insumo) {
+        return insumoRepository.save(insumo);
     }
 }
