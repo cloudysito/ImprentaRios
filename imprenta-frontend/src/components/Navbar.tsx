@@ -1,13 +1,13 @@
 import "../styles/Navbar.css";
 
 interface NavbarProps {
-    seccion: string;
+    section: string;
 }
-const Navbar = ({ seccion }: NavbarProps) => {
+const Navbar = ({ section }: NavbarProps) => {
     return (
         <header className="navbar">
             <div className="navbar__content">
-                <h1>{seccion}</h1>
+                <h1>{section}</h1>
             </div>
         </header>
     )

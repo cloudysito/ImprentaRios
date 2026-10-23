@@ -1,6 +1,5 @@
 import {
   BrowserRouter,
-  Navigate,
   Route,
   Routes,
   useLocation,
@@ -30,7 +29,7 @@ function AppLayout() {
       />
 
       <div className="content-shell">
-        <Navbar seccion={pageTitle} />
+        <Navbar section={pageTitle} />
 
         <main className="page-content">
           <Routes>
