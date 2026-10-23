@@ -1,0 +1,13 @@
+.navbar{
+    background-color: #f8f9fa;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    height: 60px;
+    border-bottom: 2px solid #dee2e6;
+    z-index: 20;
+}
+.navbar__content{
+    font-family: frauces, Georgia, serif;
+}
