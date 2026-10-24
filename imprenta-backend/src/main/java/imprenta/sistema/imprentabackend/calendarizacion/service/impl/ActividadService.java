@@ -41,6 +41,7 @@ public class ActividadService implements IActividadService {
         actividad.setEmpleadoId(actividad.getEmpleadoId());
         actividad.setFechaHoraInicio(actividad.getFechaHoraInicio());
         actividad.setFechaHoraFin(actividad.getFechaHoraFin());
+        actividad.setId(id);
         return actividadRepository.save(actividad);
     }
 

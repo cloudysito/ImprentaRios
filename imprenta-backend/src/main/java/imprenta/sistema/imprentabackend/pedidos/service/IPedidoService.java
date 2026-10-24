@@ -5,7 +5,7 @@ import imprenta.sistema.imprentabackend.pedidos.model.Pedido;
 
 public interface IPedidoService {
 
-    Pedido capturarPedido(Pedido pedido, Cliente cliente, String insumoId, int cantidadDisponible);
+    Pedido capturarPedido(Pedido pedido, Cliente cliente);
     Pedido actualizarPedido(Pedido pedido, String id) throws Exception;
 
 }

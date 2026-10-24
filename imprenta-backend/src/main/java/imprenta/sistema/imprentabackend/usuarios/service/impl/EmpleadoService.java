@@ -54,6 +54,7 @@ public class EmpleadoService implements IEmpleadoService {
         }
         empleado.setPassword(empleado.getPassword());
         empleado.setActivo(empleado.getActivo());
+        empleado.setId(id);
         return empleadoRepository.save(empleado);
     }
 }
