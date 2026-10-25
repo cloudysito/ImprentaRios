@@ -16,13 +16,21 @@ public class ActividadController {
     private final IActividadService actividadService;
 
     @PostMapping
-    public ResponseEntity<ActividadResponeDTO> agregar(@Valid @RequestBody ActividadRequestDTO dto) throws Exception {
+    public ResponseEntity<ActividadResponeDTO> agregar(@Valid @RequestBody ActividadRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(actividadService.agregarActividad(dto));
     }
 
     @PutMapping({ "/{id}"})
-    public ResponseEntity<ActividadResponeDTO> actualizar(@Valid @RequestBody ActividadRequestDTO dto, @PathVariable String id) throws Exception {
+    public ResponseEntity<ActividadResponeDTO> actualizar(@Valid @RequestBody ActividadRequestDTO dto, @PathVariable String id) {
         return ResponseEntity.status(HttpStatus.OK).body(actividadService.actualizarActividad(id,dto));
     }
+    @GetMapping({ "/{id}"})
+    public ResponseEntity<ActividadResponeDTO> buscarActividad(@PathVariable String id) {
+        return ResponseEntity.status(HttpStatus.OK).body(actividadService.buscarActividad(id));
+    }
 
+    @DeleteMapping({ "/{id}"})
+    public void eliminarActividad(@PathVariable String id) {
+        actividadService.eliminarActividad(id);
+    }
 }
