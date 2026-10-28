@@ -1,12 +1,10 @@
 package imprenta.sistema.imprentabackend.usuarios.service.impl;
 
-
 import imprenta.sistema.imprentabackend.usuarios.model.Empleado;
 import imprenta.sistema.imprentabackend.usuarios.repository.EmpleadoRepository;
 import imprenta.sistema.imprentabackend.usuarios.service.IEmpleadoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,44 +15,55 @@ public class EmpleadoService implements IEmpleadoService {
     private final EmpleadoRepository empleadoRepository;
 
     @Override
-    public Empleado agregarEmpleado(Empleado empleado, String id) throws Exception {
-        if (empleadoRepository.existsById(String.valueOf(id))) {
-            throw new Exception("Empleado ya existe");
+    public Empleado agregarEmpleado(Empleado empleado) {
+        if (empleadoRepository.findByUsuario(empleado.getUsuario()) != null) {
+            throw new IllegalArgumentException("El nombre de usuario ya está registrado");
         }
+        empleado.setActivo(true);
         return empleadoRepository.save(empleado);
     }
 
     @Override
-    public void eliminarEmpleado(String id) throws Exception {
-        if (!empleadoRepository.existsById(String.valueOf(id))) {
-            throw new Exception("Empleado no encontrado");
+    public void eliminarEmpleado(String id) {
+        if (!empleadoRepository.existsById(id)) {
+            throw new IllegalArgumentException("Empleado no encontrado");
         }
-        System.out.println("Empleado eliminado");
-        empleadoRepository.deleteById(String.valueOf(id));
+        empleadoRepository.deleteById(id);
     }
 
     @Override
-    public Empleado obtenerEmpleado(String id) throws Exception {
-        if (!empleadoRepository.existsById(String.valueOf(id))) {
-            throw new Exception("Empleado no encontrado");
-        }
-        System.out.println("Empleado encontrado");
-        return empleadoRepository.findById(String.valueOf(id)).orElse(null);
+    public Empleado obtenerEmpleado(String id) {
+        return empleadoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Empleado no encontrado"));
     }
 
     @Override
-    public List<Empleado> listarEmpleados() throws Exception {
+    public List<Empleado> listarEmpleados() {
         return empleadoRepository.findAll();
     }
 
     @Override
-    public Empleado actualizarEmpleado(Empleado empleado, String id) throws Exception {
-        if (!empleadoRepository.existsById(String.valueOf(id))) {
-            throw new Exception("Empleado no encontrado");
+    public Empleado actualizarEmpleado(Empleado empleado, String id) {
+        Empleado empleadoExistente = empleadoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Empleado no encontrado"));
+
+        empleadoExistente.setNombre(empleado.getNombre());
+        empleadoExistente.setUsuario(empleado.getUsuario());
+        empleadoExistente.setPassword(empleado.getPassword());
+        empleadoExistente.setRol(empleado.getRol());
+        empleadoExistente.setActivo(empleado.getActivo());
+
+        return empleadoRepository.save(empleadoExistente);
+    }
+
+    public Empleado autenticarEmpleado(String usuario, String password) {
+        Empleado empleado = empleadoRepository.findByUsuario(usuario);
+        if (empleado == null || !empleado.getPassword().equals(password)) {
+            throw new IllegalArgumentException("Credenciales inválidas");
         }
-        empleado.setPassword(empleado.getPassword());
-        empleado.setActivo(empleado.getActivo());
-        empleado.setId(id);
-        return empleadoRepository.save(empleado);
+        if (!empleado.getActivo()) {
+            throw new IllegalArgumentException("El usuario está inactivo");
+        }
+        return empleado;
     }
 }
