@@ -15,7 +15,8 @@ public enum CodigoError {
     PRODUCTO_NO_ENCONTRADO(HttpStatus.NOT_FOUND, "Producto no encontrado"),
     TIPO_PRODUCTO_NO_ENCONTRADO(HttpStatus.NOT_FOUND, "Tipo producto no encontrado"),
     MATERIAL_NO_ENCONTRADO(HttpStatus.NOT_FOUND, "Material no encontrado"),
-    ;
+    INSUMO_NO_ENCONTRADO(HttpStatus.NOT_FOUND, "Insumo no encontrado"),
+    INVENTARIO_INSUFICIENTE(HttpStatus.CONFLICT, "Inventario insuficiente");
 
     private final HttpStatus status;
     private final String mensaje;
