@@ -1,5 +1,8 @@
 package imprenta.sistema.imprentabackend.usuarios.controller;
 
+import imprenta.sistema.imprentabackend.auth.JwtService;
+import imprenta.sistema.imprentabackend.auth.dto.LoginRequest;
+import imprenta.sistema.imprentabackend.auth.dto.LoginResponse;
 import imprenta.sistema.imprentabackend.usuarios.dtos.EmpleadoRequestDTO;
 import imprenta.sistema.imprentabackend.usuarios.dtos.EmpleadoResponseDTO;
 import imprenta.sistema.imprentabackend.usuarios.service.IEmpleadoService;
@@ -16,10 +19,23 @@ import java.util.List;
 @RequiredArgsConstructor
 public class EmpleadoController {
     private final IEmpleadoService empleadoService;
+    private final JwtService jwtService;
 
     @PostMapping("/login")
-    public ResponseEntity<EmpleadoResponseDTO> autenticar(@RequestParam String usuario, @RequestParam String password) {
-        return ResponseEntity.ok(empleadoService.autenticarEmpleado(usuario, password));
+    public ResponseEntity<LoginResponse> autenticar(@RequestBody LoginRequest request) {
+        EmpleadoResponseDTO empleado = empleadoService.autenticarEmpleado(
+                request.usuario(),
+                request.password()
+        );
+
+        String token = jwtService.generarToken(
+                empleado.usuario(),
+                empleado.rol().name(),
+                empleado.nombre(),
+                empleado.id()
+        );
+
+        return ResponseEntity.ok(new LoginResponse(token, empleado));
     }
 
     @PostMapping

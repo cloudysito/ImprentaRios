@@ -18,7 +18,6 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class EmpleadoService implements IEmpleadoService {
-
     private final EmpleadoRepository empleadoRepository;
     private final PasswordEncoder passwordEncoder;
 
