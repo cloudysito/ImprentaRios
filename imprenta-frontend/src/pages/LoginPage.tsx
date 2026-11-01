@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { AlertCircle, Eye, EyeOff } from "lucide-react";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 import "../styles/LoginPage.css";
 
 const LoginPage = () => {
@@ -15,7 +15,7 @@ const LoginPage = () => {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Si ya hay sesión (o el login salió bien) se va a la página que quería
+
   if (user) {
     return <Navigate to={from} replace />;
   }

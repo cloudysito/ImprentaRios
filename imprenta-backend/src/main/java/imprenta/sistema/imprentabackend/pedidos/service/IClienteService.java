@@ -2,7 +2,6 @@ package imprenta.sistema.imprentabackend.pedidos.service;
 
 import imprenta.sistema.imprentabackend.pedidos.dtos.ClienteRequestDTO;
 import imprenta.sistema.imprentabackend.pedidos.dtos.ClienteResponseDTO;
-import imprenta.sistema.imprentabackend.pedidos.model.Cliente;
 
 public interface IClienteService {
     ClienteResponseDTO crearCliente(ClienteRequestDTO dto);

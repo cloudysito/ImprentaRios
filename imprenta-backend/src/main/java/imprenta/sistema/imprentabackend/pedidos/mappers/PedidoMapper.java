@@ -5,8 +5,6 @@ import imprenta.sistema.imprentabackend.pedidos.dtos.PedidoResponseDTO;
 import imprenta.sistema.imprentabackend.pedidos.model.EstadoPedido;
 import imprenta.sistema.imprentabackend.pedidos.model.Pedido;
 
-import java.util.Collections;
-import java.util.stream.Collectors;
 
 public final class PedidoMapper {
     private PedidoMapper() {}

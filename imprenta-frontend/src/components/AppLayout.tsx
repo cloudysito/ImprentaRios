@@ -1,7 +1,7 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
 import Sidebar from "./SideBar";
 import Navbar from "./Navbar";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../hooks/useAuth";
 import { rolLabels } from "../services/authService";
 
 interface RouteMeta {
@@ -13,7 +13,7 @@ const routeMeta: Record<string, RouteMeta> = {
   "/": { seccion: "Inicio", titulo: "Dashboard" },
   "/calendario": { seccion: "Calendario", titulo: "Generar calendario" },
   "/cronograma": { seccion: "Cronograma", titulo: "Consultar cronograma" },
-  "/pedidos": { seccion: "Pedidos", titulo: "Gestionar pedidos" },
+  "/pedidos": { seccion: "Seguimiento administrativo", titulo: "Gestionar pedidos" },
   "/pedidos/nuevo": { seccion: "Pedidos", titulo  : "Capturar pedido" },
 };
 

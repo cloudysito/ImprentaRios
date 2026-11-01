@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 import Sidebar from "./components/SideBar";
 import Navbar from "./components/Navbar";
+import GestionarPedidosPage from "./pages/GestionarPedidosPage";
 
 interface RouteMeta {
   seccion?: string;
@@ -16,7 +17,7 @@ const routeMeta: Record<string, RouteMeta> = {
   "/": { seccion: "Inicio", titulo: "Dashboard" },
   "/calendario": { seccion: "Calendario", titulo: "Generar calendario" },
   "/cronograma": { seccion: "Cronograma", titulo: "Consultar cronograma" },
-  "/pedidos": { seccion: "Pedidos", titulo: "Gestionar pedidos" },
+  "/pedidos": { seccion: "Seguimiento administrativo", titulo: "Gestionar pedidos" },
   "/pedidos/nuevo": { seccion: "Pedidos", titulo: "Capturar pedido" },
 };
 
@@ -44,7 +45,7 @@ function AppLayout() {
             <Route path="/"/>
             <Route path="/calendario"/>
             <Route path="/cronograma" />
-            <Route path="/pedidos"/>
+            <Route path="/pedidos" element={<GestionarPedidosPage />} />
             <Route path="/pedidos/nuevo" />
             <Route path="*"/>
           </Routes>

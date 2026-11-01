@@ -1,3 +1,4 @@
+import { useState } from "react";
 import "../styles/Navbar.css";
 
 interface NavbarProps {
@@ -13,7 +14,8 @@ const formatDate = (date: Date) => {
   return `${weekday.charAt(0).toUpperCase()}${weekday.slice(1)} ${date.getDate()} de ${month}`;
 };
 
-const Navbar = ({ seccion, titulo, userName, fecha = new Date() }: NavbarProps) => {
+const Navbar = ({ seccion, titulo, userName, fecha }: NavbarProps) => {
+  const [hoy] = useState(() => new Date());
   const firstName = userName?.trim().split(/\s+/)[0];
 
   return (
@@ -25,7 +27,7 @@ const Navbar = ({ seccion, titulo, userName, fecha = new Date() }: NavbarProps) 
 
       <div className="navbar__user">
         {firstName && <span className="navbar__greeting">Hola, {firstName}</span>}
-        <span className="navbar__date">{formatDate(fecha)}</span>
+        <span className="navbar__date">{formatDate(fecha ?? hoy)}</span>
       </div>
     </header>
   );

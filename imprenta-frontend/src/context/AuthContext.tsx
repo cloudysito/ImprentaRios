@@ -1,15 +1,8 @@
-import { createContext, useContext, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { login as loginRequest, type Empleado } from "../services/authService";
-
-interface AuthContextValue {
-  user: Empleado | null;
-  login: (usuario: string, password: string) => Promise<void>;
-  logout: () => void;
-}
+import { AuthContext } from "../hooks/useAuth";
 
 const STORAGE_KEY = "imprenta.user";
-
-const AuthContext = createContext<AuthContextValue | null>(null);
 
 const readStoredUser = (): Empleado | null => {
   try {
@@ -46,12 +39,4 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       {children}
     </AuthContext.Provider>
   );
-}
-
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth debe usarse dentro de <AuthProvider>");
-  }
-  return context;
 }

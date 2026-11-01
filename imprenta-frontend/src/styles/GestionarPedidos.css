@@ -1,0 +1,26 @@
+/* Dos columnas, la lista se estira y el detalle mide 316px */
+.gestionar-pedidos {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 316px;
+    gap: 20px;
+    align-items: start;
+}
+
+.gestionar-pedidos__lista {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    min-width: 0;
+}
+
+/* En pantallas angostas el detalle baja debajo de la tabla */
+@media (max-width: 1100px) {
+    .gestionar-pedidos {
+        grid-template-columns: 1fr;
+    }
+
+    .detalle-folio {
+        position: static;
+        min-height: 0;
+    }
+}
