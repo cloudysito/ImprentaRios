@@ -1,4 +1,4 @@
-package imprenta.sistema.imprentabackend.pedidos.service.controllers;
+package imprenta.sistema.imprentabackend.pedidos.controller;
 
 import imprenta.sistema.imprentabackend.pedidos.dtos.ArchivoDisenioRequestDTO;
 import imprenta.sistema.imprentabackend.pedidos.dtos.ArchivoDisenioResponseDTO;
