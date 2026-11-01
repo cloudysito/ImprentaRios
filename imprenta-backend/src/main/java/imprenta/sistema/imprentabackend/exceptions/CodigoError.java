@@ -17,7 +17,12 @@ public enum CodigoError {
     MATERIAL_NO_ENCONTRADO(HttpStatus.NOT_FOUND, "Material no encontrado"),
     INSUMO_NO_ENCONTRADO(HttpStatus.NOT_FOUND, "Insumo no encontrado"),
     INVENTARIO_INSUFICIENTE(HttpStatus.CONFLICT, "Inventario insuficiente"),
-    TRANSICION_ESTADO_INVALIDA(HttpStatus.CONFLICT, "Solo se puede entregar un pedido terminado");
+    TRANSICION_ESTADO_INVALIDA(HttpStatus.CONFLICT, "Solo se puede entregar un pedido terminado"),
+    EMPLEADO_NO_ENCONTRADO(HttpStatus.NOT_FOUND, "Empleado no encontrado"),
+    USUARIO_YA_REGISTRADO(HttpStatus.CONFLICT, "El nombre de usuario ya está registrado"),
+    PASSWORD_REQUERIDA(HttpStatus.BAD_REQUEST, "La contraseña es obligatoria"),
+    CREDENCIALES_INVALIDAS(HttpStatus.UNAUTHORIZED, "Usuario o contraseña incorrectos"),
+    EMPLEADO_INACTIVO(HttpStatus.FORBIDDEN, "El usuario está inactivo");
 
     private final HttpStatus status;
     private final String mensaje;

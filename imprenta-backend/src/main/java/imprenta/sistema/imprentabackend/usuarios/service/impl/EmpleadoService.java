@@ -1,9 +1,16 @@
 package imprenta.sistema.imprentabackend.usuarios.service.impl;
 
+import imprenta.sistema.imprentabackend.exceptions.CodigoError;
+import imprenta.sistema.imprentabackend.exceptions.NegocioException;
+import imprenta.sistema.imprentabackend.usuarios.dtos.EmpleadoRequestDTO;
+import imprenta.sistema.imprentabackend.usuarios.dtos.EmpleadoResponseDTO;
+import imprenta.sistema.imprentabackend.usuarios.mapper.EmpleadoMapper;
 import imprenta.sistema.imprentabackend.usuarios.model.Empleado;
 import imprenta.sistema.imprentabackend.usuarios.repository.EmpleadoRepository;
 import imprenta.sistema.imprentabackend.usuarios.service.IEmpleadoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DuplicateKeyException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,57 +20,105 @@ import java.util.List;
 public class EmpleadoService implements IEmpleadoService {
 
     private final EmpleadoRepository empleadoRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
-    public Empleado agregarEmpleado(Empleado empleado) {
-        if (empleadoRepository.findByUsuario(empleado.getUsuario()) != null) {
-            throw new IllegalArgumentException("El nombre de usuario ya está registrado");
+    public EmpleadoResponseDTO agregarEmpleado(EmpleadoRequestDTO dto) {
+        if (dto.password() == null || dto.password().isBlank()) {
+            throw new NegocioException(CodigoError.PASSWORD_REQUERIDA);
         }
+        if (empleadoRepository.existsByUsuario(dto.usuario())) {
+            throw new NegocioException(CodigoError.USUARIO_YA_REGISTRADO);
+        }
+
+        Empleado empleado = new Empleado();
+        empleado.setNombre(dto.nombre());
+        empleado.setUsuario(dto.usuario());
+        empleado.setPassword(passwordEncoder.encode(dto.password()));
+        empleado.setRol(dto.rol());
         empleado.setActivo(true);
-        return empleadoRepository.save(empleado);
+
+        return EmpleadoMapper.toResponse(guardar(empleado));
     }
 
     @Override
     public void eliminarEmpleado(String id) {
-        if (!empleadoRepository.existsById(id)) {
-            throw new IllegalArgumentException("Empleado no encontrado");
+        empleadoRepository.delete(buscarPorId(id));
+    }
+
+    @Override
+    public EmpleadoResponseDTO obtenerEmpleado(String id) {
+        return EmpleadoMapper.toResponse(buscarPorId(id));
+    }
+
+    @Override
+    public List<EmpleadoResponseDTO> listarEmpleados() {
+        return empleadoRepository.findAll().stream()
+                .map(EmpleadoMapper::toResponse)
+                .toList();
+    }
+
+    @Override
+    public EmpleadoResponseDTO actualizarEmpleado(String id, EmpleadoRequestDTO dto) {
+        Empleado existente = buscarPorId(id);
+
+        Empleado conMismoUsuario = empleadoRepository.findByUsuario(dto.usuario());
+        if (conMismoUsuario != null && !conMismoUsuario.getId().equals(id)) {
+            throw new NegocioException(CodigoError.USUARIO_YA_REGISTRADO);
         }
-        empleadoRepository.deleteById(id);
+
+        existente.setNombre(dto.nombre());
+        existente.setUsuario(dto.usuario());
+        existente.setRol(dto.rol());
+        if (dto.activo() != null) {
+            existente.setActivo(dto.activo());
+        }
+        if (dto.password() != null && !dto.password().isBlank()) {
+            existente.setPassword(passwordEncoder.encode(dto.password()));
+        }
+
+        return EmpleadoMapper.toResponse(guardar(existente));
     }
 
     @Override
-    public Empleado obtenerEmpleado(String id) {
-        return empleadoRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Empleado no encontrado"));
-    }
-
-    @Override
-    public List<Empleado> listarEmpleados() {
-        return empleadoRepository.findAll();
-    }
-
-    @Override
-    public Empleado actualizarEmpleado(Empleado empleado, String id) {
-        Empleado empleadoExistente = empleadoRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Empleado no encontrado"));
-
-        empleadoExistente.setNombre(empleado.getNombre());
-        empleadoExistente.setUsuario(empleado.getUsuario());
-        empleadoExistente.setPassword(empleado.getPassword());
-        empleadoExistente.setRol(empleado.getRol());
-        empleadoExistente.setActivo(empleado.getActivo());
-
-        return empleadoRepository.save(empleadoExistente);
-    }
-
-    public Empleado autenticarEmpleado(String usuario, String password) {
+    public EmpleadoResponseDTO autenticarEmpleado(String usuario, String password) {
         Empleado empleado = empleadoRepository.findByUsuario(usuario);
-        if (empleado == null || !empleado.getPassword().equals(password)) {
-            throw new IllegalArgumentException("Credenciales inválidas");
+        if (empleado == null || !passwordCorrecta(empleado, password)) {
+            throw new NegocioException(CodigoError.CREDENCIALES_INVALIDAS);
         }
-        if (!empleado.getActivo()) {
-            throw new IllegalArgumentException("El usuario está inactivo");
+        if (!Boolean.TRUE.equals(empleado.getActivo())) {
+            throw new NegocioException(CodigoError.EMPLEADO_INACTIVO);
         }
-        return empleado;
+        return EmpleadoMapper.toResponse(empleado);
+    }
+
+    private boolean passwordCorrecta(Empleado empleado, String password) {
+        String guardada = empleado.getPassword();
+        if (guardada == null || password == null) {
+            return false;
+        }
+        if (guardada.startsWith("$2")) {
+            return passwordEncoder.matches(password, guardada);
+        }
+
+        if (guardada.equals(password)) {
+            empleado.setPassword(passwordEncoder.encode(password));
+            empleadoRepository.save(empleado);
+            return true;
+        }
+        return false;
+    }
+
+    private Empleado buscarPorId(String id) {
+        return empleadoRepository.findById(id)
+                .orElseThrow(() -> new NegocioException(CodigoError.EMPLEADO_NO_ENCONTRADO));
+    }
+
+    private Empleado guardar(Empleado empleado) {
+        try {
+            return empleadoRepository.save(empleado);
+        } catch (DuplicateKeyException e) {
+            throw new NegocioException(CodigoError.USUARIO_YA_REGISTRADO);
+        }
     }
 }

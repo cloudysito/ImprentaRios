@@ -1,8 +1,11 @@
 package imprenta.sistema.imprentabackend.usuarios.controller;
 
-import imprenta.sistema.imprentabackend.usuarios.model.Empleado;
+import imprenta.sistema.imprentabackend.usuarios.dtos.EmpleadoRequestDTO;
+import imprenta.sistema.imprentabackend.usuarios.dtos.EmpleadoResponseDTO;
 import imprenta.sistema.imprentabackend.usuarios.service.IEmpleadoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,33 +18,32 @@ public class EmpleadoController {
     private final IEmpleadoService empleadoService;
 
     @PostMapping("/login")
-    public ResponseEntity<Empleado> autenticar(@RequestParam String usuario, @RequestParam String password) throws Exception {
-        Empleado empleado = empleadoService.autenticarEmpleado(usuario, password);
-        return ResponseEntity.ok(empleado);
+    public ResponseEntity<EmpleadoResponseDTO> autenticar(@RequestParam String usuario, @RequestParam String password) {
+        return ResponseEntity.ok(empleadoService.autenticarEmpleado(usuario, password));
     }
 
     @PostMapping
-    public ResponseEntity<Empleado> crear(@RequestBody Empleado empleado) throws Exception {
-        return ResponseEntity.ok(empleadoService.agregarEmpleado(empleado));
+    public ResponseEntity<EmpleadoResponseDTO> crear(@Valid @RequestBody EmpleadoRequestDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(empleadoService.agregarEmpleado(dto));
     }
 
     @GetMapping
-    public ResponseEntity<List<Empleado>> listar() throws Exception {
+    public ResponseEntity<List<EmpleadoResponseDTO>> listar() {
         return ResponseEntity.ok(empleadoService.listarEmpleados());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Empleado> obtener(@PathVariable String id) throws Exception {
+    public ResponseEntity<EmpleadoResponseDTO> obtener(@PathVariable String id) {
         return ResponseEntity.ok(empleadoService.obtenerEmpleado(id));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Empleado> actualizar(@PathVariable String id, @RequestBody Empleado empleado) throws Exception {
-        return ResponseEntity.ok(empleadoService.actualizarEmpleado(empleado, id));
+    public ResponseEntity<EmpleadoResponseDTO> actualizar(@PathVariable String id, @Valid @RequestBody EmpleadoRequestDTO dto) {
+        return ResponseEntity.ok(empleadoService.actualizarEmpleado(id, dto));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Empleado> eliminar(@PathVariable String id) throws Exception {
+    public ResponseEntity<Void> eliminar(@PathVariable String id) {
         empleadoService.eliminarEmpleado(id);
         return ResponseEntity.noContent().build();
     }
