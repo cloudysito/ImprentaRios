@@ -1,11 +1,10 @@
 import React from 'react';
-import '../styles/capturarPedido.css';
+import '../styles/CapturarPedido.css';
 
 const CapturarPedido: React.FC = () => {
     return (
         <div className="capturar-pedido-container">
             <div className="content-grid">
-                {/* Columna Izquierda: Formulario Principal */}
                 <section className="form-card">
                     <div className="section-header">
                         <h2>DATOS DEL CLIENTE</h2>
@@ -40,7 +39,6 @@ const CapturarPedido: React.FC = () => {
                             <label>Tipo de producto <span>*</span></label>
                             <select name="tipoProductoId" defaultValue="">
                                 <option value="" disabled>Seleccionar...</option>
-                                {/* Opciones a cargar dinámicamente desde la BD */}
                             </select>
                         </div>
                         <div className="form-group">
@@ -51,7 +49,6 @@ const CapturarPedido: React.FC = () => {
                             <label>Material <span>*</span></label>
                             <select name="materialId" defaultValue="">
                                 <option value="" disabled>Seleccionar...</option>
-                                {/* Opciones a cargar dinámicamente desde la BD */}
                             </select>
                         </div>
                     </div>
@@ -65,14 +62,12 @@ const CapturarPedido: React.FC = () => {
                             <label>Tintas <span>*</span></label>
                             <select name="tintaId" defaultValue="">
                                 <option value="" disabled>Seleccionar...</option>
-                                {/* Opciones a cargar dinámicamente desde la BD */}
                             </select>
                         </div>
                         <div className="form-group">
                             <label>Acabado</label>
                             <select name="acabadoId" defaultValue="">
                                 <option value="" disabled>Seleccionar...</option>
-                                {/* Opciones a cargar dinámicamente desde la BD */}
                             </select>
                         </div>
                     </div>
@@ -87,12 +82,10 @@ const CapturarPedido: React.FC = () => {
                         <label>Archivo de diseño (opcional)</label>
                         <select name="archivoDisenioId" defaultValue="">
                             <option value="" disabled>Seleccionar archivo registrado...</option>
-                            {/* Opciones a cargar dinámicamente desde la BD */}
                         </select>
                     </div>
                 </section>
 
-                {/* Columna Derecha: Resumen y Acciones */}
                 <aside className="summary-sidebar">
                     <div className="summary-card">
                         <h3>FOLIO</h3>

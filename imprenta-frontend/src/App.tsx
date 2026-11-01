@@ -6,7 +6,8 @@ import {
 } from "react-router-dom";
 import Sidebar from "./components/SideBar";
 import Navbar from "./components/Navbar";
-import CapturarPedido from "./pages/capturarPedido";
+import CapturarPedido from "./pages/CapturarPedido.tsx";
+import RegistrarDisenio from "./pages/RegistrarArchivoDiseno.tsx";
 
 const routeTitles: Record<string, string> = {
   "/": "Dashboard",
@@ -14,6 +15,7 @@ const routeTitles: Record<string, string> = {
   "/cronograma": "Cronograma",
   "/pedidos": "Pedidos",
   "/pedidos/nuevo": "Nuevo pedido",
+  "/archivos-de-diseno/registrar": "Registrar archivo de diseño"
 };
 
 function AppLayout() {
@@ -39,6 +41,7 @@ function AppLayout() {
             <Route path="/cronograma" />
             <Route path="/pedidos"/>
             <Route path="/pedidos/nuevo" element={<CapturarPedido />} />
+            <Route path="/archivos-de-diseno/registrar" element={<RegistrarDisenio />} />
             <Route path="*"/>
           </Routes>
         </main>
