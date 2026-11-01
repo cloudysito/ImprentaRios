@@ -1,4 +1,4 @@
-package imprenta.sistema.imprentabackend.pedidos.controllers;
+package imprenta.sistema.imprentabackend.pedidos.controller;
 
 import imprenta.sistema.imprentabackend.pedidos.dtos.CambioEstadoDTO;
 import imprenta.sistema.imprentabackend.pedidos.dtos.PedidoDetalleDTO;
