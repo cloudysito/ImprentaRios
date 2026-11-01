@@ -6,6 +6,7 @@ import {
 } from "react-router-dom";
 import Sidebar from "./components/SideBar";
 import Navbar from "./components/Navbar";
+import CapturarPedido from "./pages/capturarPedido";
 
 const routeTitles: Record<string, string> = {
   "/": "Dashboard",
@@ -37,7 +38,7 @@ function AppLayout() {
             <Route path="/calendario"/>
             <Route path="/cronograma" />
             <Route path="/pedidos"/>
-            <Route path="/pedidos/nuevo" />
+            <Route path="/pedidos/nuevo" element={<CapturarPedido />} />
             <Route path="*"/>
           </Routes>
         </main>
