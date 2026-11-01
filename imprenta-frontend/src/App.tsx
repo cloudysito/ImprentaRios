@@ -7,29 +7,37 @@ import {
 import Sidebar from "./components/SideBar";
 import Navbar from "./components/Navbar";
 
-const routeTitles: Record<string, string> = {
-  "/": "Dashboard",
-  "/calendario": "Calendario",
-  "/cronograma": "Cronograma",
-  "/pedidos": "Pedidos",
-  "/pedidos/nuevo": "Nuevo pedido",
+interface RouteMeta {
+  seccion?: string;
+  titulo: string;
+}
+
+const routeMeta: Record<string, RouteMeta> = {
+  "/": { seccion: "Inicio", titulo: "Dashboard" },
+  "/calendario": { seccion: "Calendario", titulo: "Generar calendario" },
+  "/cronograma": { seccion: "Cronograma", titulo: "Consultar cronograma" },
+  "/pedidos": { seccion: "Pedidos", titulo: "Gestionar pedidos" },
+  "/pedidos/nuevo": { seccion: "Pedidos", titulo: "Capturar pedido" },
 };
+
+const currentUser = { name: "Marisol Ruiz", role: "Secretaria" };
 
 function AppLayout() {
   const location = useLocation();
-  const pageTitle = routeTitles[location.pathname] ?? "Imprenta Ríos";
+  const { seccion, titulo } = routeMeta[location.pathname] ?? { titulo: "Imprenta Ríos" };
 
   return (
     <div className="app-shell">
       <Sidebar
-        userName="John Doe"
-        userRole="Admin"
+        userName={currentUser.name}
+        userRole={currentUser.role}
         sidebarOpen={true}
         onCloseSidebar={() => console.log("Sidebar closed")}
+        onLogout={() => console.log("Cerrar sesión")}
       />
 
       <div className="content-shell">
-        <Navbar section={pageTitle} />
+        <Navbar seccion={seccion} titulo={titulo} userName={currentUser.name} />
 
         <main className="page-content">
           <Routes>

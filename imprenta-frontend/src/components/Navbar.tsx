@@ -1,15 +1,33 @@
 import "../styles/Navbar.css";
 
 interface NavbarProps {
-    section: string;
+  seccion?: string;
+  titulo: string;
+  userName?: string;
+  fecha?: Date;
 }
-const Navbar = ({ section }: NavbarProps) => {
-    return (
-        <header className="navbar">
-            <div className="navbar__content">
-                <h1>{section}</h1>
-            </div>
-        </header>
-    )
-}
+
+const formatDate = (date: Date) => {
+  const weekday = date.toLocaleDateString("es-MX", { weekday: "long" });
+  const month = date.toLocaleDateString("es-MX", { month: "long" });
+  return `${weekday.charAt(0).toUpperCase()}${weekday.slice(1)} ${date.getDate()} de ${month}`;
+};
+
+const Navbar = ({ seccion, titulo, userName, fecha = new Date() }: NavbarProps) => {
+  const firstName = userName?.trim().split(/\s+/)[0];
+
+  return (
+    <header className="navbar">
+      <div className="navbar__heading">
+        {seccion && <span className="navbar__section">{seccion}</span>}
+        <h1 className="navbar__title">{titulo}</h1>
+      </div>
+
+      <div className="navbar__user">
+        {firstName && <span className="navbar__greeting">Hola, {firstName}</span>}
+        <span className="navbar__date">{formatDate(fecha)}</span>
+      </div>
+    </header>
+  );
+};
 export default Navbar;
