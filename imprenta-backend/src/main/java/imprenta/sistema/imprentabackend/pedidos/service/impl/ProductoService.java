@@ -22,6 +22,7 @@ public class ProductoService implements IProductoService {
 
     @Override
     public ProductoResponseDTO registrarProducto(ProductoRequestDTO dto) {
+        validarRelaciones(dto.tipoProductoId(), dto.materialId());
         Producto guardado = productoRepository.save(ProductoMapper.toEntity(dto));
         return ProductoMapper.toResponse(guardado);
     }

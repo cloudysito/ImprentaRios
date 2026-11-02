@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/actividad")
+@RequestMapping("/api/actividad")
 @RequiredArgsConstructor
 public class ActividadController {
     private final IActividadService actividadService;

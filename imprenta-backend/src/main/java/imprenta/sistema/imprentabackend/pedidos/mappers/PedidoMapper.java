@@ -5,9 +5,8 @@ import imprenta.sistema.imprentabackend.pedidos.dtos.PedidoResponseDTO;
 import imprenta.sistema.imprentabackend.pedidos.model.EstadoPedido;
 import imprenta.sistema.imprentabackend.pedidos.model.Pedido;
 
-
 public final class PedidoMapper {
-    private PedidoMapper() {}
+    private PedidoMapper() { }
 
     public static Pedido toEntity(PedidoRequestDTO dto) {
         Pedido pedido = new Pedido();
@@ -19,10 +18,21 @@ public final class PedidoMapper {
         pedido.setFolio(dto.folio());
         pedido.setFechaRegistro(dto.fechaRegistro());
         pedido.setFechaEntrega(dto.fechaEntrega());
-        pedido.setEstado(dto.estado() != null ? EstadoPedido.valueOf(dto.estado()) : null);
+        pedido.setEstado(
+                dto.estado() != null
+                        ? EstadoPedido.valueOf(dto.estado())
+                        : null
+        );
         pedido.setNombreProyecto(dto.nombreProyecto());
         pedido.setClienteId(dto.clienteId());
         pedido.setEmpleadoId(dto.empleadoId());
+
+        pedido.setProductos(
+                dto.productos()
+                        .stream()
+                        .map(ProductoMapper::toEntity)
+                        .toList()
+        );
     }
 
     public static PedidoResponseDTO toResponse(Pedido pedido) {

@@ -10,7 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/archivo_disenio")
+@RequestMapping("/api/archivo_disenio")
 @RequiredArgsConstructor
 public class ArchivoDisenioController {
     private final IArchivoDisenioService archivoDisenioService;

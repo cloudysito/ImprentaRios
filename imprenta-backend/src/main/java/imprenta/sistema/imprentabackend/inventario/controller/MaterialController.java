@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/material")
+@RequestMapping("/api/material")
 @RequiredArgsConstructor
 public class MaterialController {
     private final IMaterialService materialService;
