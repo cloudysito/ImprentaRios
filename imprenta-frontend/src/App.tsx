@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import {
   BrowserRouter,
   Route,
@@ -33,65 +32,37 @@ function AppLayout() {
   const { seccion, titulo } = routeMeta[location.pathname] ?? { titulo: "Imprenta Ríos" };
 
   return (
-    <div className="app-shell">
-      <Sidebar
-        userName={currentUser.name}
-        userRole={currentUser.role}
-        sidebarOpen={true}
-        onCloseSidebar={() => console.log("Sidebar closed")}
-        onLogout={() => console.log("Cerrar sesión")}
-      />
-
-      <div className="content-shell">
-        <Navbar seccion={seccion} titulo={titulo} userName={currentUser.name} />
-
-        <main className="page-content">
-          <Routes>
-            <Route path="/"/>
-            <Route path="/calendario" element={<CalendarioPage />} />
-            <Route path="/cronograma" />
-            <Route path="/pedidos" element={<GestionarPedidosPage />} />
-            <Route path="/pedidos/nuevo" element={<CapturarPedido />} />
-            <Route path="/archivos-de-diseno/registrar" element={<RegistrarDisenio />} />
-            <Route path="*"/>
-          </Routes>
-        </main>
+      <div className="app-shell">
+        <Sidebar
+            userName={currentUser.name}
+            userRole={currentUser.role}
+            sidebarOpen={true}
+            onCloseSidebar={() => console.log("Sidebar closed")}
+            onLogout={() => console.log("Cerrar sesión")}
+        />
+        <div className="content-shell">
+          <Navbar seccion={seccion} titulo={titulo} userName={currentUser.name} />
+          <main className="page-content">
+            <Routes>
+              <Route path="/"/>
+              <Route path="/calendario" element={<CalendarioPage />} />
+              <Route path="/cronograma" />
+              <Route path="/pedidos" element={<GestionarPedidosPage />} />
+              <Route path="/pedidos/nuevo" element={<CapturarPedido />} />
+              <Route path="/archivos-de-diseno/registrar" element={<RegistrarDisenio />} />
+              <Route path="*"/>
+            </Routes>
+          </main>
+        </div>
       </div>
-    </div>
   );
 }
-=======
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-import AppLayout from "./components/AppLayout";
-import GestionarPedidosPage from "./pages/GestionarPedidosPage";
-import CapturarPedido from "./pages/CapturarPedido.tsx";
-import RegistrarDisenio from "./pages/RegistrarArchivoDiseno.tsx";
-import LoginPage from "./pages/LoginPage.tsx";
->>>>>>> 29b7f384a4655d985dfed9b1f4847a5131b6b61a
 
 function App() {
   return (
-    <BrowserRouter>
-<<<<<<< HEAD
-      <AppLayout />
-=======
-      <Routes>
-        <Route path={"/login"} element={<LoginPage />} />
-        <Route element={<AppLayout />}>
-          <Route path="/" />
-          <Route path="/calendario" />
-          <Route path="/cronograma" />
-          <Route path={"/pedidos"} element={<GestionarPedidosPage />} />
-          <Route path="/pedidos/nuevo" element={<CapturarPedido />} />
-          <Route
-            path="/archivos-de-diseno/registrar"
-            element={<RegistrarDisenio />}
-          />
-          <Route path="*" />
-        </Route>
-      </Routes>
->>>>>>> 29b7f384a4655d985dfed9b1f4847a5131b6b61a
-    </BrowserRouter>
+      <BrowserRouter>
+        <AppLayout />
+      </BrowserRouter>
   );
 }
 
