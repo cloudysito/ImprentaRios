@@ -37,9 +37,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/empleados/**")
                         .hasRole("DUENO")
 
-                        // Cambiar estado: dueño y manufactura
+                        // Cambiar estado: dueño, secretaria y manufactura
                         .requestMatchers(HttpMethod.PATCH, "/api/pedidos/*/estado")
-                        .hasAnyRole("DUENO", "MANUFACTURA")
+                        .hasAnyRole("DUENO", "SECRETARIA", "MANUFACTURA")
 
                         // Pedidos: consultar
                         .requestMatchers(HttpMethod.GET, "/api/pedidos/**")
@@ -109,7 +109,7 @@ public class SecurityConfig {
 
                         // Calendarización
                         .requestMatchers(HttpMethod.GET, "/api/actividad", "/api/actividad/*")
-                        .hasAnyRole("DUENO", "DISENADOR", "MANUFACTURA")
+                        .hasAnyRole("DUENO", "SECRETARIA", "DISENADOR", "MANUFACTURA")
 
                         .requestMatchers(HttpMethod.POST, "/api/actividad")
                         .hasRole("DUENO")
