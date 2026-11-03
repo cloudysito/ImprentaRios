@@ -69,6 +69,19 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/cliente/*")
                         .hasRole("DUENO")
 
+                        // Archivos de diseño
+                        .requestMatchers(HttpMethod.GET, "/api/archivo_disenio", "/api/archivo_disenio/*")
+                        .hasAnyRole("DUENO", "SECRETARIA", "DISENADOR", "MANUFACTURA")
+
+                        .requestMatchers(HttpMethod.POST, "/api/archivo_disenio")
+                        .hasAnyRole("DUENO", "DISENADOR")
+
+                        .requestMatchers(HttpMethod.PUT, "/api/archivo_disenio/*")
+                        .hasAnyRole("DUENO", "DISENADOR")
+
+                        .requestMatchers(HttpMethod.DELETE, "/api/archivo_disenio/*")
+                        .hasAnyRole("DUENO", "DISENADOR")
+
                         // Inventario
                         .requestMatchers(HttpMethod.GET, "/api/insumo", "/api/insumo/*")
                         .hasAnyRole("DUENO", "SECRETARIA", "MANUFACTURA")

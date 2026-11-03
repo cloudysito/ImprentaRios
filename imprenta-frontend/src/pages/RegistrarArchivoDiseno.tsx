@@ -1,7 +1,53 @@
-import React from 'react';
+import React, { useState } from 'react';
 import '../styles/RegistrarArchivoDiseno.css';
+import { registrarArchivoDisenio } from '../services/archivoDisenioService';
 
 const RegistrarDisenio: React.FC = () => {
+    const [archivo, setArchivo] = useState<File | null>(null);
+    const [mensaje, setMensaje] = useState('');
+    const [guardando, setGuardando] = useState(false);
+    const [formulario, setFormulario] = useState({
+        fechaRecepcion: '2026-09-21',
+        fechaEntrega: '2026-09-28',
+        resolucion: 300,
+        modoColor: 'CMYK',
+        sangrado: 3,
+        medidaArchivo: '22.1 x 14.6 cm',
+        caras: 2,
+        prensa: 'Offset',
+    });
+
+    const actualizar = (campo: keyof typeof formulario, valor: string) => {
+        setFormulario((actual) => ({
+            ...actual,
+            [campo]: ['resolucion', 'sangrado', 'caras'].includes(campo)
+                ? Number(valor)
+                : valor,
+        }));
+    };
+
+    const registrar = async () => {
+        if (!archivo) {
+            setMensaje('Selecciona un archivo antes de registrar el diseño.');
+            return;
+        }
+
+        setGuardando(true);
+        setMensaje('');
+        try {
+            await registrarArchivoDisenio({
+                ...formulario,
+                nombreArchivo: archivo.name,
+                version: 1,
+            });
+            setMensaje('Diseño registrado correctamente.');
+        } catch {
+            setMensaje('No se pudo registrar el diseño.');
+        } finally {
+            setGuardando(false);
+        }
+    };
+
     return (
         <div className="registrar-disenio-container">
             <div className="content-grid">
@@ -13,11 +59,11 @@ const RegistrarDisenio: React.FC = () => {
                         <div className="form-row">
                             <div className="form-group">
                                 <label>Fecha de recepción</label>
-                                <input type="date" name="fechaRecepcion" defaultValue="2026-09-21" />
+                                <input type="date" name="fechaRecepcion" value={formulario.fechaRecepcion} onChange={(e) => actualizar('fechaRecepcion', e.target.value)} />
                             </div>
                             <div className="form-group">
                                 <label>Fecha de entrega estimada</label>
-                                <input type="date" name="fechaEntrega" defaultValue="2026-09-28" />
+                                <input type="date" name="fechaEntrega" value={formulario.fechaEntrega} onChange={(e) => actualizar('fechaEntrega', e.target.value)} />
                             </div>
                         </div>
                     </section>
@@ -37,15 +83,16 @@ const RegistrarDisenio: React.FC = () => {
                                 <strong>Arrastra el archivo o selecciónalo desde tu equipo</strong>
                                 <p>Formatos aceptados PDF, AI, TIFF y EPS · Tamaño máximo 200 MB</p>
                             </div>
-                            <button className="btn-secondary outline" type="button">
+                            <input id="archivo-disenio" hidden type="file" accept=".pdf,.ai,.tiff,.eps" onChange={(e) => setArchivo(e.target.files?.[0] ?? null)} />
+                            <button className="btn-secondary outline" type="button" onClick={() => document.getElementById('archivo-disenio')?.click()}>
                                 Seleccionar archivo
                             </button>
                         </div>
                         <div className="uploaded-file">
                             <div className="file-icon-box pdf">PDF</div>
                             <div className="file-info">
-                                <strong>volantes-trebol-final-v3.pdf</strong>
-                                <span>18.4 MB · Subido hoy 11:42 · Versión 3</span>
+                                <strong>{archivo?.name ?? 'Ningún archivo seleccionado'}</strong>
+                                <span>{archivo ? `${(archivo.size / 1024 / 1024).toFixed(1)} MB · Versión 1` : 'Selecciona el archivo definitivo'}</span>
                             </div>
                             <div className="file-status">
                                 <span className="status-dot green"></span> Listo para validar
@@ -60,39 +107,39 @@ const RegistrarDisenio: React.FC = () => {
                         <div className="form-row three-cols">
                             <div className="form-group">
                                 <label>Resolución</label>
-                                <select name="resolucion" defaultValue="300">
+                                <select name="resolucion" value={formulario.resolucion} onChange={(e) => actualizar('resolucion', e.target.value)}>
                                     <option value="300">300 dpi</option>
                                     <option value="150">150 dpi</option>
                                 </select>
                             </div>
                             <div className="form-group">
                                 <label>Modo de color</label>
-                                <select name="modoColor" defaultValue="CMYK">
+                                <select name="modoColor" value={formulario.modoColor} onChange={(e) => actualizar('modoColor', e.target.value)}>
                                     <option value="CMYK">CMYK</option>
                                     <option value="RGB">RGB</option>
                                 </select>
                             </div>
                             <div className="form-group">
                                 <label>Sangrado (mm)</label>
-                                <input type="number" name="sangrado" defaultValue="3" />
+                                <input type="number" name="sangrado" value={formulario.sangrado} onChange={(e) => actualizar('sangrado', e.target.value)} />
                             </div>
                         </div>
 
                         <div className="form-row three-cols">
                             <div className="form-group">
                                 <label>Medida del archivo</label>
-                                <input type="text" name="medidaArchivo" defaultValue="22.1 x 14.6 cm" />
+                                <input type="text" name="medidaArchivo" value={formulario.medidaArchivo} onChange={(e) => actualizar('medidaArchivo', e.target.value)} />
                             </div>
                             <div className="form-group">
                                 <label>Caras a imprimir</label>
-                                <select name="caras" defaultValue="2">
+                                <select name="caras" value={formulario.caras} onChange={(e) => actualizar('caras', e.target.value)}>
                                     <option value="1">1 cara</option>
                                     <option value="2">2 caras</option>
                                 </select>
                             </div>
                             <div className="form-group">
                                 <label>Prensa destino</label>
-                                <select name="prensa" defaultValue="Offset">
+                                <select name="prensa" value={formulario.prensa} onChange={(e) => actualizar('prensa', e.target.value)}>
                                     <option value="Offset">Offset Heidelberg GTO</option>
                                     <option value="Digital">Digital Konica Minolta</option>
                                 </select>
@@ -133,9 +180,10 @@ const RegistrarDisenio: React.FC = () => {
                         </ul>
                     </div>
                     <div className="action-buttons">
-                        <button className="btn-primary" type="button">
-                            Registrar diseño
+                        <button className="btn-primary" type="button" onClick={registrar} disabled={guardando}>
+                            {guardando ? 'Registrando...' : 'Registrar diseño'}
                         </button>
+                        {mensaje && <p className="helper-text-centered">{mensaje}</p>}
                         <p className="helper-text-centered">Revisa el aviso de sangrado antes de registrar</p>
                     </div>
                 </aside>
