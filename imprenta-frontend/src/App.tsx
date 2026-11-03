@@ -9,7 +9,11 @@ import Navbar from "./components/Navbar";
 import GestionarPedidosPage from "./pages/GestionarPedidosPage";
 import CapturarPedido from "./pages/CapturarPedido.tsx";
 import RegistrarDisenio from "./pages/RegistrarArchivoDiseno.tsx";
+<<<<<<< HEAD
 import CalendarioPage from "./pages/CalendarioPage.tsx";
+=======
+import GenerarCronogramaPage from "./pages/GenerarCronogramaPage.tsx";
+>>>>>>> majo-front
 
 interface RouteMeta {
   seccion?: string;
@@ -19,7 +23,11 @@ interface RouteMeta {
 const routeMeta: Record<string, RouteMeta> = {
   "/": { seccion: "Inicio", titulo: "Dashboard" },
   "/calendario": { seccion: "Calendario", titulo: "Generar calendario" },
+<<<<<<< HEAD
   "/cronograma": { seccion: "Cronograma", titulo: "Consultar cronograma" },
+=======
+  "/cronograma/generar": { seccion: "Cronograma", titulo: "Generar cronograma" },
+>>>>>>> majo-front
   "/pedidos": { seccion: "Seguimiento administrativo", titulo: "Gestionar pedidos" },
   "/pedidos/nuevo": { seccion: "Pedidos", titulo: "Capturar pedido" },
   "/archivos-de-diseno/registrar": { seccion: "Archivos de diseño", titulo: "Registrar archivo de diseño" }
@@ -32,6 +40,7 @@ function AppLayout() {
   const { seccion, titulo } = routeMeta[location.pathname] ?? { titulo: "Imprenta Ríos" };
 
   return (
+<<<<<<< HEAD
       <div className="app-shell">
         <Sidebar
             userName={currentUser.name}
@@ -55,11 +64,39 @@ function AppLayout() {
           </main>
         </div>
       </div>
+=======
+    <div className="app-shell">
+      <Sidebar
+        userName={currentUser.name}
+        userRole={currentUser.role}
+        sidebarOpen={true}
+        onCloseSidebar={() => console.log("Sidebar closed")}
+        onLogout={() => console.log("Cerrar sesión")}
+      />
+
+      <div className="content-shell">
+        <Navbar seccion={seccion} titulo={titulo} userName={currentUser.name} />
+
+        <main className="page-content">
+          <Routes>
+            <Route path="/"/>
+            <Route path="/calendario"/>
+            <Route path="/cronograma/generar" element={<GenerarCronogramaPage />} />
+            <Route path="/pedidos" element={<GestionarPedidosPage />} />
+            <Route path="/pedidos/nuevo" element={<CapturarPedido />} />
+            <Route path="/archivos-de-diseno/registrar" element={<RegistrarDisenio />} />
+            <Route path="*"/>
+          </Routes>
+        </main>
+      </div>
+    </div>
+>>>>>>> majo-front
   );
 }
 
 function App() {
   return (
+<<<<<<< HEAD
       <BrowserRouter>
         <AppLayout />
       </BrowserRouter>
@@ -67,3 +104,12 @@ function App() {
 }
 
 export default App;
+=======
+    <BrowserRouter>
+      <AppLayout />
+    </BrowserRouter>
+  );
+}
+
+export default App;
+>>>>>>> majo-front

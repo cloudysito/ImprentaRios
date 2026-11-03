@@ -9,6 +9,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+<<<<<<< HEAD
+=======
+import java.util.List;
+
+>>>>>>> majo-front
 @RestController
 @RequestMapping("/api/actividad")
 @RequiredArgsConstructor
@@ -33,4 +38,14 @@ public class ActividadController {
     public void eliminarActividad(@PathVariable String id) {
         actividadService.eliminarActividad(id);
     }
+<<<<<<< HEAD
 }
+=======
+
+    @GetMapping
+    public ResponseEntity<List<ActividadResponeDTO>> listar(@RequestParam(required = false) String pedidoId) {
+        return ResponseEntity.ok(actividadService.listarActividades(pedidoId));
+    }
+}
+
+>>>>>>> majo-front

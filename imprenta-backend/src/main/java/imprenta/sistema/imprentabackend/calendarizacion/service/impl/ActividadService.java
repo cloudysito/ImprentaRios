@@ -11,6 +11,10 @@ import imprenta.sistema.imprentabackend.exceptions.NegocioException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+<<<<<<< HEAD
+=======
+import java.util.Comparator;
+>>>>>>> majo-front
 import java.util.List;
 
 @Service
@@ -42,10 +46,26 @@ public class ActividadService implements IActividadService {
         return ActividadMapper.toResponse(obtenerActividad(id));
     }
 
+<<<<<<< HEAD
+=======
+    @Override
+    public List<ActividadResponeDTO> listarActividades(String pedidoId) {
+        return actividadRepository.findAll().stream()
+                .filter(a -> pedidoId == null || pedidoId.isBlank() || pedidoId.equals(a.getPedidoId()))
+                .sorted(Comparator.comparing(Actividad::getFechaHoraInicio))
+                .map(a -> new ActividadResponeDTO(
+                        a.getId(), a.getNombreActividad(), a.getDescripcion(),
+                        a.getFechaHoraInicio(), a.getFechaHoraFin(),
+                        a.getPedidoId(), a.getEmpleadoId()))
+                .toList();
+    }
+
+>>>>>>> majo-front
     private Actividad obtenerActividad(String id) {
         return actividadRepository.findById(id)
                 .orElseThrow(() -> new NegocioException(CodigoError.ACTIVIDAD_NO_ENCONTRADA));
     }
+<<<<<<< HEAD
 
     @Override
     public List<ActividadResponeDTO> listarActividades() {
@@ -54,4 +74,6 @@ public class ActividadService implements IActividadService {
                 .map(ActividadMapper::toResponse)
                 .toList();
     }
+=======
+>>>>>>> majo-front
 }

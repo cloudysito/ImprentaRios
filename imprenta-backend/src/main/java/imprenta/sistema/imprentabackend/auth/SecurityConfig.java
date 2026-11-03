@@ -69,6 +69,35 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/cliente/*")
                         .hasRole("DUENO")
 
+<<<<<<< HEAD
+=======
+                        // Archivos de diseño
+                        .requestMatchers(HttpMethod.GET, "/api/archivo_disenio/*")
+                        .hasAnyRole("DUENO", "SECRETARIA", "DISENADOR", "MANUFACTURA")
+
+                        .requestMatchers(HttpMethod.POST, "/api/archivo_disenio")
+                        .hasAnyRole("DUENO", "DISENADOR")
+
+                        .requestMatchers(HttpMethod.PUT, "/api/archivo_disenio/*")
+                        .hasAnyRole("DUENO", "DISENADOR")
+
+                        .requestMatchers(HttpMethod.DELETE, "/api/archivo_disenio/*")
+                        .hasAnyRole("DUENO", "DISENADOR")
+
+                        // Productos
+                        .requestMatchers(HttpMethod.GET, "/api/producto/*")
+                        .hasAnyRole("DUENO", "SECRETARIA", "DISENADOR", "MANUFACTURA")
+
+                        .requestMatchers(HttpMethod.POST, "/api/producto")
+                        .hasAnyRole("DUENO", "SECRETARIA")
+
+                        .requestMatchers(HttpMethod.PUT, "/api/producto/*")
+                        .hasAnyRole("DUENO", "SECRETARIA")
+
+                        .requestMatchers(HttpMethod.DELETE, "/api/producto/*")
+                        .hasRole("DUENO")
+
+>>>>>>> majo-front
                         // Inventario
                         .requestMatchers(HttpMethod.GET, "/api/insumo", "/api/insumo/*")
                         .hasAnyRole("DUENO", "SECRETARIA", "MANUFACTURA")
@@ -107,9 +136,12 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/actividad/*")
                         .hasRole("DUENO")
 
+<<<<<<< HEAD
                         .requestMatchers(HttpMethod.GET, "/api/tipo-producto")
                         .hasAnyRole("DUENO", "SECRETARIA")
 
+=======
+>>>>>>> majo-front
                         // Cualquier otra ruta requiere login
                         .anyRequest().authenticated()
                 )
