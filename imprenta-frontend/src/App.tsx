@@ -16,7 +16,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route element={<AppLayout />}>
-          <Route index element={<Navigate to="/pedidos" replace />} />
+          <Route index element={<Navigate to="/calendario" replace />} />
           <Route path="/calendario" element={<CalendarioPage />} />
           <Route path="/calendario/generar" element={<CalendarioPage />} />
           <Route path="/cronograma" element={<GenerarCronogramaPage />} />
@@ -30,7 +30,7 @@ function App() {
           <Route path="/taller" element={<VerificarProgresoPage />} />
           <Route path="/inventario" element={<GestionarStockPage />} />
           <Route path="/mantenimiento" element={<GestionarMantenimientoPage />} />
-          <Route path="*" element={<Navigate to="/pedidos" replace />} />
+          <Route path="*" element={<Navigate to="/calendario" replace />} />
         </Route>
       </Routes>
     </BrowserRouter>

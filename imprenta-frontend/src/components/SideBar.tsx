@@ -42,16 +42,18 @@ const cronograma: NavItem = { to: "/cronograma", label: "Cronograma", icon: Alig
 const MENU: Record<Rol, SeccionMenu[]> = {
   SECRETARIA: [
     {
+      titulo: "General",
       items: [
         calendario,
         cronograma,
-        { to: "/pedidos", label: "Pedidos", icon: FileText },
         { to: "/pedidos/nuevo", label: "Capturar pedido", icon: Plus },
+        { to: "/pedidos", label: "Pedidos", icon: FileText },
       ],
     },
   ],
   DISENADOR: [
     {
+      titulo: "General",
       items: [
         calendario,
         cronograma,
@@ -61,7 +63,17 @@ const MENU: Record<Rol, SeccionMenu[]> = {
   ],
   MANUFACTURA: [{ items: [calendario, cronograma, { to: "/taller", label: "Taller", icon: Cog }] }],
   DUENO: [
-    { items: [calendario, cronograma] },
+    {
+      titulo: "General",
+      items: [calendario, cronograma] },
+    {
+      titulo: "Pedidos",
+      items: [
+        { to: "/pedidos", label: "Pedidos", icon: FileText },
+        { to: "/pedidos/nuevo", label: "Capturar pedido", icon: Plus },
+        { to: "/archivos-de-diseno/registrar", label: "Archivos de diseño", icon: FolderOpen },
+      ],
+    },
     {
       titulo: "Administración",
       items: [

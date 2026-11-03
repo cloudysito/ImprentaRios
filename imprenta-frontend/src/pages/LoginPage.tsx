@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { AlertCircle, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
@@ -17,6 +17,10 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    document.title = "Iniciar sesión | Imprenta Ríos";
+  }, []);
 
   if (user) {
     return <Navigate to={from} replace />;
