@@ -4,9 +4,16 @@ import {
   FileText,
   Plus,
   LogOut,
+  Cog,
+  FolderOpen,
+  CalendarCheck,
+  ListTodo,
+  Package,
+  Wrench,
   type LucideIcon,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
+import type { Rol } from "../services/authService";
 import "../styles/SideBar.css";
 
 interface NavItem {
@@ -14,19 +21,58 @@ interface NavItem {
   label: string;
   icon: LucideIcon;
 }
+
+interface SeccionMenu {
+  titulo?: string;
+  items: NavItem[];
+}
+
 interface SideBarProps {
   userName: string;
   userRole: string;
+  rol?: Rol;
   sidebarOpen?: boolean;
   onCloseSidebar?: () => void;
   onLogout?: () => void;
 }
-const navItems: NavItem[] = [
-  { to: "/calendario", label: "Calendario", icon: Calendar },
-  { to: "/cronograma", label: "Cronograma", icon: AlignLeft },
-  { to: "/pedidos", label: "Pedidos", icon: FileText },
-  { to: "/pedidos/nuevo", label: "Capturar pedido", icon: Plus },
-];
+
+const calendario: NavItem = { to: "/calendario", label: "Calendario", icon: Calendar };
+const cronograma: NavItem = { to: "/cronograma", label: "Cronograma", icon: AlignLeft };
+
+const MENU: Record<Rol, SeccionMenu[]> = {
+  SECRETARIA: [
+    {
+      items: [
+        calendario,
+        cronograma,
+        { to: "/pedidos", label: "Pedidos", icon: FileText },
+        { to: "/pedidos/nuevo", label: "Capturar pedido", icon: Plus },
+      ],
+    },
+  ],
+  DISENADOR: [
+    {
+      items: [
+        calendario,
+        cronograma,
+        { to: "/archivos-de-diseno/registrar", label: "Archivos de diseño", icon: FolderOpen },
+      ],
+    },
+  ],
+  MANUFACTURA: [{ items: [calendario, cronograma, { to: "/taller", label: "Taller", icon: Cog }] }],
+  DUENO: [
+    { items: [calendario, cronograma] },
+    {
+      titulo: "Administración",
+      items: [
+        { to: "/calendario/generar", label: "Programar entregas", icon: CalendarCheck },
+        { to: "/cronograma/generar", label: "Asignar cronograma", icon: ListTodo },
+        { to: "/inventario", label: "Inventario", icon: Package },
+        { to: "/mantenimiento", label: "Mantenimiento", icon: Wrench },
+      ],
+    },
+  ],
+};
 
 const getInitials = (name: string) =>
   name
@@ -39,10 +85,13 @@ const getInitials = (name: string) =>
 const Sidebar = ({
   userName,
   userRole,
+  rol,
   sidebarOpen = false,
   onCloseSidebar,
   onLogout,
 }: SideBarProps) => {
+  const secciones = MENU[rol ?? "SECRETARIA"] ?? MENU.SECRETARIA;
+
   return (
     <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
       <div className="sidebar-brand">
@@ -51,23 +100,26 @@ const Sidebar = ({
       </div>
 
       <nav>
-        <ul className="sidebar-menu">
-          {navItems.map(({ to, label, icon: Icon }) => (
-            <li key={to}>
-              <NavLink
-                to={to}
-                end
-                onClick={onCloseSidebar}
-                className={({ isActive }) =>
-                  `sidebar-link ${isActive ? "active" : ""}`
-                }
-              >
-                <Icon size={18} strokeWidth={1.75} />
-                <span>{label}</span>
-              </NavLink>
-            </li>
-          ))}
-        </ul>
+        {secciones.map((seccion, i) => (
+          <div key={seccion.titulo ?? i} className="sidebar-grupo">
+            {seccion.titulo && <span className="sidebar-seccion">{seccion.titulo}</span>}
+            <ul className="sidebar-menu">
+              {seccion.items.map(({ to, label, icon: Icon }) => (
+                <li key={to}>
+                  <NavLink
+                    to={to}
+                    end
+                    onClick={onCloseSidebar}
+                    className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}
+                  >
+                    <Icon size={18} strokeWidth={1.75} />
+                    <span>{label}</span>
+                  </NavLink>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
       </nav>
 
       <div className="sidebar-bottom">

@@ -1,0 +1,215 @@
+.ui-card {
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(28, 25, 22, 0.05), 0 4px 14px rgba(28, 25, 22, 0.04);
+}
+
+.ui-eyebrow {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #6f6a63;
+}
+
+.ui-grid {
+    display: grid;
+    gap: 14px;
+}
+
+.ui-grid--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.ui-grid--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+
+.ui-campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    min-width: 0;
+}
+
+/* En filas de varios campos, los inputs quedan alineados aunque una etiqueta ocupe dos líneas */
+.ui-grid > .ui-campo {
+    justify-content: flex-end;
+}
+
+.ui-campo > span {
+    font-size: 13px;
+    font-weight: 500;
+    color: #3b3631;
+}
+
+.ui-input {
+    width: 100%;
+    height: 44px;
+    padding: 0 12px;
+    border: 1px solid #ddd8d0;
+    border-radius: 8px;
+    background: #fff;
+    font: inherit;
+    font-size: 14.5px;
+    color: #1c1916;
+}
+
+textarea.ui-input {
+    height: auto;
+    min-height: 56px;
+    padding: 10px 12px;
+    line-height: 1.4;
+    resize: vertical;
+}
+
+select.ui-input {
+    cursor: pointer;
+}
+
+.ui-input:focus {
+    outline: none;
+    border-color: #e07b39;
+    box-shadow: 0 0 0 3px rgba(224, 123, 57, 0.18);
+}
+
+.ui-input:disabled {
+    background: #f8f6f2;
+    color: #8a837a;
+    cursor: not-allowed;
+}
+
+.ui-input--chico {
+    height: 36px;
+    max-width: 96px;
+    text-align: right;
+}
+
+.ui-sufijo {
+    position: relative;
+}
+
+.ui-sufijo .ui-input {
+    padding-right: 34px;
+}
+
+.ui-sufijo > em {
+    position: absolute;
+    top: 50%;
+    right: 12px;
+    transform: translateY(-50%);
+    font-style: normal;
+    font-size: 14px;
+    color: #6f6a63;
+    pointer-events: none;
+}
+
+.ui-btn {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    height: 44px;
+    padding: 0 20px;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s;
+}
+
+.ui-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.ui-btn:focus-visible {
+    outline: 2px solid #e07b39;
+    outline-offset: 2px;
+}
+
+.ui-btn--primario { background: #a63d30; color: #fff; }
+.ui-btn--primario:hover:not(:disabled) { background: #8f3327; }
+
+.ui-btn--oscuro { background: #1c1916; color: #fff; }
+.ui-btn--oscuro:hover:not(:disabled) { background: #33302c; }
+
+.ui-btn--contorno { border-color: #ddd8d0; background: #fff; color: #1c1916; }
+.ui-btn--contorno:hover:not(:disabled) { background: #f8f6f2; }
+
+.ui-btn--verde { border-color: #2f5e4e; background: #fff; color: #2f5e4e; }
+.ui-btn--verde:hover:not(:disabled) { background: #eef5f1; }
+
+.ui-btn--ancho { width: 100%; }
+
+.ui-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+    background: var(--badge-bg);
+    color: var(--badge-fg);
+}
+
+.ui-badge::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+}
+
+.ui-badge--ok     { --badge-bg: #e3f0ea; --badge-fg: #2f6b52; }
+.ui-badge--aviso  { --badge-bg: #f6ead9; --badge-fg: #8a5a1f; }
+.ui-badge--peligro { --badge-bg: #fbe7e3; --badge-fg: #a63d30; }
+
+.ui-progreso {
+    height: 8px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: #ece6dc;
+}
+
+.ui-progreso__barra {
+    height: 100%;
+    border-radius: inherit;
+    background: #a63d30;
+    transition: width 0.3s ease;
+}
+
+.ui-progreso--completo .ui-progreso__barra {
+    background: #2f5e4e;
+}
+
+.ui-error {
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #fbeae7;
+    font-size: 13px;
+    color: #a63d30;
+}
+
+.ui-exito {
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #e3f0ea;
+    font-size: 13px;
+    color: #2f6b52;
+}
+
+.ui-vacio {
+    padding: 32px 16px;
+    font-size: 14px;
+    text-align: center;
+    color: #6f6a63;
+}
+
+@media (max-width: 640px) {
+    .ui-grid--2,
+    .ui-grid--3 {
+        grid-template-columns: 1fr;
+    }
+}

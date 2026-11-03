@@ -123,6 +123,17 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/tipo-producto")
                         .hasAnyRole("DUENO", "SECRETARIA")
 
+                        // Inventario: entradas y salidas de stock
+                        .requestMatchers(HttpMethod.POST, "/api/insumo/*/movimientos")
+                        .hasAnyRole("DUENO", "MANUFACTURA")
+                        // Taller: reportar avance y terminar trabajos
+                        .requestMatchers(HttpMethod.POST, "/api/actividad/*/avance", "/api/actividad/*/terminar")
+                        .hasAnyRole("DUENO", "MANUFACTURA")
+                        // Mantenimiento de maquinaria
+                        .requestMatchers(HttpMethod.GET, "/api/maquinas", "/api/maquinas/**")
+                        .hasAnyRole("DUENO", "MANUFACTURA")
+                        .requestMatchers("/api/maquinas", "/api/maquinas/**")
+                        .hasRole("DUENO")
                         // Cualquier otra ruta requiere login
                         .anyRequest().authenticated()
                 )

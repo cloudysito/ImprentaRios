@@ -21,7 +21,11 @@ public enum CodigoError {
     USUARIO_YA_REGISTRADO(HttpStatus.CONFLICT, "El nombre de usuario ya está registrado"),
     PASSWORD_REQUERIDA(HttpStatus.BAD_REQUEST, "La contraseña es obligatoria"),
     CREDENCIALES_INVALIDAS(HttpStatus.UNAUTHORIZED, "Usuario o contraseña incorrectos"),
-    EMPLEADO_INACTIVO(HttpStatus.FORBIDDEN, "El usuario está inactivo");
+    EMPLEADO_INACTIVO(HttpStatus.FORBIDDEN, "El usuario está inactivo"),
+    ACTIVIDAD_NO_ASIGNADA(HttpStatus.FORBIDDEN, "Esta actividad está asignada a otro empleado"),
+    ACTIVIDAD_YA_TERMINADA(HttpStatus.CONFLICT, "Esta actividad ya se marcó como terminada"),
+    PIEZAS_EXCEDEN_TOTAL(HttpStatus.BAD_REQUEST, "Las piezas terminadas no pueden superar el total del pedido"),
+    MAQUINA_NO_ENCONTRADA(HttpStatus.NOT_FOUND, "Máquina no encontrada");
 
     private final HttpStatus status;
     private final String mensaje;

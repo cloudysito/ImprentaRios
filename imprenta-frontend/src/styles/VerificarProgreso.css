@@ -1,0 +1,192 @@
+.taller {
+    padding: 24px 32px 32px; /* .page-content no tiene padding (lo quita CapturarPedido.css) */
+    display: grid;
+    grid-template-columns: 316px minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
+}
+
+.taller__lista {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.taller__turno {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    align-self: flex-start;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: #e3f0ea;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #24493d;
+}
+
+.taller__turno::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #2f6b52;
+}
+
+.taller__titulo-lista {
+    margin: 4px 8px 0;
+}
+
+.taller-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    padding: 16px 16px 14px;
+    border: 1px solid transparent;
+    font: inherit;
+    text-align: left;
+    color: #1c1916;
+    cursor: pointer;
+    transition: box-shadow 0.15s, border-color 0.15s;
+}
+
+.taller-card:hover {
+    border-color: #e6e0d7;
+}
+
+.taller-card.is-selected {
+    box-shadow: 0 2px 4px rgba(28, 25, 22, 0.06), 0 10px 26px rgba(28, 25, 22, 0.1);
+    border-color: #e0d9ce;
+}
+
+.taller-card:focus-visible {
+    outline: 2px solid #e07b39;
+    outline-offset: 2px;
+}
+
+.taller-card__fila {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+    font-size: 14px;
+}
+
+.taller-card__fila > span {
+    font-size: 12.5px;
+    color: #6f6a63;
+}
+
+.taller-card__producto {
+    font-size: 13.5px;
+    color: #3b3631;
+}
+
+.taller-card .ui-progreso {
+    display: block;
+    margin-top: 6px;
+}
+
+.taller-card .ui-progreso__barra {
+    display: block;
+}
+
+.taller-card__avance {
+    font-size: 12px;
+    color: #6f6a63;
+}
+
+.taller-card.is-terminada .taller-card__avance {
+    font-weight: 600;
+    color: #2f6b52;
+}
+
+.taller__detalle {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+}
+
+.taller-curso {
+    padding: 24px 24px 22px;
+}
+
+.taller-curso__encabezado {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.taller-curso__titulo {
+    margin-top: 8px;
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1.15;
+    letter-spacing: -0.01em;
+    color: #1c1916;
+}
+
+.taller-curso__detalle {
+    margin-top: 6px;
+    font-size: 13.5px;
+    color: #4f4a44;
+}
+
+.taller-curso__cifra {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 26px;
+}
+
+.taller-curso__cifra strong {
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 46px;
+    font-weight: 700;
+    line-height: 1;
+    color: #1c1916;
+}
+
+.taller-curso__cifra span {
+    font-size: 15px;
+    color: #4f4a44;
+}
+
+.taller-curso__barra {
+    height: 12px;
+    margin-top: 16px;
+}
+
+.taller-curso__pie {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 10px;
+    font-size: 12.5px;
+    color: #6f6a63;
+}
+
+.taller-reporte {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 24px;
+}
+
+.taller-reporte__acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 4px;
+}
+
+@media (max-width: 1000px) {
+    .taller {
+        grid-template-columns: 1fr;
+    }
+}

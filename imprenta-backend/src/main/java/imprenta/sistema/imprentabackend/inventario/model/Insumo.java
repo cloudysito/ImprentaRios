@@ -6,6 +6,8 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDate;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -17,4 +19,9 @@ public class Insumo {
     private TipoInsumo tipo;
     private String unidad;
     private int cantidadDisponible;
+
+    // Cantidad mínima antes de pedir más al proveedor
+    private int puntoReorden;
+
+    private LocalDate ultimaEntrada;
 }

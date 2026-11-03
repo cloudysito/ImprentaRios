@@ -6,6 +6,9 @@ import RegistrarDisenio from "./pages/RegistrarArchivoDiseno.tsx";
 import CalendarioPage from "./pages/CalendarioPage.tsx";
 import GenerarCronogramaPage from "./pages/GenerarCronogramaPage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
+import VerificarProgresoPage from "./pages/VerificarProgresoPage";
+import GestionarStockPage from "./pages/GestionarStockPage";
+import GestionarMantenimientoPage from "./pages/GestionarMantenimientoPage";
 
 function App() {
   return (
@@ -15,6 +18,7 @@ function App() {
         <Route element={<AppLayout />}>
           <Route index element={<Navigate to="/pedidos" replace />} />
           <Route path="/calendario" element={<CalendarioPage />} />
+          <Route path="/calendario/generar" element={<CalendarioPage />} />
           <Route path="/cronograma" element={<GenerarCronogramaPage />} />
           <Route path="/cronograma/generar" element={<GenerarCronogramaPage />} />
           <Route path="/pedidos" element={<GestionarPedidosPage />} />
@@ -23,6 +27,9 @@ function App() {
             path="/archivos-de-diseno/registrar"
             element={<RegistrarDisenio />}
           />
+          <Route path="/taller" element={<VerificarProgresoPage />} />
+          <Route path="/inventario" element={<GestionarStockPage />} />
+          <Route path="/mantenimiento" element={<GestionarMantenimientoPage />} />
           <Route path="*" element={<Navigate to="/pedidos" replace />} />
         </Route>
       </Routes>

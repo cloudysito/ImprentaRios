@@ -16,6 +16,11 @@ const routeMeta: Record<string, RouteMeta> = {
   "/pedidos": { seccion: "Seguimiento administrativo", titulo: "Gestionar pedidos" },
   "/pedidos/nuevo": { seccion: "Pedidos", titulo  : "Capturar pedido" },
   "/archivos-de-diseno/registrar": { seccion: "Archivos de diseño", titulo: "Registrar archivo de diseño" },
+  "/calendario/generar": { seccion: "Fechas límite de entrega", titulo: "Generar calendario" },
+  "/cronograma/generar": { seccion: "Asignación de mano de obra", titulo: "Generar cronograma" },
+  "/taller": { seccion: "Taller", titulo: "Verificar progreso de trabajo" },
+  "/inventario": { seccion: "Inventario de materiales", titulo: "Gestionar stock" },
+  "/mantenimiento": { seccion: "Historial técnico del equipo", titulo: "Gestionar mantenimiento de maquinaria" },
 };
 
 
@@ -34,6 +39,7 @@ const AppLayout = () => {
       <Sidebar
         userName={user.nombre}
         userRole={rolLabels[user.rol] ?? user.rol}
+        rol={user.rol}
         sidebarOpen={true}
         onLogout={logout}
       />

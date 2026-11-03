@@ -20,4 +20,11 @@ public class Actividad {
     private LocalDateTime fechaHoraFin;
     private String pedidoId;
     private String empleadoId;
+
+    private Integer piezasTerminadas;
+    private Integer merma;
+    private String motivoMerma;
+    private String observaciones;
+    private LocalDateTime ultimoReporte;
+    private Boolean terminada;
 }

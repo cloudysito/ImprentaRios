@@ -1,5 +1,7 @@
 package imprenta.sistema.imprentabackend.pedidos.service.impl;
 
+import imprenta.sistema.imprentabackend.calendarizacion.model.Actividad;
+import imprenta.sistema.imprentabackend.calendarizacion.repository.ActividadRepository;
 import imprenta.sistema.imprentabackend.exceptions.CodigoError;
 import imprenta.sistema.imprentabackend.exceptions.NegocioException;
 import imprenta.sistema.imprentabackend.pedidos.dtos.EventoBitacoraDTO;
@@ -35,6 +37,7 @@ public class PedidoService implements IPedidoService {
     private final ClienteRepository clienteRepository;
     private final TipoProductoRepository tipoProductoRepository;
     private final IMaterialService materialService;
+    private final ActividadRepository actividadRepository;
 
     @Override
     public PedidoResponseDTO capturarPedido(PedidoRequestDTO dto, String empleadoId) {
@@ -143,8 +146,13 @@ public class PedidoService implements IPedidoService {
 
         PedidoResumenDTO r = aResumen(p, clientes, tipos);
 
+        // Avance real que reporta el taller. Si no hay reportes, se usa el estado del pedido
         boolean terminado = p.getEstado() == EstadoPedido.TERMINADO || p.getEstado() == EstadoPedido.ENTREGADO;
-        int piezasTerminadas = terminado ? r.piezas() : 0;
+        int piezasTerminadas = terminado ? r.piezas() : actividadRepository.findByPedidoId(p.getId()).stream()
+                .map(Actividad::getPiezasTerminadas)
+                .filter(Objects::nonNull)
+                .max(Integer::compare)
+                .orElse(0);
 
         List<EventoBitacoraDTO> bitacora = p.getFechaRegistro() == null
                 ? List.of()

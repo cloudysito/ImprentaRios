@@ -4,6 +4,9 @@ import { AlertCircle, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import "../styles/LoginPage.css";
 
+// Fuera del componente para no llamar a Date en cada render
+const ANIO_ACTUAL = new Date().getFullYear();
+
 const LoginPage = () => {
   const { user, login } = useAuth();
   const location = useLocation();
@@ -14,7 +17,6 @@ const LoginPage = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-
 
   if (user) {
     return <Navigate to={from} replace />;
@@ -52,7 +54,7 @@ const LoginPage = () => {
           </p>
         </div>
 
-        <span className="login__copy">© {new Date().getFullYear()} Imprenta Ríos</span>
+        <span className="login__copy">© {ANIO_ACTUAL} Imprenta Ríos</span>
       </aside>
 
       <main className="login__main">

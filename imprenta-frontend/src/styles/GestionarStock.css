@@ -1,0 +1,165 @@
+.stock {
+    padding: 24px 32px 32px; /* .page-content no tiene padding (lo quita CapturarPedido.css) */
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 316px;
+    gap: 24px;
+    align-items: start;
+}
+
+.stock__principal {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    min-width: 0;
+}
+
+.stock__toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.stock__toolbar-grupo {
+    display: flex;
+    gap: 10px;
+}
+
+.stock-kpis {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.stock-kpi {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 18px 18px 20px;
+}
+
+.stock-kpi strong {
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1;
+    color: #1c1916;
+}
+
+.stock-kpi--alerta {
+    background: #fbecea;
+}
+
+.stock-kpi--alerta .ui-eyebrow,
+.stock-kpi--alerta strong {
+    color: #8f3327;
+}
+
+.stock-tabla {
+    overflow-x: auto;
+}
+
+.stock-tabla table {
+    width: 100%;
+    min-width: 600px;
+    border-collapse: collapse;
+    font-size: 13.5px;
+}
+
+.stock-tabla th {
+    padding: 14px 14px;
+    background: #faf9f6;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-align: left;
+    text-transform: uppercase;
+    vertical-align: bottom;
+    color: #6f6a63;
+}
+
+.stock-tabla td {
+    padding: 14px 14px;
+    border-top: 1px solid #efebe5;
+    vertical-align: middle;
+    color: #1c1916;
+}
+
+.stock-tabla .is-num {
+    text-align: right;
+}
+
+.stock-tabla .is-num .ui-input--chico {
+    margin-left: auto;
+}
+
+.stock-tabla__nombre {
+    min-width: 150px;
+    font-weight: 600;
+}
+
+.stock-tabla__fecha {
+    white-space: nowrap;
+    color: #4f4a44;
+}
+
+.stock-tabla__fila--desabasto {
+    background: #fdf6f3;
+}
+
+.stock-tabla__fila--por_agotarse {
+    background: #fcf9f3;
+}
+
+.stock__lateral {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.stock-movimiento {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+}
+
+.stock-movimiento__tipo {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+}
+
+.stock-alertas {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 18px 20px;
+    border-radius: 14px;
+    background: #fbecea;
+    font-size: 13px;
+    line-height: 1.45;
+    color: #7a2e24;
+}
+
+.stock-alertas h3 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #5f241c;
+}
+
+@media (max-width: 1100px) {
+    .stock {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .stock-kpis {
+        grid-template-columns: 1fr;
+    }
+}
