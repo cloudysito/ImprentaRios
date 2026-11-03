@@ -11,11 +11,5 @@ public interface IActividadService {
     void eliminarActividad(String id);
     ActividadResponeDTO actualizarActividad(String id, ActividadRequestDTO dto);
     ActividadResponeDTO buscarActividad(String id);
-<<<<<<< HEAD
-
-    List<ActividadResponeDTO> listarActividades();
-=======
     List<ActividadResponeDTO> listarActividades(String pedidoId);
-
->>>>>>> majo-front
 }
