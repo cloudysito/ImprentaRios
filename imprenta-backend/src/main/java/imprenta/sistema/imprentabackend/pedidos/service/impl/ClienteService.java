@@ -1,5 +1,10 @@
 package imprenta.sistema.imprentabackend.pedidos.service.impl;
 
+import imprenta.sistema.imprentabackend.exceptions.CodigoError;
+import imprenta.sistema.imprentabackend.exceptions.NegocioException;
+import imprenta.sistema.imprentabackend.pedidos.dtos.ClienteRequestDTO;
+import imprenta.sistema.imprentabackend.pedidos.dtos.ClienteResponseDTO;
+import imprenta.sistema.imprentabackend.pedidos.mappers.ClienteMapper;
 import imprenta.sistema.imprentabackend.pedidos.model.Cliente;
 import imprenta.sistema.imprentabackend.pedidos.repository.ClienteRepository;
 import imprenta.sistema.imprentabackend.pedidos.service.IClienteService;
@@ -12,19 +17,30 @@ public class ClienteService implements IClienteService {
     private final ClienteRepository clienteRepository;
 
     @Override
-    public Cliente crearCliente(Cliente cliente){
+    public ClienteResponseDTO crearCliente(ClienteRequestDTO dto) {
+        Cliente guardado = clienteRepository.save(ClienteMapper.toEntity(dto));
+        return ClienteMapper.toResponse(guardado);
+    }
 
-        //Validaciones
-        if (cliente.getNombre() == null || "".equals(cliente.getNombre())) {
-            throw new IllegalArgumentException("ERROR: El nombre es obligatorio");
-        }
+    @Override
+    public void eliminarCliente(String id) {
+        clienteRepository.delete(obtenerCliente(id));
+    }
 
-        if(cliente.getCorreo() == null || "".equals(cliente.getCorreo())) {
-            throw new IllegalArgumentException("ERROR: El correo es obligatorio");
-        }
+    @Override
+    public ClienteResponseDTO actualizarCliente(String id, ClienteRequestDTO dto) {
+        Cliente cliente = obtenerCliente(id);
+        ClienteMapper.actualizarEntidad(cliente, dto);
+        return ClienteMapper.toResponse(clienteRepository.save(cliente));
+    }
 
-        // Cliente clienteExistente = clienteRepository.findByCorreo(cliente.getCorreo()); //<<podemos usar esto cuando llenemos los repositories
+    @Override
+    public ClienteResponseDTO buscarCliente(String id) {
+        return ClienteMapper.toResponse(obtenerCliente(id));
+    }
 
-        return cliente;
+    private Cliente obtenerCliente(String id) {
+        return clienteRepository.findById(id)
+                .orElseThrow(() -> new NegocioException(CodigoError.CLIENTE_NO_ENCONTRADO));
     }
 }

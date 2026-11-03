@@ -1,7 +1,11 @@
 package imprenta.sistema.imprentabackend.pedidos.service;
 
-import imprenta.sistema.imprentabackend.pedidos.model.Producto;
+import imprenta.sistema.imprentabackend.pedidos.dtos.ProductoRequestDTO;
+import imprenta.sistema.imprentabackend.pedidos.dtos.ProductoResponseDTO;
 
 public interface IProductoService {
-    Producto registrarProducto(Producto producto, String pedidoId);
+    ProductoResponseDTO registrarProducto(ProductoRequestDTO dto);
+    void eliminarProducto(String id);
+    ProductoResponseDTO actualizarProducto(String id, ProductoRequestDTO dto);
+    ProductoResponseDTO buscarProducto(String id);
 }

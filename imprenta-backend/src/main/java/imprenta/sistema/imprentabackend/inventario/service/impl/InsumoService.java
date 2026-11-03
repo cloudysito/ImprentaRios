@@ -1,50 +1,59 @@
 package imprenta.sistema.imprentabackend.inventario.service.impl;
 
+import imprenta.sistema.imprentabackend.inventario.dtos.InsumoRequestDTO;
+import imprenta.sistema.imprentabackend.inventario.dtos.InsumoResponseDTO;
+import imprenta.sistema.imprentabackend.inventario.mapper.InsumoMapper;
 import imprenta.sistema.imprentabackend.inventario.model.Insumo;
 import imprenta.sistema.imprentabackend.inventario.repository.InsumoRepository;
-import imprenta.sistema.imprentabackend.inventario.repository.MaterialRepository;
 import imprenta.sistema.imprentabackend.inventario.service.IInsumoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
+import imprenta.sistema.imprentabackend.exceptions.CodigoError;
+import imprenta.sistema.imprentabackend.exceptions.NegocioException;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 public class InsumoService implements IInsumoService {
     private final InsumoRepository insumoRepository;
-    private final MaterialRepository materialRepository;
 
     @Override
-    public boolean verificaExistencias(String insumoId, int cantidadRequerida){
-
-        //Verificar existencias
-        Insumo insumo = insumoRepository.findById(insumoId)
-                .orElseThrow(() -> new RuntimeException("ERROR: Insumo no encontrado"));
-
-        return insumo.getCantidadDisponible()>=cantidadRequerida; //Checamos si tenemos la cantidad requerida en base al stock
+    public InsumoResponseDTO agregarInsumo(InsumoRequestDTO dto) {
+        Insumo guardado = insumoRepository.save(InsumoMapper.toEntity(dto));
+        return InsumoMapper.toResponse(guardado);
     }
 
-    //Metodo que actualiza el inventario
     @Override
-    public void descontarInventario(String insumoId, int cantidadUsada){
-        Insumo insumo = insumoRepository.findById(insumoId)
-                .orElseThrow(() -> new RuntimeException("ERROR: Insumo no encontrado"));
-
-        int nuevaCantidad = insumo.getCantidadDisponible() - cantidadUsada;
-
-        //evitemos que el stock sea negativo vale
-        if (nuevaCantidad<=0){
-            throw new IllegalArgumentException("ERROR: Inventario INSUFICIENTE");
-        }
-
-        insumo.setCantidadDisponible(nuevaCantidad);
-
-        //se actualiza
-        insumoRepository.save(insumo);
+    public List<InsumoResponseDTO> listarInsumos() {
+        return insumoRepository.findAll()
+                .stream()
+                .map(InsumoMapper::toResponse)
+                .toList();
     }
+
     @Override
-    public Insumo agregarInsumo(Insumo insumo) {
-        return insumoRepository.save(insumo);
+    public InsumoResponseDTO buscarInsumoPorId(String idInsumo) {
+        Insumo insumo = insumoRepository.findById(idInsumo)
+                .orElseThrow(() -> new NegocioException(CodigoError.INSUMO_NO_ENCONTRADO));
+
+        return InsumoMapper.toResponse(insumo);
+    }
+
+    @Override
+    public InsumoResponseDTO actualizarInsumo(String idInsumo, InsumoRequestDTO dto) {
+        Insumo insumo = insumoRepository.findById(idInsumo)
+                .orElseThrow(() -> new NegocioException(CodigoError.INSUMO_NO_ENCONTRADO));
+
+        InsumoMapper.actualizarEntidad(insumo, dto);
+        Insumo actualizado = insumoRepository.save(insumo);
+        return InsumoMapper.toResponse(actualizado);
+    }
+
+    @Override
+    public void eliminarInsumoPorId(String idInsumo) {
+        Insumo insumo = insumoRepository.findById(idInsumo)
+                .orElseThrow(() -> new NegocioException(CodigoError.INSUMO_NO_ENCONTRADO));
+
+        insumoRepository.delete(insumo);
     }
 }
