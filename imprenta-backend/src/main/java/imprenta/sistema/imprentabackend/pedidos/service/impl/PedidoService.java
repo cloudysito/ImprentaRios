@@ -1,17 +1,27 @@
 package imprenta.sistema.imprentabackend.pedidos.service.impl;
 
-import imprenta.sistema.imprentabackend.inventario.service.impl.InsumoService;
-import imprenta.sistema.imprentabackend.pedidos.model.Cliente;
+import imprenta.sistema.imprentabackend.exceptions.CodigoError;
+import imprenta.sistema.imprentabackend.exceptions.NegocioException;
+import imprenta.sistema.imprentabackend.pedidos.dtos.EventoBitacoraDTO;
+import imprenta.sistema.imprentabackend.pedidos.dtos.PedidoDetalleDTO;
+import imprenta.sistema.imprentabackend.pedidos.dtos.PedidoRequestDTO;
+import imprenta.sistema.imprentabackend.pedidos.dtos.PedidoResponseDTO;
+import imprenta.sistema.imprentabackend.pedidos.dtos.PedidoResumenDTO;
+import imprenta.sistema.imprentabackend.pedidos.mappers.PedidoMapper;
 import imprenta.sistema.imprentabackend.pedidos.model.EstadoPedido;
 import imprenta.sistema.imprentabackend.pedidos.model.Pedido;
+import imprenta.sistema.imprentabackend.pedidos.model.Producto;
 import imprenta.sistema.imprentabackend.pedidos.repository.ClienteRepository;
 import imprenta.sistema.imprentabackend.pedidos.repository.PedidoRepository;
+import imprenta.sistema.imprentabackend.pedidos.repository.TipoProductoRepository;
 import imprenta.sistema.imprentabackend.pedidos.service.IPedidoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
 
 @Service
@@ -19,41 +29,117 @@ import java.time.LocalDateTime;
 public class PedidoService implements IPedidoService {
     private final PedidoRepository pedidoRepository;
     private final ClienteRepository clienteRepository;
-    private final InsumoService insumoService;
+    private final TipoProductoRepository tipoProductoRepository;
 
-    //Metodo principal para capturar pedido
     @Override
-    public Pedido capturarPedido(Pedido pedido, Cliente cliente, String insumoId, int cantidadDisponible) {
-
-        if (cliente.getId() == null){
-            cliente = clienteRepository.save(cliente); //Si no existe el cliente, se crea
-        }
-
-        pedido.setFolio(pedido.getFolio()); //Se asigna el folio
-        pedido.setClienteId(cliente.getId()); //Se vincula el cliente al pedido con su id
-        pedido.setFechaRegistro(LocalDateTime.now()); //Ponemos la fecha de registro a la fecha que se registra el pedido
-        pedido.setEstado(EstadoPedido.REGISTRADO); //Estado inicial
-
-        boolean hayMaterial = insumoService.verificaExistencias(insumoId,cantidadDisponible);//verifica existencias
-
-        if (hayMaterial){
-            throw new IllegalArgumentException("No hay material en stock");
-        }
-
-        return pedidoRepository.save(pedido);
-
+    public PedidoResponseDTO capturarPedido(PedidoRequestDTO dto) {
+        Pedido guardado = pedidoRepository.save(PedidoMapper.toEntity(dto));
+        return PedidoMapper.toResponse(guardado);
     }
 
     @Override
-    public Pedido actualizarPedido(Pedido pedido, String id) throws Exception {
-        if (!pedidoRepository.existsById(String.valueOf(id))) {
-            throw new Exception("Pedido no encontrado");
-        }
-        pedido.setFolio(pedido.getFolio());
-        pedido.setFechaEntrega(LocalDateTime.now());
-        pedido.setNombreProyecto(pedido.getNombreProyecto());
-        return pedidoRepository.save(pedido);
+    public void eliminarPedido(String id) {
+        pedidoRepository.delete(obtenerPedido(id));
+    }
+
+    @Override
+    public PedidoResponseDTO actualizarPedido(String id, PedidoRequestDTO dto) {
+        Pedido pedido = obtenerPedido(id);
+        PedidoMapper.actualizarEntidad(pedido, dto);
+        return PedidoMapper.toResponse(pedidoRepository.save(pedido));
+    }
+
+    @Override
+    public PedidoResponseDTO buscarPedido(String id) {
+        return PedidoMapper.toResponse(obtenerPedido(id));
     }
 
 
+    @Override
+    public List<PedidoResumenDTO> listarPedidos() {
+        Map<String, String> clientes = new HashMap<>();
+        clienteRepository.findAll()
+                .forEach(c -> clientes.put(c.getId(), Objects.requireNonNullElse(c.getNombre(), "")));
+
+        Map<String, String> tipos = new HashMap<>();
+        tipoProductoRepository.findAll()
+                .forEach(t -> tipos.put(t.getId(), Objects.requireNonNullElse(t.getNombre(), "")));
+
+        return pedidoRepository.findAll().stream()
+                .map(p -> aResumen(p, clientes, tipos))
+                .toList();
+    }
+
+    @Override
+    public PedidoDetalleDTO obtenerDetalle(String id) {
+        return aDetalle(obtenerPedido(id));
+    }
+
+    @Override
+    public PedidoDetalleDTO cambiarEstado(String id, EstadoPedido nuevoEstado) {
+        Pedido pedido = obtenerPedido(id);
+
+        if (nuevoEstado == EstadoPedido.ENTREGADO && pedido.getEstado() != EstadoPedido.TERMINADO) {
+            throw new NegocioException(CodigoError.TRANSICION_ESTADO_INVALIDA);
+        }
+
+        pedido.setEstado(nuevoEstado);
+        return aDetalle(pedidoRepository.save(pedido));
+    }
+
+    private PedidoResumenDTO aResumen(Pedido p, Map<String, String> clientes, Map<String, String> tipos) {
+        List<Producto> productos = productosDe(p);
+
+        String cliente = clientes.getOrDefault(p.getClienteId(), "Cliente no encontrado");
+
+        String producto = productos.isEmpty() ? "" : tipos.getOrDefault(productos.get(0).getTipoProductoId(), "");
+        if (productos.size() > 1) {
+            producto += " y " + (productos.size() - 1) + " más";
+        }
+
+        int piezas = productos.stream().mapToInt(Producto::getCantidad).sum();
+
+        return new PedidoResumenDTO(p.getId(), p.getFolio(), cliente, producto,
+                piezas, p.getFechaEntrega(), p.getEstado());
+    }
+
+    private PedidoDetalleDTO aDetalle(Pedido p) {
+        List<Producto> productos = productosDe(p);
+
+        Map<String, String> clientes = new HashMap<>();
+        if (p.getClienteId() != null) {
+            clienteRepository.findById(p.getClienteId())
+                    .ifPresent(c -> clientes.put(c.getId(), Objects.requireNonNullElse(c.getNombre(), "")));
+        }
+        Map<String, String> tipos = new HashMap<>();
+        List<String> tipoIds = productos.stream().map(Producto::getTipoProductoId).filter(Objects::nonNull).toList();
+        tipoProductoRepository.findAllById(tipoIds)
+                .forEach(t -> tipos.put(t.getId(), Objects.requireNonNullElse(t.getNombre(), "")));
+
+        PedidoResumenDTO r = aResumen(p, clientes, tipos);
+
+        boolean terminado = p.getEstado() == EstadoPedido.TERMINADO || p.getEstado() == EstadoPedido.ENTREGADO;
+        int piezasTerminadas = terminado ? r.piezas() : 0;
+
+        int archivos = productos.stream()
+                .mapToInt(pr -> pr.getArchivosDisenio() == null ? 0 : pr.getArchivosDisenio().size())
+                .sum();
+        String versionDisenio = archivos == 0 ? null : "v" + archivos;
+
+        List<EventoBitacoraDTO> bitacora = p.getFechaRegistro() == null
+                ? List.of()
+                : List.of(new EventoBitacoraDTO(p.getFechaRegistro(), "Pedido registrado"));
+
+        return new PedidoDetalleDTO(r.id(), r.folio(), r.clienteNombre(), r.producto(), r.piezas(),
+                r.fechaEntrega(), r.estado(), piezasTerminadas, versionDisenio, bitacora);
+    }
+
+    private List<Producto> productosDe(Pedido p) {
+        return p.getProductos() != null ? p.getProductos() : List.of();
+    }
+
+    private Pedido obtenerPedido(String id) {
+        return pedidoRepository.findById(id)
+                .orElseThrow(() -> new NegocioException(CodigoError.PEDIDO_NO_ENCONTRADO));
+    }
 }

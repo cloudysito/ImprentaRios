@@ -3,7 +3,10 @@ import PedidosTabla from "../components/pedidos/PedidosTabla";
 import DetalleFolio from "../components/pedidos/DetalleFolio";
 import { usePedidos } from "../hooks/usePedidos";
 import { useDetallePedido } from "../hooks/useDetallePedido";
+<<<<<<< HEAD
 // @ts-ignore
+=======
+>>>>>>> 29b7f384a4655d985dfed9b1f4847a5131b6b61a
 import "../styles/GestionarPedidos.css";
 
 const GestionarPedidosPage = () => {

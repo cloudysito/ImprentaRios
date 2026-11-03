@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import {
   BrowserRouter,
   Route,
@@ -59,11 +60,37 @@ function AppLayout() {
     </div>
   );
 }
+=======
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import AppLayout from "./components/AppLayout";
+import GestionarPedidosPage from "./pages/GestionarPedidosPage";
+import CapturarPedido from "./pages/CapturarPedido.tsx";
+import RegistrarDisenio from "./pages/RegistrarArchivoDiseno.tsx";
+import LoginPage from "./pages/LoginPage.tsx";
+>>>>>>> 29b7f384a4655d985dfed9b1f4847a5131b6b61a
 
 function App() {
   return (
     <BrowserRouter>
+<<<<<<< HEAD
       <AppLayout />
+=======
+      <Routes>
+        <Route path={"/login"} element={<LoginPage />} />
+        <Route element={<AppLayout />}>
+          <Route path="/" />
+          <Route path="/calendario" />
+          <Route path="/cronograma" />
+          <Route path={"/pedidos"} element={<GestionarPedidosPage />} />
+          <Route path="/pedidos/nuevo" element={<CapturarPedido />} />
+          <Route
+            path="/archivos-de-diseno/registrar"
+            element={<RegistrarDisenio />}
+          />
+          <Route path="*" />
+        </Route>
+      </Routes>
+>>>>>>> 29b7f384a4655d985dfed9b1f4847a5131b6b61a
     </BrowserRouter>
   );
 }

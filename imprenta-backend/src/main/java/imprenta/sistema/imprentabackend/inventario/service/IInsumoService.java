@@ -1,9 +1,14 @@
 package imprenta.sistema.imprentabackend.inventario.service;
 
-import imprenta.sistema.imprentabackend.inventario.model.Insumo;
+import imprenta.sistema.imprentabackend.inventario.dtos.InsumoRequestDTO;
+import imprenta.sistema.imprentabackend.inventario.dtos.InsumoResponseDTO;
+
+import java.util.List;
 
 public interface IInsumoService {
-    boolean verificaExistencias(String idInsumo, int cantidadRequerida);
-     void descontarInventario(String idInsumo, int cantidadRequerida);
-     Insumo agregarInsumo(Insumo insumo);
+     InsumoResponseDTO agregarInsumo(InsumoRequestDTO insumo);
+     List<InsumoResponseDTO> listarInsumos();
+     InsumoResponseDTO buscarInsumoPorId(String idInsumo);
+     InsumoResponseDTO actualizarInsumo(String idInsumo, InsumoRequestDTO insumo);
+     void eliminarInsumoPorId(String idInsumo);
 }

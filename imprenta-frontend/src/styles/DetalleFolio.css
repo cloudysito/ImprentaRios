@@ -1,0 +1,141 @@
+.detalle-folio {
+    position: sticky;
+    top: 98px; /* altura del navbar + un margen */
+    display: flex;
+    flex-direction: column;
+    min-height: calc(100vh - 126px);
+    padding: 24px 20px;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(28, 25, 22, 0.05);
+}
+
+.detalle-folio--vacio {
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    font-size: 14px;
+    color: #6f6a63;
+}
+
+.detalle-folio__eyebrow {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #6f6a63;
+}
+
+.detalle-folio__folio {
+    margin-top: 6px;
+    font-family: "Fraunces", Georgia, serif;
+    font-size: 28px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    color: #1c1916;
+}
+
+.detalle-folio__cliente {
+    margin-top: 2px;
+    font-size: 13.5px;
+    color: #6f6a63;
+}
+
+.detalle-folio__datos {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 16px 0;
+    padding: 16px 0;
+    border-top: 1px solid #efebe5;
+    border-bottom: 1px solid #efebe5;
+    font-size: 13.5px;
+}
+
+.detalle-folio__datos div {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.detalle-folio__datos dt {
+    color: #6f6a63;
+}
+
+.detalle-folio__datos dd {
+    font-weight: 600;
+    text-align: right;
+    color: #1c1916;
+}
+
+.detalle-folio__datos dd.is-ok {
+    color: #2f6b52;
+}
+
+.detalle-folio__datos dd.is-muted {
+    font-weight: 400;
+    color: #8a837a;
+}
+
+.detalle-folio__bitacora {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 12px;
+    list-style: none;
+    font-size: 13px;
+    color: #4f4a44;
+}
+
+.detalle-folio__bitacora strong {
+    color: #1c1916;
+}
+
+.detalle-folio__error {
+    margin-top: 16px;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #fbeae7;
+    font-size: 13px;
+    color: #a63d30;
+}
+
+/* margin-top auto empuja los botones hasta abajo del panel */
+.detalle-folio__acciones {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: auto;
+    padding-top: 24px;
+}
+
+.detalle-folio__btn {
+    height: 46px;
+    border: 1px solid #ddd8d0;
+    border-radius: 8px;
+    background: #fff;
+    font: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1c1916;
+    cursor: pointer;
+}
+
+.detalle-folio__btn:hover:not(:disabled) {
+    background: #f8f6f2;
+}
+
+.detalle-folio__btn--primario {
+    border-color: #2f5e4e;
+    background: #2f5e4e;
+    color: #fff;
+}
+
+.detalle-folio__btn--primario:hover:not(:disabled) {
+    background: #264d40;
+}
+
+.detalle-folio__btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
