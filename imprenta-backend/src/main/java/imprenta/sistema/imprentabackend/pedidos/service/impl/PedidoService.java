@@ -7,6 +7,8 @@ import imprenta.sistema.imprentabackend.pedidos.dtos.PedidoDetalleDTO;
 import imprenta.sistema.imprentabackend.pedidos.dtos.PedidoRequestDTO;
 import imprenta.sistema.imprentabackend.pedidos.dtos.PedidoResponseDTO;
 import imprenta.sistema.imprentabackend.pedidos.dtos.PedidoResumenDTO;
+import imprenta.sistema.imprentabackend.pedidos.dtos.ProductoRequestDTO;
+import imprenta.sistema.imprentabackend.inventario.service.IMaterialService;
 import imprenta.sistema.imprentabackend.pedidos.mappers.PedidoMapper;
 import imprenta.sistema.imprentabackend.pedidos.model.EstadoPedido;
 import imprenta.sistema.imprentabackend.pedidos.model.Pedido;
@@ -22,6 +24,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 
 @Service
@@ -30,11 +34,32 @@ public class PedidoService implements IPedidoService {
     private final PedidoRepository pedidoRepository;
     private final ClienteRepository clienteRepository;
     private final TipoProductoRepository tipoProductoRepository;
+    private final IMaterialService materialService;
 
     @Override
-    public PedidoResponseDTO capturarPedido(PedidoRequestDTO dto) {
-        Pedido guardado = pedidoRepository.save(PedidoMapper.toEntity(dto));
-        return PedidoMapper.toResponse(guardado);
+    public PedidoResponseDTO capturarPedido(PedidoRequestDTO dto, String empleadoId) {
+        if (!clienteRepository.existsById(dto.clienteId())) {
+            throw new NegocioException(CodigoError.CLIENTE_NO_ENCONTRADO);
+        }
+        for (ProductoRequestDTO p : dto.productos()) {
+            if (!tipoProductoRepository.existsById(p.tipoProductoId())) {
+                throw new NegocioException(CodigoError.TIPO_PRODUCTO_NO_ENCONTRADO);
+            }
+            materialService.buscarMaterialPorId(p.materialId());
+        }
+        // TODO: verificar existencias de insumo cuando la imprenta defina la respuesta.
+
+        Pedido pedido = PedidoMapper.toEntity(dto);
+        pedido.setFolio(generarFolio());
+        pedido.setFechaRegistro(LocalDateTime.now());
+        pedido.setEstado(EstadoPedido.REGISTRADO);
+        pedido.setEmpleadoId(empleadoId);
+        return PedidoMapper.toResponse(pedidoRepository.save(pedido));
+    }
+
+    private String generarFolio() {
+        return "PED-" + LocalDate.now().getYear() + "-"
+                + String.format("%04d", pedidoRepository.count() + 1);
     }
 
     @Override
@@ -121,17 +146,12 @@ public class PedidoService implements IPedidoService {
         boolean terminado = p.getEstado() == EstadoPedido.TERMINADO || p.getEstado() == EstadoPedido.ENTREGADO;
         int piezasTerminadas = terminado ? r.piezas() : 0;
 
-        int archivos = productos.stream()
-                .mapToInt(pr -> pr.getArchivosDisenio() == null ? 0 : pr.getArchivosDisenio().size())
-                .sum();
-        String versionDisenio = archivos == 0 ? null : "v" + archivos;
-
         List<EventoBitacoraDTO> bitacora = p.getFechaRegistro() == null
                 ? List.of()
                 : List.of(new EventoBitacoraDTO(p.getFechaRegistro(), "Pedido registrado"));
 
         return new PedidoDetalleDTO(r.id(), r.folio(), r.clienteNombre(), r.producto(), r.piezas(),
-                r.fechaEntrega(), r.estado(), piezasTerminadas, versionDisenio, bitacora);
+                r.fechaEntrega(), r.estado(), piezasTerminadas, null, bitacora);
     }
 
     private List<Producto> productosDe(Pedido p) {

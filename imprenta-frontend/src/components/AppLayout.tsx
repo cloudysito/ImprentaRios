@@ -15,6 +15,7 @@ const routeMeta: Record<string, RouteMeta> = {
   "/cronograma": { seccion: "Cronograma", titulo: "Consultar cronograma" },
   "/pedidos": { seccion: "Seguimiento administrativo", titulo: "Gestionar pedidos" },
   "/pedidos/nuevo": { seccion: "Pedidos", titulo  : "Capturar pedido" },
+  "/archivos-de-diseno/registrar": { seccion: "Archivos de diseño", titulo: "Registrar archivo de diseño" },
 };
 
 

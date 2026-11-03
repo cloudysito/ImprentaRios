@@ -46,6 +46,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         null,
                         authorities
                 );
+                authentication.setDetails(jwtService.extraerEmpleadoId(token));
 
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }

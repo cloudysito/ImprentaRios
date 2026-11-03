@@ -1,19 +1,16 @@
 package imprenta.sistema.imprentabackend.pedidos.dtos;
 
-import imprenta.sistema.imprentabackend.pedidos.model.ArchivoDisenio;
 import imprenta.sistema.imprentabackend.pedidos.model.Prioridad;
 import imprenta.sistema.imprentabackend.pedidos.model.TipoAcabado;
 import imprenta.sistema.imprentabackend.pedidos.model.TipoTinta;
 import jakarta.validation.constraints.*;
-
-import java.util.List;
 
 public record ProductoRequestDTO(
         @Min(value = 1, message = "La cantidad a producir no debe ser 0")
         int cantidad,
 
         @NotBlank(message = "Las medidas son obligatorias")
-        @Size(max = 10)
+        @Size(max = 30)
         String medidas,
 
         @NotNull(message = "El tipo de tinta es obligatorio")
@@ -32,9 +29,6 @@ public record ProductoRequestDTO(
         String tipoProductoId,
 
         @NotBlank(message = "El material es obligatorio")
-        String materialId,
-
-        @NotEmpty(message = "La lista de archivos de diseno no puede estar vacia")
-        List<ArchivoDisenio> archivosDisenio
+        String materialId
 ) {
 }

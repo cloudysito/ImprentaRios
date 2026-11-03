@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface IPedidoService {
 
-    PedidoResponseDTO capturarPedido(PedidoRequestDTO dto);
+    PedidoResponseDTO capturarPedido(PedidoRequestDTO dto, String empleadoId);
     void eliminarPedido(String id);
     PedidoResponseDTO actualizarPedido(String id, PedidoRequestDTO dto);
     PedidoResponseDTO buscarPedido(String id);
