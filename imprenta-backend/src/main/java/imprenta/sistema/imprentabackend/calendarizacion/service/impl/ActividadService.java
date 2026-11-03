@@ -7,6 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ActividadService implements IActividadService {
@@ -51,5 +53,13 @@ public class ActividadService implements IActividadService {
         }
         System.out.println("Actividad encontrada");
         return actividadRepository.findById(id).orElse(null);
+    }
+
+    @Override
+    public List<ActividadResponeDTO> listarActividades() {
+        return actividadRepository.findAll()
+                .stream()
+                .map(ActividadMapper::toResponse)
+                .toList();
     }
 }

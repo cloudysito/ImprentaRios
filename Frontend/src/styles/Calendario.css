@@ -1,0 +1,288 @@
+.calendario-container {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 316px;
+    gap: 20px;
+    align-items: start;
+    font-family: "DM Sans", system-ui, sans-serif;
+}
+
+.calendario-main {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* Toolbar */
+.calendario-toolbar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.calendario-toolbar__top {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.calendario-toggle {
+    display: flex;
+    border: 1px solid #ddd8d0;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+}
+
+.calendario-toggle button {
+    padding: 8px 16px;
+    border: none;
+    background: transparent;
+    font-size: 13.5px;
+    font-weight: 500;
+    color: #6f6a63;
+    cursor: pointer;
+}
+
+.calendario-toggle button.is-active {
+    background: #1c1916;
+    color: #fff;
+    font-weight: 600;
+}
+
+.calendario-date-nav {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 6px 12px;
+    border: 1px solid #ddd8d0;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1c1916;
+}
+
+.calendario-date-nav button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6f6a63;
+    font-size: 16px;
+}
+
+.calendario-filtros {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6f6a63;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.calendario-filtros label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.calendario-filtros input[type="checkbox"] {
+    accent-color: #1c1916;
+}
+
+.filtro-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+}
+
+.dot-produccion { background: #57478a; }
+.dot-entregas { background: #2f6b52; }
+.dot-mantenimiento { background: #8a5a1f; }
+
+/* grid */
+.calendario-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 12px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 1px 2px rgba(28, 25, 22, 0.05);
+}
+
+.calendario-col__header {
+    text-align: center;
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+    border-bottom: 1px solid #efebe5;
+    display: flex;
+    flex-direction: column;
+}
+
+.col-day {
+    font-size: 11px;
+    font-weight: 600;
+    color: #6f6a63;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.col-date {
+    font-size: 20px;
+    font-family: "Fraunces", Georgia, serif;
+    font-weight: 700;
+    color: #1c1916;
+    margin-top: 4px;
+}
+
+.calendario-col.is-today .col-day,
+.calendario-col.is-today .col-date {
+    color: #a63d30;
+}
+.calendario-col.is-today .calendario-col__header {
+    border-bottom: 2px solid #a63d30;
+}
+
+.calendario-col__content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+/* Tarjetas de Actividad */
+.cal-card {
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 12px;
+    line-height: 1.4;
+    display: flex;
+    flex-direction: column;
+}
+
+.cal-card strong {
+    font-weight: 600;
+}
+
+.cal-card.produccion {
+    background: #ece8f6;
+    color: #57478a;
+    border-left: 3px solid #57478a;
+}
+
+.cal-card.entrega {
+    background: #e3f0ea;
+    color: #2f6b52;
+    border-left: 3px solid #2f6b52;
+}
+
+.cal-card.mantenimiento {
+    background: #fbeedd;
+    color: #8a5a1f;
+    border-left: 3px solid #8a5a1f;
+}
+
+.cal-card.empty {
+    background: #f5f3ef;
+    color: #8a837a;
+    border: 1px dashed #ddd8d0;
+    align-items: center;
+    justify-content: center;
+    height: 60px;
+}
+
+/* Panel Lateral (Sidebar Derecho) */
+.calendario-sidebar {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.cal-sidebar-card {
+    background: #fff;
+    padding: 20px;
+    border-radius: 14px;
+    box-shadow: 0 1px 2px rgba(28, 25, 22, 0.05);
+}
+
+.cal-sidebar-card.info {
+    background: #fbf9f6;
+    border: 1px solid #efebe5;
+}
+
+.cal-sidebar-card h3 {
+    font-size: 11px;
+    font-weight: 600;
+    color: #6f6a63;
+    text-transform: uppercase;
+    letter-spacing: 0.14em;
+    margin-bottom: 16px;
+}
+
+/* tareas */
+.tarea-item {
+    margin-bottom: 16px;
+    padding-left: 12px;
+    display: flex;
+    flex-direction: column;
+    font-size: 13px;
+}
+.tarea-item:last-child {
+    margin-bottom: 0;
+}
+.tarea-item strong {
+    color: #1c1916;
+    font-weight: 600;
+    margin-bottom: 2px;
+}
+.tarea-item span {
+    color: #6f6a63;
+}
+.tarea-item.produccion { border-left: 3px solid #57478a; }
+.tarea-item.mantenimiento { border-left: 3px solid #8a5a1f; }
+
+/* entregas */
+.entrega-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    font-size: 13px;
+}
+
+.entrega-list li {
+    display: flex;
+    justify-content: space-between;
+}
+
+.entrega-list li span:first-child {
+    color: #1c1916;
+}
+
+.entrega-list li span:last-child {
+    color: #6f6a63;
+    font-weight: 500;
+}
+
+.info-text {
+    font-size: 13px;
+    color: #8a5a1f;
+    line-height: 1.5;
+}
+.info-text strong {
+    display: block;
+    margin-bottom: 4px;
+}
+
+/* pa celular */
+@media (max-width: 1100px) {
+    .calendario-container {
+        grid-template-columns: 1fr;
+    }
+    .calendario-grid {
+        overflow-x: auto;
+        min-width: 800px;
+    }
+}
