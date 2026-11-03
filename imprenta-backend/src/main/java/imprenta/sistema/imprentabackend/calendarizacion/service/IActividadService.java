@@ -12,5 +12,4 @@ public interface IActividadService {
     ActividadResponeDTO actualizarActividad(String id, ActividadRequestDTO dto);
     ActividadResponeDTO buscarActividad(String id);
     List<ActividadResponeDTO> listarActividades(String pedidoId);
-
 }

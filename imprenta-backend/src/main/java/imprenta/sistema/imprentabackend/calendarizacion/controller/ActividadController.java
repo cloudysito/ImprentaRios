@@ -41,4 +41,3 @@ public class ActividadController {
         return ResponseEntity.ok(actividadService.listarActividades(pedidoId));
     }
 }
-

@@ -133,6 +133,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/actividad/*")
                         .hasRole("DUENO")
 
+                        .requestMatchers(HttpMethod.GET, "/api/tipo-producto")
+                        .hasAnyRole("DUENO", "SECRETARIA")
+
                         // Cualquier otra ruta requiere login
                         .anyRequest().authenticated()
                 )
