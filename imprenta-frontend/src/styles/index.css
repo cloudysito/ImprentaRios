@@ -22,6 +22,7 @@ body {
 .app-shell {
   display: flex;
   min-height: 100vh;
+  height: 100%;
   width: 100%;
 }
 
@@ -30,9 +31,13 @@ body {
   display: flex;
   flex-direction: column;
   min-width: 0;
+  height: 100%;
+  background-color: #f7f6f4;
 }
 
+/* El menú queda fijo y solo se desplaza el contenido */
 .page-content {
   flex: 1;
+  overflow-y: auto;
   padding: 28px 32px;
 }

@@ -3,6 +3,7 @@ import { useCalendario } from '../hooks/useCalendario';
 import { formatFechaCorta } from '../utils/formato';
 // @ts-ignore
 import '../styles/Calendario.css';
+import {MensajeError} from "../components/MensajeError.tsx";
 
 const CalendarioPage = () => {
     const {
@@ -69,7 +70,7 @@ const CalendarioPage = () => {
                     )}
                     {error && (
                         <div style={{ gridColumn: 'span 6', padding: '40px', textAlign: 'center', color: '#a63d30' }}>
-                            {error}
+                            <MensajeError mensaje={error} onReintentar={() => window.location.reload()} />
                         </div>
                     )}
                     {!cargando && !error && actividadesVisibles.length === 0 && (
