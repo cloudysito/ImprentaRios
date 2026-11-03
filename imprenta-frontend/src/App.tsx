@@ -9,6 +9,7 @@ import Navbar from "./components/Navbar";
 import GestionarPedidosPage from "./pages/GestionarPedidosPage";
 import CapturarPedido from "./pages/CapturarPedido.tsx";
 import RegistrarDisenio from "./pages/RegistrarArchivoDiseno.tsx";
+import GenerarCronogramaPage from "./pages/GenerarCronogramaPage.tsx";
 
 interface RouteMeta {
   seccion?: string;
@@ -18,7 +19,7 @@ interface RouteMeta {
 const routeMeta: Record<string, RouteMeta> = {
   "/": { seccion: "Inicio", titulo: "Dashboard" },
   "/calendario": { seccion: "Calendario", titulo: "Generar calendario" },
-  "/cronograma": { seccion: "Cronograma", titulo: "Consultar cronograma" },
+  "/cronograma/generar": { seccion: "Cronograma", titulo: "Generar cronograma" },
   "/pedidos": { seccion: "Seguimiento administrativo", titulo: "Gestionar pedidos" },
   "/pedidos/nuevo": { seccion: "Pedidos", titulo: "Capturar pedido" },
   "/archivos-de-diseno/registrar": { seccion: "Archivos de diseño", titulo: "Registrar archivo de diseño" }
@@ -47,7 +48,7 @@ function AppLayout() {
           <Routes>
             <Route path="/"/>
             <Route path="/calendario"/>
-            <Route path="/cronograma" />
+            <Route path="/cronograma/generar" element={<GenerarCronogramaPage />} />
             <Route path="/pedidos" element={<GestionarPedidosPage />} />
             <Route path="/pedidos/nuevo" element={<CapturarPedido />} />
             <Route path="/archivos-de-diseno/registrar" element={<RegistrarDisenio />} />

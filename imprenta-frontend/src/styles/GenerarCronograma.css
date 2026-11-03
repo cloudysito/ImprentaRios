@@ -1,0 +1,40 @@
+.estatus-badge--sin_generar {
+    background: #efebe5;
+    color: #6f6a63;
+}
+
+.estatus-badge--generado {
+    background: #e3f1ea;
+    color: #2f6b52;
+}
+
+.detalle-folio__campo {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 16px;
+    font-size: 13px;
+    color: #6f6a63;
+}
+
+.detalle-folio__input {
+    height: 44px;
+    padding: 0 12px;
+    border: 1px solid #ddd8d0;
+    border-radius: 8px;
+    background: #fff;
+    font: inherit;
+    font-size: 14px;
+    color: #1c1916;
+}
+
+.detalle-folio__input:focus {
+    outline: none;
+    border-color: #e07b39;
+    box-shadow: 0 0 0 3px rgba(224, 123, 57, 0.18);
+}
+
+.detalle-folio__input:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
