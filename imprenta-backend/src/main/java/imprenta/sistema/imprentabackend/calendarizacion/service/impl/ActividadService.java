@@ -11,6 +11,9 @@ import imprenta.sistema.imprentabackend.exceptions.NegocioException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class ActividadService implements IActividadService {
@@ -38,6 +41,18 @@ public class ActividadService implements IActividadService {
     @Override
     public ActividadResponeDTO buscarActividad(String id) {
         return ActividadMapper.toResponse(obtenerActividad(id));
+    }
+
+    @Override
+    public List<ActividadResponeDTO> listarActividades(String pedidoId) {
+        return actividadRepository.findAll().stream()
+                .filter(a -> pedidoId == null || pedidoId.isBlank() || pedidoId.equals(a.getPedidoId()))
+                .sorted(Comparator.comparing(Actividad::getFechaHoraInicio))
+                .map(a -> new ActividadResponeDTO(
+                        a.getId(), a.getNombreActividad(), a.getDescripcion(),
+                        a.getFechaHoraInicio(), a.getFechaHoraFin(),
+                        a.getPedidoId(), a.getEmpleadoId()))
+                .toList();
     }
 
     private Actividad obtenerActividad(String id) {

@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/actividad")
 @RequiredArgsConstructor
@@ -33,4 +35,10 @@ public class ActividadController {
     public void eliminarActividad(@PathVariable String id) {
         actividadService.eliminarActividad(id);
     }
+
+    @GetMapping
+    public ResponseEntity<List<ActividadResponeDTO>> listar(@RequestParam(required = false) String pedidoId) {
+        return ResponseEntity.ok(actividadService.listarActividades(pedidoId));
+    }
 }
+
