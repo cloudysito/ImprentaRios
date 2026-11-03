@@ -307,173 +307,21 @@ button {
     padding: 0;
 }
 
-.capturar-pedido-container textarea {
-    font-family: inherit;
-    resize: vertical;
+.producto-bloque {
+    border: 1px solid #e3ded8;
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 16px;
 }
-
-.capturar-pedido-container .price-input input[type="number"] {
+.btn-link {
+    background: none;
     border: none;
-    background: transparent;
+    color: #a33a2a;
+    cursor: pointer;
+    margin-top: 8px;
     padding: 0;
-    font-size: 1.25rem;
 }
-
-.captura-campos {
-    border: none;
-    margin: 0;
-    padding: 0;
-    min-width: 0;
-}
-
-.capturar-pedido-container input[type="tel"],
-.capturar-pedido-container input[type="date"] {
-    padding: 0.75rem;
-    border: 1px solid #dcdcdc;
-    border-radius: 6px;
-    font-size: 0.95rem;
-    font-family: inherit;
-    color: #333;
-    background-color: #fff;
-}
-
-.capturar-pedido-container fieldset:disabled input,
-.capturar-pedido-container fieldset:disabled select,
-.capturar-pedido-container fieldset:disabled textarea,
-.price-input input:disabled {
-    background-color: #f7f6f4;
-    color: #777;
-}
-
-.form-group.has-error input,
-.form-group.has-error select,
-.form-group.has-error textarea {
-    border-color: #a84236;
-}
-
-.field-error {
-    margin-top: 0.35rem;
-    font-size: 0.75rem;
-    color: #a84236;
-}
-
-.summary-card.has-error .field-error {
-    display: block;
-    margin: -0.5rem 0 0.75rem;
-}
-
-.form-alert {
-    background-color: #fbeae7;
-    color: #8c362a;
-    border-radius: 8px;
-    padding: 0.85rem 1rem;
-    font-size: 0.85rem;
-    margin-bottom: 1.5rem;
-}
-
-.registro-exito {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
-    flex-wrap: wrap;
-    background-color: #eaf3ed;
-    border-radius: 8px;
-    padding: 1rem 1.25rem;
-    margin-bottom: 1.5rem;
-}
-
-.registro-exito strong {
-    color: #2a5a3b;
-}
-
-.registro-exito p {
-    margin: 0.25rem 0 0;
-    font-size: 0.85rem;
-    color: #3b6b4c;
-}
-
-.registro-exito__acciones {
-    display: flex;
-    gap: 0.75rem;
-}
-
-.registro-exito__acciones button {
-    padding: 0.6rem 1rem;
-}
-
-.badge.registrado {
-    background-color: #e3f0e7;
-    color: #2a5a3b;
-    padding: 0.35rem 0.75rem;
-    border-radius: 20px;
-    font-size: 0.75rem;
-    font-weight: 600;
-    display: inline-block;
-    margin-bottom: 1.5rem;
-}
-
-.info-card.neutral,
-.info-card.warning,
-.info-card.danger {
-    border-radius: 8px;
-    padding: 1.25rem;
-    margin-bottom: 1.5rem;
-}
-
-.info-card.neutral { background-color: #efedea; }
-.info-card.warning { background-color: #fbf1df; }
-.info-card.danger { background-color: #fbeae7; }
-
-.info-card.neutral h4,
-.info-card.warning h4,
-.info-card.danger h4 {
-    margin: 0 0 0.5rem 0;
+.error-text {
+    color: #a33a2a;
     font-size: 0.9rem;
-}
-
-.info-card.neutral h4 { color: #444; }
-.info-card.warning h4 { color: #7a5417; }
-.info-card.danger h4 { color: #8c362a; }
-
-.info-card.neutral p,
-.info-card.warning p,
-.info-card.danger p {
-    margin: 0;
-    font-size: 0.85rem;
-    line-height: 1.4;
-}
-
-.info-card.neutral p { color: #666; }
-.info-card.warning p { color: #7a5417; }
-.info-card.danger p { color: #8c362a; }
-
-.action-buttons button:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-@media (max-width: 960px) {
-    .capturar-pedido-container {
-        padding: 1.25rem 1rem;
-    }
-
-    .content-grid,
-    .form-row,
-    .form-row.three-cols {
-        grid-template-columns: minmax(0, 1fr);
-    }
-
-    .form-card,
-    .summary-card {
-        padding: 1.25rem;
-    }
-
-    .form-group input,
-    .form-group select,
-    .form-group textarea {
-        min-width: 0;
-        width: 100%;
-        box-sizing: border-box;
-    }
 }
