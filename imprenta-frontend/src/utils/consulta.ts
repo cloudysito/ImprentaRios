@@ -5,9 +5,7 @@ import type { EstadoBarra, EventoCalendario, FilaCronograma, TipoEvento } from "
 import { aFecha } from "./fechas";
 import { folioCorto, inicioDeDia, sumarDias } from "./calendario";
 
-// El backend manda "fechaHoraFina" (typo en ActividadResponeDTO). Se acepta también "fechaHoraFin"
-export const finDeActividad = (a: ActividadResponse) =>
-    (a as ActividadResponse & { fechaHoraFin?: string }).fechaHoraFin ?? a.fechaHoraFina ?? a.fechaHoraInicio;
+export const finDeActividad = (a: ActividadResponse) => a.fechaHoraFin ?? a.fechaHoraInicio;
 
 export const tipoDeActividad = (nombre: string): TipoEvento => {
     const n = nombre.toLowerCase();

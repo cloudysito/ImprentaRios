@@ -37,9 +37,9 @@ public class SecurityConfig {
                         .requestMatchers("/api/empleados/**")
                         .hasRole("DUENO")
 
-                        // Cambiar estado: dueño, secretaria y manufactura
+                        // Cambiar estado: dueño y manufactura
                         .requestMatchers(HttpMethod.PATCH, "/api/pedidos/*/estado")
-                        .hasAnyRole("DUENO", "SECRETARIA", "MANUFACTURA")
+                        .hasAnyRole("DUENO", "MANUFACTURA")
 
                         // Pedidos: consultar
                         .requestMatchers(HttpMethod.GET, "/api/pedidos/**")
@@ -107,7 +107,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/material/*")
                         .hasRole("DUENO")
 
-                        // Calendarización
+                        // Calendarización: consultar (calendario y cronograma son de solo lectura para todos)
                         .requestMatchers(HttpMethod.GET, "/api/actividad", "/api/actividad/*")
                         .hasAnyRole("DUENO", "SECRETARIA", "DISENADOR", "MANUFACTURA")
 
@@ -129,7 +129,11 @@ public class SecurityConfig {
                         // Taller: reportar avance y terminar trabajos
                         .requestMatchers(HttpMethod.POST, "/api/actividad/*/avance", "/api/actividad/*/terminar")
                         .hasAnyRole("DUENO", "MANUFACTURA")
-                        // Mantenimiento de maquinaria
+                        // Mantenimiento: el listado (nombre y próximo servicio) lo ve todo el personal
+                        // para mostrar los paros en calendario y cronograma
+                        .requestMatchers(HttpMethod.GET, "/api/maquinas")
+                        .hasAnyRole("DUENO", "SECRETARIA", "DISENADOR", "MANUFACTURA")
+                        // Mantenimiento de maquinaria: detalle e historial
                         .requestMatchers(HttpMethod.GET, "/api/maquinas", "/api/maquinas/**")
                         .hasAnyRole("DUENO", "MANUFACTURA")
                         .requestMatchers("/api/maquinas", "/api/maquinas/**")
