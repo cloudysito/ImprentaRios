@@ -4,6 +4,8 @@ import GestionarPedidosPage from "./pages/GestionarPedidosPage";
 import CapturarPedido from "./pages/CapturarPedido.tsx";
 import RegistrarDisenio from "./pages/RegistrarArchivoDiseno.tsx";
 import CalendarioPage from "./pages/CalendarioPage.tsx";
+import ConsultarCalendario from "./pages/ConsultarCalendario";
+import ConsultarCronograma from "./pages/ConsultarCronograma";
 import GenerarCronogramaPage from "./pages/GenerarCronogramaPage.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
 import VerificarProgresoPage from "./pages/VerificarProgresoPage";
@@ -16,10 +18,10 @@ function App() {
       <Routes>
         <Route path="/login" element={<LoginPage />} />
         <Route element={<AppLayout />}>
-          <Route index element={<Navigate to="/calendario" replace />} />
-          <Route path="/calendario" element={<CalendarioPage />} />
+          <Route index element={<Navigate to="/pedidos" replace />} />
+          <Route path="/calendario" element={<ConsultarCalendario />} />
           <Route path="/calendario/generar" element={<CalendarioPage />} />
-          <Route path="/cronograma" element={<GenerarCronogramaPage />} />
+          <Route path="/cronograma" element={<ConsultarCronograma />} />
           <Route path="/cronograma/generar" element={<GenerarCronogramaPage />} />
           <Route path="/pedidos" element={<GestionarPedidosPage />} />
           <Route path="/pedidos/nuevo" element={<CapturarPedido />} />
@@ -30,7 +32,7 @@ function App() {
           <Route path="/taller" element={<VerificarProgresoPage />} />
           <Route path="/inventario" element={<GestionarStockPage />} />
           <Route path="/mantenimiento" element={<GestionarMantenimientoPage />} />
-          <Route path="*" element={<Navigate to="/calendario" replace />} />
+          <Route path="*" element={<Navigate to="/pedidos" replace />} />
         </Route>
       </Routes>
     </BrowserRouter>
