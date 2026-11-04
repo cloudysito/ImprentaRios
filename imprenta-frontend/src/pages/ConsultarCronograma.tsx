@@ -20,7 +20,7 @@ const ConsultarCronograma = () => {
     return (
         <div className="cg-pantalla">
             <section className="cg-principal">
-                <div className="cg-barra">
+                <div className="cg-herramientas">
                     <SelectorVista opciones={VISTAS} valor={c.vista} onChange={c.setVista} ariaLabel="Rango del cronograma" />
                     <button type="button" className="cons-boton" onClick={c.exportar} disabled={c.filas.length === 0}>
                         Exportar vista

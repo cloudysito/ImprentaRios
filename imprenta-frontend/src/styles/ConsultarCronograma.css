@@ -8,7 +8,7 @@
 .cg-principal { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
 .cg-lateral { display: flex; flex-direction: column; gap: 16px; }
 
-.cg-barra { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.cg-herramientas { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
 
 /* Filtros */
 .cg-filtros { display: flex; flex-wrap: wrap; gap: 14px; }
