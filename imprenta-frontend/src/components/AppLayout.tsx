@@ -20,6 +20,7 @@ const routeMeta: Record<string, RouteMeta> = {
   "/cronograma/generar": { seccion: "Asignación de mano de obra", titulo: "Generar cronograma" },
   "/taller": { seccion: "Taller", titulo: "Verificar progreso de trabajo" },
   "/inventario": { seccion: "Inventario de materiales", titulo: "Gestionar stock" },
+  "/empleados": { seccion: "Administración", titulo: "Gestionar empleados" },
   "/mantenimiento": { seccion: "Historial técnico del equipo", titulo: "Gestionar mantenimiento de maquinaria" },
 };
 

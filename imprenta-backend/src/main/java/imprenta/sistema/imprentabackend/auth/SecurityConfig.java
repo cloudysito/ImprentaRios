@@ -96,7 +96,7 @@ public class SecurityConfig {
                         .hasRole("DUENO")
 
                         .requestMatchers(HttpMethod.GET, "/api/material", "/api/material/*")
-                        .hasAnyRole("DUENO", "SECRETARIA", "MANUFACTURA")
+                        .hasAnyRole("DUENO", "SECRETARIA", "DISENADOR", "MANUFACTURA")
 
                         .requestMatchers(HttpMethod.POST, "/api/material")
                         .hasAnyRole("DUENO", "MANUFACTURA")
@@ -121,7 +121,7 @@ public class SecurityConfig {
                         .hasRole("DUENO")
 
                         .requestMatchers(HttpMethod.GET, "/api/tipo-producto")
-                        .hasAnyRole("DUENO", "SECRETARIA")
+                        .hasAnyRole("DUENO", "SECRETARIA", "DISENADOR", "MANUFACTURA")
 
                         // Inventario: entradas y salidas de stock
                         .requestMatchers(HttpMethod.POST, "/api/insumo/*/movimientos")

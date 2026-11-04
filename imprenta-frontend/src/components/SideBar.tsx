@@ -10,6 +10,7 @@ import {
   ListTodo,
   Package,
   Wrench,
+  Users,
   type LucideIcon,
 } from "lucide-react";
 import { NavLink } from "react-router-dom";
@@ -81,6 +82,7 @@ const MENU: Record<Rol, SeccionMenu[]> = {
         { to: "/cronograma/generar", label: "Asignar cronograma", icon: ListTodo },
         { to: "/inventario", label: "Inventario", icon: Package },
         { to: "/mantenimiento", label: "Mantenimiento", icon: Wrench },
+        { to: "/empleados", label: "Empleados", icon: Users },
       ],
     },
   ],

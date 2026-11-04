@@ -11,6 +11,7 @@ import LoginPage from "./pages/LoginPage.tsx";
 import VerificarProgresoPage from "./pages/VerificarProgresoPage";
 import GestionarStockPage from "./pages/GestionarStockPage";
 import GestionarMantenimientoPage from "./pages/GestionarMantenimientoPage";
+import GestionarEmpleadosPage from "./pages/GestionarEmpleadosPage";
 
 function App() {
   return (
@@ -32,7 +33,8 @@ function App() {
           <Route path="/taller" element={<VerificarProgresoPage />} />
           <Route path="/inventario" element={<GestionarStockPage />} />
           <Route path="/mantenimiento" element={<GestionarMantenimientoPage />} />
-          <Route path="*" element={<Navigate to="/pedidos" replace />} />
+          <Route path="/empleados" element={<GestionarEmpleadosPage />} />
+          <Route path="*" element={<Navigate to="/calendario" replace />} />
         </Route>
       </Routes>
     </BrowserRouter>
