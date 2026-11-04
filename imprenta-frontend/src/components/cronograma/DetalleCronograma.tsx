@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useAuth } from "../../hooks/useAuth";
 import type { CronogramaDetalle } from "../../types/cronograma";
 import { formatFechaCorta, formatFechaLarga, formatNumero } from "../../utils/formato";
 import CronogramaBadge from "./CronogramaBadge";
@@ -23,6 +24,9 @@ const DetalleCronograma = ({
                                onEliminar,
                            }: DetalleCronogramaProps) => {
     const [empleadoId, setEmpleadoId] = useState("");
+    const { user } = useAuth();
+    // Solo el dueño genera o elimina cronogramas, los demás roles solo los consultan
+    const esDueno = user?.rol === "DUENO";
 
     if (cargando || !detalle) {
         return (
@@ -90,6 +94,7 @@ const DetalleCronograma = ({
                 <p className="detalle-folio__cliente">Este pedido aún no tiene cronograma.</p>
             )}
 
+            {esDueno && (
             <label className="detalle-folio__campo">
                 ID del empleado responsable
                 <input
@@ -101,9 +106,11 @@ const DetalleCronograma = ({
                     disabled={!puedeGenerar || guardando}
                 />
             </label>
+            )}
 
             {error && <p className="detalle-folio__error">{error}</p>}
 
+            {esDueno && (
             <div className="detalle-folio__acciones">
                 <button
                     type="button"
@@ -122,6 +129,7 @@ const DetalleCronograma = ({
                     Eliminar cronograma
                 </button>
             </div>
+            )}
         </aside>
     );
 };

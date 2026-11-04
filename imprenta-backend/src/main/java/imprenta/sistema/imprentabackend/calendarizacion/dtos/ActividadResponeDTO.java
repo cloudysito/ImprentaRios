@@ -7,7 +7,7 @@ public record ActividadResponeDTO(
         String nombreActividad,
         String descripcion,
         LocalDateTime fechaHoraInicio,
-        LocalDateTime fechaHoraFina,
+        LocalDateTime fechaHoraFin,
         String pedidoId,
         String empleadoId
 ) {}

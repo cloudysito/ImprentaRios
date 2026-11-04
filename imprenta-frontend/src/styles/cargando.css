@@ -1,0 +1,25 @@
+:root {
+    --apagado: #6b7f93;
+    --linea: #dde5ed;
+    --cian: #1fa8e0;
+    --rojo: #d6435f;
+}
+.cargando {
+    padding: 3rem 0;
+    text-align: center;
+    color: var(--apagado);
+}
+.cargando__rueda {
+    width: 40px;
+    height: 40px;
+    margin: 0 auto 0.8rem;
+    border: 4px solid var(--linea);
+    border-top-color: var(--cian);
+    border-radius: 50%;
+    animation: girar 0.8s linear infinite;
+}
+@keyframes girar {
+    to {
+        transform: rotate(360deg);
+    }
+}

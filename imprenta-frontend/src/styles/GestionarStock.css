@@ -1,5 +1,4 @@
 .stock {
-    padding: 24px 32px 32px; /* .page-content no tiene padding (lo quita CapturarPedido.css) */
     display: grid;
     grid-template-columns: minmax(0, 1fr) 316px;
     gap: 24px;

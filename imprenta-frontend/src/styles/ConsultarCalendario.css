@@ -1,0 +1,155 @@
+.cc-pantalla {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 316px;
+    gap: 20px;
+    align-items: start;
+    font-family: "DM Sans", system-ui, sans-serif;
+}
+.cc-principal { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.cc-lateral { display: flex; flex-direction: column; gap: 16px; }
+
+.cc-barra { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+
+.cc-nav {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+    padding: 8px 14px;
+    border: 1px solid #ddd8d0;
+    border-radius: 10px;
+    background: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    color: #1c1916;
+}
+.cc-nav button {
+    display: inline-flex;
+    border: none;
+    background: none;
+    color: #4a453f;
+    cursor: pointer;
+}
+
+.cc-filtros {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 18px;
+    font-size: 13px;
+    color: #1c1916;
+}
+.cc-filtros__titulo {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #6f6a63;
+}
+.cc-filtros label { display: inline-flex; align-items: center; gap: 7px; cursor: pointer; }
+.cc-filtros input { width: 16px; height: 16px; accent-color: #1c1916; }
+
+.cc-punto { width: 9px; height: 9px; border-radius: 2px; }
+.cc-punto--produccion { background: #57478a; }
+.cc-punto--entrega { background: #2f6b52; }
+.cc-punto--mantenimiento { background: #b5801f; }
+
+/* Cuadrícula */
+.cc-grilla-scroll { overflow-x: auto; }
+.cc-grilla {
+    display: grid;
+    grid-template-columns: repeat(var(--columnas, 6), minmax(120px, 1fr));
+    gap: 8px;
+    padding: 18px 14px 28px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(28, 25, 22, 0.05);
+}
+.cc-grilla--mensaje {
+    display: block;
+    padding: 56px 20px;
+    text-align: center;
+    color: #6f6a63;
+    font-size: 14px;
+}
+.cc-grilla--mensaje.is-error { color: #a63d30; }
+
+.cc-columna { display: flex; flex-direction: column; padding: 0 4px 10px; border-radius: 10px; }
+.cc-columna.is-hoy { background: #fbf8f3; }
+
+.cc-columna__cabecera {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #efebe5;
+}
+.cc-columna__dia {
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: #6f6a63;
+}
+.cc-columna__fecha {
+    margin-top: 2px;
+    font-size: 20px;
+    font-weight: 700;
+    color: #1c1916;
+}
+.cc-columna.is-hoy .cc-columna__cabecera { border-bottom: 2px solid #a63d30; }
+.cc-columna.is-hoy .cc-columna__dia,
+.cc-columna.is-hoy .cc-columna__fecha { color: #a63d30; }
+
+.cc-columna__eventos { display: flex; flex-direction: column; gap: 8px; }
+
+.cc-evento {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+    padding: 8px 10px;
+    border-left: 3px solid;
+    border-radius: 6px;
+    font-size: 12px;
+    line-height: 1.35;
+}
+.cc-evento strong { font-weight: 700; }
+.cc-evento--produccion { background: #ece8f6; border-color: #57478a; color: #3d3163; }
+.cc-evento--entrega { background: #e3f0ea; border-color: #2f6b52; color: #24523f; }
+.cc-evento--mantenimiento { background: #f7ecdc; border-color: #b5801f; color: #6b4a14; }
+
+.cc-libre {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 56px;
+    border: 1px dashed #ddd8d0;
+    border-radius: 8px;
+    background: #f5f3ef;
+    font-size: 12px;
+    color: #8a837a;
+}
+
+/* Panel lateral */
+.cc-tareas { display: flex; flex-direction: column; gap: 14px; list-style: none; }
+.cc-tarea {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding-left: 10px;
+    border-left: 3px solid;
+    font-size: 12.5px;
+}
+.cc-tarea strong { font-size: 14px; color: #1c1916; }
+.cc-tarea span { color: #6f6a63; }
+.cc-tarea--produccion { border-color: #2f6b52; }
+.cc-tarea--entrega { border-color: #2f6b52; }
+.cc-tarea--mantenimiento { border-color: #b5801f; }
+
+.cc-entregas { display: flex; flex-direction: column; gap: 12px; list-style: none; }
+.cc-entregas li { display: flex; justify-content: space-between; gap: 12px; font-size: 13.5px; }
+.cc-entregas li span:first-child { color: #1c1916; }
+.cc-entregas li span:last-child { color: #6f6a63; white-space: nowrap; }
+
+@media (max-width: 1100px) {
+    .cc-pantalla { grid-template-columns: 1fr; }
+}

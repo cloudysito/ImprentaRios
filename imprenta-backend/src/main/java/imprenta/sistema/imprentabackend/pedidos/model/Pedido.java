@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -26,4 +27,7 @@ public class Pedido {
     private List<Producto> productos;
     private String clienteId;
     private String empleadoId;
+    private String personaSolicita;
+    private BigDecimal precioAcordado;
+    private String archivoDisenioId;
 }
