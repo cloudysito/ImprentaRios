@@ -1,7 +1,5 @@
 package imprenta.sistema.imprentabackend.pedidos.service;
 
-import imprenta.sistema.imprentabackend.pedidos.dtos.PedidoDetalleDTO;
-import imprenta.sistema.imprentabackend.pedidos.model.Pedido;
 import imprenta.sistema.imprentabackend.pedidos.repository.PedidoRepository;
 import imprenta.sistema.imprentabackend.pedidos.service.impl.PedidoService;
 
@@ -11,7 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,12 +25,11 @@ class PedidoServiceTest {
 
     @Test
     void testBuscarPorId_NoEncontrado_LanzaExcepcion() {
-        // Simulamos que el repositorio no encuentra nada
-        when(pedidoRepository.findById(999L)).thenReturn(Optional.empty());
+        when(pedidoRepository.findById("999")).thenReturn(Optional.empty());
 
-        // FALLA AQUÍ: Espera NoSuchElementException, pero la capa de negocio lanza NegocioException
-        assertThrows(NoSuchElementException.class, () -> {
-            pedidoService.obtenerPorId(999L);
-        });
+        var exception = assertThrows(imprenta.sistema.imprentabackend.exceptions.NegocioException.class,
+                () -> pedidoService.buscarPedido("999"));
+        assertEquals(imprenta.sistema.imprentabackend.exceptions.CodigoError.PEDIDO_NO_ENCONTRADO,
+                exception.getCodigo());
     }
 }

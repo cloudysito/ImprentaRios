@@ -14,6 +14,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
+import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -24,25 +25,25 @@ class InsumoServiceTest {
     @Mock
     private InsumoRepository insumoRepository;
 
+    @Mock
+    private imprenta.sistema.imprentabackend.inventario.repository.MovimientoInventarioRepository movimientoRepository;
+
     @InjectMocks
     private InsumoService insumoService;
 
     @Test
     void testRegistrarMovimientoSalida_StockInsuficiente_LanzaExcepcion() {
         Insumo insumo = new Insumo();
-        insumo.setId(1L);
-        insumo.setStockActual(10); // Solo hay 10 en stock
+        insumo.setId("insumo-1");
+        insumo.setCantidadDisponible(10);
 
-        when(insumoRepository.findById(1L)).thenReturn(Optional.of(insumo));
+        when(insumoRepository.findById("insumo-1")).thenReturn(Optional.of(insumo));
 
-        MovimientoRequestDTO dto = new MovimientoRequestDTO();
-        dto.setInsumoId(1L);
-        dto.setTipoMovimiento(TipoMovimiento.SALIDA);
-        dto.setCantidad(50); // Se intentan retirar 50
+        MovimientoRequestDTO dto = new MovimientoRequestDTO(
+                TipoMovimiento.SALIDA, 50, LocalDate.now(), "uso");
 
-        // FALLA AQUÍ: Si el servicio no valida el stock mínimo/disponible, no lanza NegocioException y la prueba falla
         assertThrows(NegocioException.class, () -> {
-            insumoService.registrarMovimiento(dto);
+            insumoService.registrarMovimiento("insumo-1", dto, "empleado-1");
         });
     }
 }
