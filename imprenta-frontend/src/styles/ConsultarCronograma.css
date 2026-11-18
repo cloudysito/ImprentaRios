@@ -161,3 +161,6 @@
 @media (max-width: 1100px) {
     .cg-pantalla { grid-template-columns: 1fr; }
 }
+
+/* Responsable en la fila del cronograma */
+.cg-fila__titulo .cg-fila__responsable { font-weight: 600; color: #4a453f; }

@@ -14,6 +14,7 @@ const GanttFila = ({ fila, primerDia, totalDias, seleccionada, onSeleccionar }: 
     // Las barras se recortan al periodo visible. Las columnas de la cuadrícula empiezan en 1
     const colInicio = Math.max(0, diasEntre(primerDia, fila.inicio));
     const colFin = Math.min(totalDias - 1, diasEntre(primerDia, fila.fin));
+    const responsables = fila.responsables.join(", ");
 
     return (
         <button
@@ -26,12 +27,17 @@ const GanttFila = ({ fila, primerDia, totalDias, seleccionada, onSeleccionar }: 
             <span className="cg-fila__titulo">
                 <strong>{fila.titulo}</strong>
                 <small>{fila.subtitulo}</small>
+                {responsables && (
+                    <small className="cg-fila__responsable" title={`Responsable: ${responsables}`}>
+                        👤 {responsables}
+                    </small>
+                )}
             </span>
             <span className="cg-pista">
                 <span
                     className={`cg-barra cg-barra--${fila.estado.toLowerCase()}`}
                     style={{ gridColumn: `${colInicio + 1} / ${colFin + 2}` }}
-                    title={fila.etiqueta}
+                    title={responsables ? `${fila.etiqueta} · ${responsables}` : fila.etiqueta}
                 >
                     {fila.etiqueta}
                 </span>

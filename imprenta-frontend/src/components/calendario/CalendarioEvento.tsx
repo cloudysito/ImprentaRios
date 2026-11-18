@@ -7,6 +7,7 @@ const CalendarioEvento = ({ evento }: { evento: EventoCalendario }) => (
         <strong>{etiquetaHoras(evento.inicio, evento.fin)}</strong>
         <span>{evento.titulo}</span>
         <span>{evento.referencia}</span>
+        {evento.responsable && <span className="cc-evento__responsable">👤 {evento.responsable}</span>}
     </article>
 );
 

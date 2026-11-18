@@ -7,6 +7,11 @@ import { folioCorto, inicioDeDia, sumarDias } from "./calendario";
 
 export const finDeActividad = (a: ActividadResponse) => a.fechaHoraFin ?? a.fechaHoraInicio;
 
+// Nombres sin repetir y en orden de aparición
+const nombresUnicos = (acts: ActividadResponse[]) => [
+    ...new Set(acts.map((a) => a.empleadoNombre).filter((n): n is string => !!n)),
+];
+
 export const tipoDeActividad = (nombre: string): TipoEvento => {
     const n = nombre.toLowerCase();
     if (n.includes("mantenimiento")) return "MANTENIMIENTO";
@@ -27,6 +32,7 @@ export function construirEventos(
         tipo: tipoDeActividad(a.nombreActividad),
         titulo: a.nombreActividad,
         referencia: folioCorto(folios.get(a.pedidoId) ?? "Sin folio"),
+        responsable: a.empleadoNombre,
         inicio: aFecha(a.fechaHoraInicio),
         fin: aFecha(finDeActividad(a)),
     }));
@@ -40,6 +46,7 @@ export function construirEventos(
                 tipo: "MANTENIMIENTO",
                 titulo: "Mantenimiento",
                 referencia: m.nombre,
+                responsable: null,
                 inicio: fecha,
                 fin: fecha,
             };
@@ -90,6 +97,7 @@ export function construirFilas(
                 subtitulo: `${p.producto} · ${p.clienteNombre}`,
                 estado,
                 etiqueta: ESTADO_LABEL[p.estado],
+                responsables: nombresUnicos(acts),
                 inicio: new Date(Math.min(...inicios)),
                 fin: new Date(Math.max(...fines)),
             });
@@ -103,6 +111,7 @@ export function construirFilas(
                 subtitulo: `${p.producto} · Sin programar`,
                 estado: "ESTIMADO",
                 etiqueta: "Estimado",
+                responsables: [],
                 inicio: sumarDias(entrega, -1),
                 fin: entrega,
             });
@@ -120,6 +129,7 @@ export function construirFilas(
                 subtitulo: "Mantenimiento",
                 estado: "PARO",
                 etiqueta: "Paro",
+                responsables: [],
                 inicio: dia,
                 fin: dia,
             };

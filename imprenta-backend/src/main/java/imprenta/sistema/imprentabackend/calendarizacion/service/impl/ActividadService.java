@@ -13,6 +13,8 @@ import imprenta.sistema.imprentabackend.exceptions.NegocioException;
 import imprenta.sistema.imprentabackend.pedidos.dtos.PedidoDetalleDTO;
 import imprenta.sistema.imprentabackend.pedidos.model.EstadoPedido;
 import imprenta.sistema.imprentabackend.pedidos.service.IPedidoService;
+import imprenta.sistema.imprentabackend.usuarios.model.Empleado;
+import imprenta.sistema.imprentabackend.usuarios.repository.EmpleadoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,11 +32,12 @@ import java.util.Objects;
 public class ActividadService implements IActividadService {
     private final ActividadRepository actividadRepository;
     private final IPedidoService pedidoService;
+    private final EmpleadoRepository empleadoRepository;
 
     @Override
     public ActividadResponeDTO agregarActividad(ActividadRequestDTO dto) {
         Actividad guardado = actividadRepository.save(ActividadMapper.toEntity(dto));
-        return  ActividadMapper.toResponse(guardado);
+        return ActividadMapper.toResponse(guardado, nombreDeEmpleado(guardado.getEmpleadoId()));
     }
 
     @Override
@@ -46,23 +49,27 @@ public class ActividadService implements IActividadService {
     public ActividadResponeDTO actualizarActividad(String id, ActividadRequestDTO dto) {
         Actividad actividad = obtenerActividad(id);
         ActividadMapper.actualizarEntidad(actividad, dto);
-        return ActividadMapper.toResponse(actividadRepository.save(actividad));
+        Actividad guardada = actividadRepository.save(actividad);
+        return ActividadMapper.toResponse(guardada, nombreDeEmpleado(guardada.getEmpleadoId()));
     }
 
     @Override
     public ActividadResponeDTO buscarActividad(String id) {
-        return ActividadMapper.toResponse(obtenerActividad(id));
+        Actividad actividad = obtenerActividad(id);
+        return ActividadMapper.toResponse(actividad, nombreDeEmpleado(actividad.getEmpleadoId()));
     }
 
     @Override
     public List<ActividadResponeDTO> listarActividades(String pedidoId) {
-        return actividadRepository.findAll().stream()
+        List<Actividad> actividades = actividadRepository.findAll().stream()
                 .filter(a -> pedidoId == null || pedidoId.isBlank() || pedidoId.equals(a.getPedidoId()))
                 .sorted(Comparator.comparing(Actividad::getFechaHoraInicio))
-                .map(a -> new ActividadResponeDTO(
-                        a.getId(), a.getNombreActividad(), a.getDescripcion(),
-                        a.getFechaHoraInicio(), a.getFechaHoraFin(),
-                        a.getPedidoId(), a.getEmpleadoId()))
+                .toList();
+
+        // Un solo viaje a la base para todos los nombres, en lugar de uno por actividad
+        Map<String, String> nombres = nombresDeEmpleados(actividades);
+        return actividades.stream()
+                .map(a -> ActividadMapper.toResponse(a, nombres.get(a.getEmpleadoId())))
                 .toList();
     }
 
@@ -179,6 +186,24 @@ public class ActividadService implements IActividadService {
 
     private String textoONull(String texto) {
         return texto == null || texto.isBlank() ? null : texto.trim();
+    }
+
+    private String nombreDeEmpleado(String empleadoId) {
+        if (empleadoId == null || empleadoId.isBlank()) {
+            return null;
+        }
+        return empleadoRepository.findById(empleadoId).map(Empleado::getNombre).orElse(null);
+    }
+
+    private Map<String, String> nombresDeEmpleados(List<Actividad> actividades) {
+        List<String> ids = actividades.stream()
+                .map(Actividad::getEmpleadoId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .toList();
+        Map<String, String> nombres = new HashMap<>();
+        empleadoRepository.findAllById(ids).forEach(e -> nombres.put(e.getId(), e.getNombre()));
+        return nombres;
     }
 
     private Actividad obtenerActividad(String id) {

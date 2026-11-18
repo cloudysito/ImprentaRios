@@ -89,6 +89,9 @@ const CalendarioPage = () => {
                                 <strong>{formatFechaCorta(act.fechaHoraInicio)}</strong>
                                 <span>{act.nombreActividad}</span>
                                 <span style={{ fontSize: '11px', opacity: 0.8, marginTop: '2px' }}>{act.descripcion}</span>
+                                {act.empleadoNombre && (
+                                    <span style={{ fontSize: '11px', fontWeight: 600 }}>👤 {act.empleadoNombre}</span>
+                                )}
                             </div>
                         );
                     })}

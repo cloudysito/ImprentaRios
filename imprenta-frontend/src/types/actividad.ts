@@ -6,4 +6,5 @@ export interface ActividadResponse {
     fechaHoraFin: string;
     pedidoId: string;
     empleadoId: string;
+    empleadoNombre: string | null; // lo resuelve el backend, el dueño ya no es el único que ve nombres
 }

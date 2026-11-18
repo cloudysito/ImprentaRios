@@ -87,6 +87,12 @@ const DetalleCronograma = ({
                             {formatFechaCorta(a.fechaHoraInicio) !== formatFechaCorta(a.fechaHoraFin) && (
                                 <> → {formatFechaCorta(a.fechaHoraFin)}</>
                             )}
+                            {a.empleadoNombre && (
+                                <>
+                                    {" "}
+                                    · <span className="detalle-folio__responsable">👤 {a.empleadoNombre}</span>
+                                </>
+                            )}
                         </li>
                     ))}
                 </ul>
