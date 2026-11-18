@@ -1,5 +1,4 @@
 .mantenimiento {
-    padding: 24px 32px 32px; /* .page-content no tiene padding (lo quita CapturarPedido.css) */
     display: grid;
     grid-template-columns: 310px minmax(0, 1fr);
     gap: 28px;

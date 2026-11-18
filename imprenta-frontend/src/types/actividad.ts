@@ -3,7 +3,7 @@ export interface ActividadResponse {
     nombreActividad: string;
     descripcion: string;
     fechaHoraInicio: string;
-    fechaHoraFina: string;
+    fechaHoraFin: string;
     pedidoId: string;
     empleadoId: string;
 }

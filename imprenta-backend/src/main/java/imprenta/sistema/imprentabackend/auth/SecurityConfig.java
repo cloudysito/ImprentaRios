@@ -96,7 +96,7 @@ public class SecurityConfig {
                         .hasRole("DUENO")
 
                         .requestMatchers(HttpMethod.GET, "/api/material", "/api/material/*")
-                        .hasAnyRole("DUENO", "SECRETARIA", "MANUFACTURA")
+                        .hasAnyRole("DUENO", "SECRETARIA", "DISENADOR", "MANUFACTURA")
 
                         .requestMatchers(HttpMethod.POST, "/api/material")
                         .hasAnyRole("DUENO", "MANUFACTURA")
@@ -107,9 +107,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/material/*")
                         .hasRole("DUENO")
 
-                        // Calendarización
+                        // Calendarización: consultar (calendario y cronograma son de solo lectura para todos)
                         .requestMatchers(HttpMethod.GET, "/api/actividad", "/api/actividad/*")
-                        .hasAnyRole("DUENO", "DISENADOR", "MANUFACTURA")
+                        .hasAnyRole("DUENO", "SECRETARIA", "DISENADOR", "MANUFACTURA")
 
                         .requestMatchers(HttpMethod.POST, "/api/actividad")
                         .hasRole("DUENO")
@@ -121,7 +121,7 @@ public class SecurityConfig {
                         .hasRole("DUENO")
 
                         .requestMatchers(HttpMethod.GET, "/api/tipo-producto")
-                        .hasAnyRole("DUENO", "SECRETARIA")
+                        .hasAnyRole("DUENO", "SECRETARIA", "DISENADOR", "MANUFACTURA")
 
                         // Inventario: entradas y salidas de stock
                         .requestMatchers(HttpMethod.POST, "/api/insumo/*/movimientos")
@@ -129,7 +129,11 @@ public class SecurityConfig {
                         // Taller: reportar avance y terminar trabajos
                         .requestMatchers(HttpMethod.POST, "/api/actividad/*/avance", "/api/actividad/*/terminar")
                         .hasAnyRole("DUENO", "MANUFACTURA")
-                        // Mantenimiento de maquinaria
+                        // Mantenimiento: el listado (nombre y próximo servicio) lo ve todo el personal
+                        // para mostrar los paros en calendario y cronograma
+                        .requestMatchers(HttpMethod.GET, "/api/maquinas")
+                        .hasAnyRole("DUENO", "SECRETARIA", "DISENADOR", "MANUFACTURA")
+                        // Mantenimiento de maquinaria: detalle e historial
                         .requestMatchers(HttpMethod.GET, "/api/maquinas", "/api/maquinas/**")
                         .hasAnyRole("DUENO", "MANUFACTURA")
                         .requestMatchers("/api/maquinas", "/api/maquinas/**")

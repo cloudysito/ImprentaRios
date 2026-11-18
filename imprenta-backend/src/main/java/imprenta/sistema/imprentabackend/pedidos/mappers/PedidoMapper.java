@@ -17,6 +17,9 @@ public final class PedidoMapper {
         pedido.setFechaEntrega(dto.fechaEntrega());
         pedido.setNombreProyecto(dto.nombreProyecto());
         pedido.setClienteId(dto.clienteId());
+        pedido.setPersonaSolicita(dto.personaSolicita());
+        pedido.setPrecioAcordado(dto.precioAcordado());
+        pedido.setArchivoDisenioId(dto.archivoDisenioId());
         pedido.setProductos(dto.productos().stream().map(ProductoMapper::toEntity).toList());
     }
 
@@ -34,7 +37,10 @@ public final class PedidoMapper {
                 pedido.getNombreProyecto(),
                 pedido.getProductos(),
                 pedido.getClienteId(),
-                pedido.getEmpleadoId()
+                pedido.getEmpleadoId(),
+                pedido.getPersonaSolicita(),
+                pedido.getPrecioAcordado(),
+                pedido.getArchivoDisenioId()
         );
     }
 }

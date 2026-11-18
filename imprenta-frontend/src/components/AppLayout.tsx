@@ -11,8 +11,8 @@ interface RouteMeta {
 
 const routeMeta: Record<string, RouteMeta> = {
   "/": { seccion: "Inicio", titulo: "Dashboard" },
-  "/calendario": { seccion: "Calendario", titulo: "Generar calendario" },
-  "/cronograma": { seccion: "Cronograma", titulo: "Consultar cronograma" },
+  "/calendario": { seccion: "Consulta sin edición", titulo: "Consultar calendario" },
+  "/cronograma": { seccion: "Línea de tiempo · Consulta sin edición", titulo: "Consultar cronograma" },
   "/pedidos": { seccion: "Seguimiento administrativo", titulo: "Gestionar pedidos" },
   "/pedidos/nuevo": { seccion: "Pedidos", titulo  : "Capturar pedido" },
   "/archivos-de-diseno/registrar": { seccion: "Archivos de diseño", titulo: "Registrar archivo de diseño" },
@@ -20,6 +20,7 @@ const routeMeta: Record<string, RouteMeta> = {
   "/cronograma/generar": { seccion: "Asignación de mano de obra", titulo: "Generar cronograma" },
   "/taller": { seccion: "Taller", titulo: "Verificar progreso de trabajo" },
   "/inventario": { seccion: "Inventario de materiales", titulo: "Gestionar stock" },
+  "/empleados": { seccion: "Administración", titulo: "Gestionar empleados" },
   "/mantenimiento": { seccion: "Historial técnico del equipo", titulo: "Gestionar mantenimiento de maquinaria" },
 };
 

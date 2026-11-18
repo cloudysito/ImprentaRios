@@ -15,6 +15,7 @@ import imprenta.sistema.imprentabackend.pedidos.mappers.PedidoMapper;
 import imprenta.sistema.imprentabackend.pedidos.model.EstadoPedido;
 import imprenta.sistema.imprentabackend.pedidos.model.Pedido;
 import imprenta.sistema.imprentabackend.pedidos.model.Producto;
+import imprenta.sistema.imprentabackend.pedidos.repository.ArchivoDisenioRepository;
 import imprenta.sistema.imprentabackend.pedidos.repository.ClienteRepository;
 import imprenta.sistema.imprentabackend.pedidos.repository.PedidoRepository;
 import imprenta.sistema.imprentabackend.pedidos.repository.TipoProductoRepository;
@@ -38,6 +39,7 @@ public class PedidoService implements IPedidoService {
     private final TipoProductoRepository tipoProductoRepository;
     private final IMaterialService materialService;
     private final ActividadRepository actividadRepository;
+    private final ArchivoDisenioRepository archivoDisenioRepository;
 
     @Override
     public PedidoResponseDTO capturarPedido(PedidoRequestDTO dto, String empleadoId) {
@@ -50,6 +52,7 @@ public class PedidoService implements IPedidoService {
             }
             materialService.buscarMaterialPorId(p.materialId());
         }
+        validarArchivoDisenio(dto.archivoDisenioId());
         // TODO: verificar existencias de insumo cuando la imprenta defina la respuesta.
 
         Pedido pedido = PedidoMapper.toEntity(dto);
@@ -58,6 +61,13 @@ public class PedidoService implements IPedidoService {
         pedido.setEstado(EstadoPedido.REGISTRADO);
         pedido.setEmpleadoId(empleadoId);
         return PedidoMapper.toResponse(pedidoRepository.save(pedido));
+    }
+
+    private void validarArchivoDisenio(String archivoDisenioId) {
+        if (archivoDisenioId != null && !archivoDisenioId.isBlank()
+                && !archivoDisenioRepository.existsById(archivoDisenioId)) {
+            throw new NegocioException(CodigoError.ARCHIVO_DE_DISENIO_NO_ENCONTRADO);
+        }
     }
 
     private String generarFolio() {
@@ -73,6 +83,7 @@ public class PedidoService implements IPedidoService {
     @Override
     public PedidoResponseDTO actualizarPedido(String id, PedidoRequestDTO dto) {
         Pedido pedido = obtenerPedido(id);
+        validarArchivoDisenio(dto.archivoDisenioId());
         PedidoMapper.actualizarEntidad(pedido, dto);
         return PedidoMapper.toResponse(pedidoRepository.save(pedido));
     }
@@ -158,8 +169,13 @@ public class PedidoService implements IPedidoService {
                 ? List.of()
                 : List.of(new EventoBitacoraDTO(p.getFechaRegistro(), "Pedido registrado"));
 
+        String versionDisenio = p.getArchivoDisenioId() == null ? null
+                : archivoDisenioRepository.findById(p.getArchivoDisenioId())
+                        .map(a -> "v" + Objects.requireNonNullElse(a.getVersion(), 1))
+                        .orElse(null);
+
         return new PedidoDetalleDTO(r.id(), r.folio(), r.clienteNombre(), r.producto(), r.piezas(),
-                r.fechaEntrega(), r.estado(), piezasTerminadas, null, bitacora);
+                r.fechaEntrega(), r.estado(), piezasTerminadas, versionDisenio, bitacora);
     }
 
     private List<Producto> productosDe(Pedido p) {

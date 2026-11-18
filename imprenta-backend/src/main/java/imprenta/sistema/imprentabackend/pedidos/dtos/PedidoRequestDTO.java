@@ -3,6 +3,7 @@ package imprenta.sistema.imprentabackend.pedidos.dtos;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -17,5 +18,10 @@ public record PedidoRequestDTO(
         @Valid
         List<ProductoRequestDTO> productos,
         @NotBlank(message = "El ID del cliente es obligatorio")
-        String clienteId
+        String clienteId,
+        @Size(max = 100)
+        String personaSolicita,
+        @DecimalMin(value = "0.0", message = "El precio no puede ser negativo")
+        BigDecimal precioAcordado,
+        String archivoDisenioId
 ) {}

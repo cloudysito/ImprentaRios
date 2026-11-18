@@ -1,0 +1,74 @@
+.empleados {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+}
+
+.empleados__panel {
+  min-width: 0;
+  padding: 24px;
+}
+
+.empleados__panel h2 {
+  margin: 0 0 16px;
+  font-size: 18px;
+}
+
+.empleados__descripcion,
+.empleados__formulario small {
+  color: #6f6a63;
+  font-size: 13px;
+}
+
+.empleados__formulario {
+  max-width: 480px;
+  margin-top: 20px;
+}
+
+.empleados__formulario fieldset {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.empleados__leyenda {
+  margin-bottom: 16px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.empleados__formulario button {
+  justify-self: start;
+}
+
+.empleados__tabla {
+  overflow-x: auto;
+}
+
+.empleados__tabla table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.empleados__tabla th,
+.empleados__tabla td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ece6dc;
+  overflow-wrap: anywhere;
+}
+
+.empleados__tabla th {
+  background: #f8f6f2;
+  font-weight: 600;
+}
+
+@media (max-width: 640px) {
+  .empleados__panel {
+    padding: 16px;
+  }
+}
