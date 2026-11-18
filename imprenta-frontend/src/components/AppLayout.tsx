@@ -1,4 +1,5 @@
 import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { useEffect } from "react";
 import Sidebar from "./SideBar";
 import Navbar from "./Navbar";
 import { useAuth } from "../hooks/useAuth";
@@ -28,12 +29,15 @@ const routeMeta: Record<string, RouteMeta> = {
 const AppLayout = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
+  const { seccion, titulo } = routeMeta[location.pathname] ?? { titulo: "Imprenta Ríos" };
+
+  useEffect(() => {
+    document.title = titulo == "Imprenta Ríos" ? "Imprenta Ríos" : `${titulo} | Imprenta Ríos`;
+  }, [titulo]);
 
   if (!user) {
     return <Navigate to="/login" replace state={{ from: location.pathname }} />;
   }
-
-  const { seccion, titulo } = routeMeta[location.pathname] ?? { titulo: "Imprenta Ríos" };
 
   return (
     <div className="app-shell">
