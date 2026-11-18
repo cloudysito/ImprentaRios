@@ -25,6 +25,7 @@ const DetalleSeleccionado = ({ detalle, cargando }: DetalleSeleccionadoProps) =>
                     <p className="cg-detalle__folio">{detalle.folio}</p>
                     <p className="cg-detalle__texto">
                         {detalle.producto} · {detalle.clienteNombre}
+                        Encargado: {detalle.asignadoA ?? "Sin asignar"}
                     </p>
                     <div
                         className="cg-progreso"

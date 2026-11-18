@@ -22,7 +22,7 @@ import imprenta.sistema.imprentabackend.pedidos.repository.TipoProductoRepositor
 import imprenta.sistema.imprentabackend.pedidos.service.IPedidoService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
+import imprenta.sistema.imprentabackend.usuarios.repository.EmpleadoRepository;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +40,7 @@ public class PedidoService implements IPedidoService {
     private final IMaterialService materialService;
     private final ActividadRepository actividadRepository;
     private final ArchivoDisenioRepository archivoDisenioRepository;
+    private final EmpleadoRepository empleadoRepository;
 
     @Override
     public PedidoResponseDTO capturarPedido(PedidoRequestDTO dto, String empleadoId) {
@@ -71,13 +72,19 @@ public class PedidoService implements IPedidoService {
     }
 
     private String generarFolio() {
-        return "PED-" + LocalDate.now().getYear() + "-"
-                + String.format("%04d", pedidoRepository.count() + 1);
+        String prefijo = "PED-" + LocalDate.now().getYear() + "-";
+        long consecutivo = pedidoRepository.count() + 1;
+        while (pedidoRepository.findByFolio(prefijo + String.format("%04d", consecutivo)).isPresent()) {
+            consecutivo++;
+        }
+        return prefijo + String.format("%04d", consecutivo);
     }
 
     @Override
     public void eliminarPedido(String id) {
-        pedidoRepository.delete(obtenerPedido(id));
+        Pedido pedido = obtenerPedido(id);
+        actividadRepository.deleteByPedidoId(id);
+        pedidoRepository.delete(pedido);
     }
 
     @Override
@@ -174,9 +181,17 @@ public class PedidoService implements IPedidoService {
                         .map(a -> "v" + Objects.requireNonNullElse(a.getVersion(), 1))
                         .orElse(null);
 
+        List<String> asignados = actividadRepository.findByPedidoId(p.getId()).stream()
+                .map(Actividad::getEmpleadoId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .map(eid -> empleadoRepository.findById(eid).map(e -> e.getNombre()).orElse(null))
+                .filter(Objects::nonNull)
+                .toList();
+        String asignadoA = asignados.isEmpty() ? null : String.join(", ", asignados);
+
         return new PedidoDetalleDTO(r.id(), r.folio(), r.clienteNombre(), r.producto(), r.piezas(),
-                r.fechaEntrega(), r.estado(), piezasTerminadas, versionDisenio, bitacora);
-    }
+                r.fechaEntrega(), r.estado(), piezasTerminadas, versionDisenio, asignadoA, bitacora);    }
 
     private List<Producto> productosDe(Pedido p) {
         return p.getProductos() != null ? p.getProductos() : List.of();

@@ -1,7 +1,9 @@
+import { X } from "lucide-react";
 import type { PedidoResumen } from "../../types/pedido";
 import { formatFechaCorta, formatNumero } from "../../utils/formato";
 import EstatusBadges from "./EstatusBadges";
 import "../../styles/PedidosTabla.css";
+import "../../styles/UI.css";
 
 interface PedidosTablaProps {
   pedidos: PedidoResumen[];
@@ -9,6 +11,7 @@ interface PedidosTablaProps {
   onSeleccionar: (id: string) => void;
   cargando: boolean;
   error: string | null;
+  onEliminar?: (pedido: PedidoResumen) => void;
 }
 
 const PedidosTabla = ({
@@ -17,6 +20,7 @@ const PedidosTabla = ({
   onSeleccionar,
   cargando,
   error,
+  onEliminar,
 }: PedidosTablaProps) => {
   const mensaje = cargando
     ? "Cargando pedidos…"
@@ -33,12 +37,13 @@ const PedidosTabla = ({
             <th className="is-num">Piezas</th>
             <th>Entrega</th>
             <th>Estatus</th>
+            {onEliminar && <th aria-label="Acciones"></th>}
           </tr>
         </thead>
         <tbody>
           {mensaje ? (
             <tr>
-              <td colSpan={6} className="pedidos-tabla__mensaje">
+              <td colSpan={onEliminar ? 7 : 6} className="pedidos-tabla__mensaje">
                 {mensaje}
               </td>
             </tr>
@@ -60,6 +65,23 @@ const PedidosTabla = ({
                 <td>
                   <EstatusBadges estado={p.estado} />
                 </td>
+                {onEliminar && (
+                  <td>
+                    <button
+                      type="button"
+                      className="ui-btn-x"
+                      title="Eliminar pedido"
+                      aria-label={`Eliminar ${p.folio}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEliminar(p);
+                      }}
+                      onKeyDown={(e) => e.stopPropagation()}
+                    >
+                      <X size={16} />
+                    </button>
+                  </td>
+                )}
               </tr>
             ))
           )}

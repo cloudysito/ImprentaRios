@@ -26,6 +26,7 @@ const GanttFila = ({ fila, primerDia, totalDias, seleccionada, onSeleccionar }: 
             <span className="cg-fila__titulo">
                 <strong>{fila.titulo}</strong>
                 <small>{fila.subtitulo}</small>
+                {fila.responsable && <small>Encargado: {fila.responsable}</small>}
             </span>
             <span className="cg-pista">
                 <span

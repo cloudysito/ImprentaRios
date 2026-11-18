@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
+import { X } from "lucide-react";
+import { crearEmpleado, eliminarEmpleado, listarEmpleados } from "../services/empleadoService";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import { rolLabels } from "../services/authService";
 import type { Empleado } from "../services/authService";
-import { crearEmpleado, listarEmpleados } from "../services/empleadoService";
 import type { NuevoEmpleado } from "../services/empleadoService";
 import { mensajeDeError } from "../utils/errores";
 import "../styles/UI.css";
@@ -24,6 +25,7 @@ const rolesAsignables: NuevoEmpleado["rol"][] = [
 ];
 
 function GestionarEmpleados() {
+  const { user } = useAuth();
   const [empleados, setEmpleados] = useState<Empleado[]>([]);
   const [formulario, setFormulario] = useState<NuevoEmpleado>({ ...formularioInicial });
   const [cargando, setCargando] = useState(true);
@@ -51,6 +53,18 @@ function GestionarEmpleados() {
     void cargar();
     return () => { vigente = false; };
   }, []);
+
+  async function eliminar(empleado: Empleado) {
+    if (!window.confirm(`¿Eliminar a ${empleado.nombre}? Sus actividades asignadas quedarán sin responsable.`)) {
+      return;
+    }
+    try {
+      await eliminarEmpleado(empleado.id);
+      setEmpleados((actuales) => actuales.filter((e) => e.id !== empleado.id));
+    } catch (err) {
+      window.alert(mensajeDeError(err, "No se pudo eliminar el empleado"));
+    }
+  }
 
   async function guardar(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -177,6 +191,7 @@ function GestionarEmpleados() {
                   <th scope="col">Usuario</th>
                   <th scope="col">Rol</th>
                   <th scope="col">Estado</th>
+                  <th scope="col" aria-label="Acciones"></th>
                 </tr>
               </thead>
               <tbody>
@@ -189,6 +204,19 @@ function GestionarEmpleados() {
                       <span className={`ui-badge ${empleado.activo ? "ui-badge--ok" : "ui-badge--peligro"}`}>
                         {empleado.activo ? "Activo" : "Inactivo"}
                       </span>
+                    </td>
+                    <td>
+                      {empleado.rol !== "DUENO" && empleado.id !== user?.id && (
+                        <button
+                          type="button"
+                          className="ui-btn-x"
+                          onClick={() => eliminar(empleado)}
+                          aria-label={`Eliminar a ${empleado.nombre}`}
+                          title="Eliminar"
+                        >
+                          <X size={16} />
+                        </button>
+                      )}
                     </td>
                   </tr>
                 ))}

@@ -15,6 +15,7 @@ public record PedidoDetalleDTO(
         EstadoPedido estado,
         int piezasTerminadas,
         String versionDisenio,
+        String asignadoA,
         List<EventoBitacoraDTO> bitacora
 ) {
 }

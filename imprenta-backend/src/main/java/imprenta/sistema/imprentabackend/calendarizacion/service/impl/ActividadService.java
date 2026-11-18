@@ -13,6 +13,7 @@ import imprenta.sistema.imprentabackend.exceptions.NegocioException;
 import imprenta.sistema.imprentabackend.pedidos.dtos.PedidoDetalleDTO;
 import imprenta.sistema.imprentabackend.pedidos.model.EstadoPedido;
 import imprenta.sistema.imprentabackend.pedidos.service.IPedidoService;
+import imprenta.sistema.imprentabackend.usuarios.repository.EmpleadoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -30,6 +31,7 @@ import java.util.Objects;
 public class ActividadService implements IActividadService {
     private final ActividadRepository actividadRepository;
     private final IPedidoService pedidoService;
+    private final EmpleadoRepository empleadoRepository;
 
     @Override
     public ActividadResponeDTO agregarActividad(ActividadRequestDTO dto) {
@@ -56,13 +58,17 @@ public class ActividadService implements IActividadService {
 
     @Override
     public List<ActividadResponeDTO> listarActividades(String pedidoId) {
+        Map<String, String> nombres = new HashMap<>();
+        empleadoRepository.findAll().forEach(e -> nombres.put(e.getId(), e.getNombre()));
+
         return actividadRepository.findAll().stream()
                 .filter(a -> pedidoId == null || pedidoId.isBlank() || pedidoId.equals(a.getPedidoId()))
                 .sorted(Comparator.comparing(Actividad::getFechaHoraInicio))
                 .map(a -> new ActividadResponeDTO(
                         a.getId(), a.getNombreActividad(), a.getDescripcion(),
                         a.getFechaHoraInicio(), a.getFechaHoraFin(),
-                        a.getPedidoId(), a.getEmpleadoId()))
+                        a.getPedidoId(), a.getEmpleadoId(),
+                        nombres.get(a.getEmpleadoId())))
                 .toList();
     }
 

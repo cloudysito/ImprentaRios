@@ -16,4 +16,8 @@ export const pedidosService = {
     const { data } = await api.patch<PedidoDetalle>(`/pedidos/${id}/estado`, { estado });
     return data;
   },
+
+  eliminar: async (id: string) => {
+    await api.delete(`/pedidos/${id}`);
+  },
 };

@@ -38,6 +38,12 @@ const DetalleFolio = ({
 
       <dl className="detalle-folio__datos">
         <div>
+          <dt>Asignado a</dt>
+          <dd className={detalle.asignadoA ? "" : "is-muted"}>
+            {detalle.asignadoA ?? "Sin asignar"}
+          </dd>
+        </div>
+        <div>
           <dt>Producto</dt>
           <dd>{detalle.producto}</dd>
         </div>

@@ -213,3 +213,20 @@ select.ui-input {
         grid-template-columns: 1fr;
     }
 }
+
+.ui-btn-x {
+    display: inline-grid;
+    place-items: center;
+    width: 30px;
+    height: 30px;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #8a837a;
+    cursor: pointer;
+}
+
+.ui-btn-x:hover {
+    background: #fbeae7;
+    color: #a63d30;
+}

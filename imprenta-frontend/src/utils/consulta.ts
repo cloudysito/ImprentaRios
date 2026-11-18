@@ -27,6 +27,7 @@ export function construirEventos(
         tipo: tipoDeActividad(a.nombreActividad),
         titulo: a.nombreActividad,
         referencia: folioCorto(folios.get(a.pedidoId) ?? "Sin folio"),
+        responsable: a.empleadoNombre,
         inicio: aFecha(a.fechaHoraInicio),
         fin: aFecha(finDeActividad(a)),
     }));
@@ -83,11 +84,13 @@ export function construirFilas(
         if (acts.length > 0) {
             const inicios = acts.map((a) => inicioDeDia(aFecha(a.fechaHoraInicio)).getTime());
             const fines = acts.map((a) => inicioDeDia(aFecha(finDeActividad(a))).getTime());
+            const nombres = [...new Set(acts.map((a) => a.empleadoNombre).filter((n): n is string => !!n))];
             filas.push({
                 id: p.id,
                 pedidoId: p.id,
                 titulo: p.folio,
                 subtitulo: `${p.producto} · ${p.clienteNombre}`,
+                responsable: nombres.length > 0 ? nombres.join(", ") : null,
                 estado,
                 etiqueta: ESTADO_LABEL[p.estado],
                 inicio: new Date(Math.min(...inicios)),

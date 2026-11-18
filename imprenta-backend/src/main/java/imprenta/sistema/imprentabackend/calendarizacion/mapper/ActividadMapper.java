@@ -28,7 +28,8 @@ public final class ActividadMapper {
                 actividad.getFechaHoraInicio(),
                 actividad.getFechaHoraFin(),
                 actividad.getPedidoId(),
-                actividad.getEmpleadoId()
+                actividad.getEmpleadoId(),
+                null
         );
     }
 }

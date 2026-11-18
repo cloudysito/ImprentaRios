@@ -8,6 +8,7 @@ export interface EventoCalendario {
     tipo: TipoEvento;
     titulo: string; // "Impresión", "Entrega", "Mantenimiento"
     referencia: string; // folio corto o nombre de la máquina
+    responsable?: string | null; // nombre del empleado asignado
     inicio: Date;
     fin: Date;
 }
@@ -52,6 +53,7 @@ export interface FilaCronograma {
     pedidoId: string | null; // null en las filas de mantenimiento
     titulo: string; // folio o nombre de máquina
     subtitulo: string;
+    responsable?: string | null; // nombre(s) del encargado
     estado: EstadoBarra;
     etiqueta: string;
     inicio: Date;

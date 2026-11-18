@@ -3,11 +3,29 @@ import PedidosTabla from "../components/pedidos/PedidosTabla";
 import DetalleFolio from "../components/pedidos/DetalleFolio";
 import { usePedidos } from "../hooks/usePedidos";
 import { useDetallePedido } from "../hooks/useDetallePedido";
+import { useAuth } from "../hooks/useAuth";
+import { pedidosService } from "../services/pedidosService";
+import { mensajeDeError } from "../utils/errores";
+import type { PedidoResumen } from "../types/pedido";
 import "../styles/GestionarPedidos.css";
 
 const GestionarPedidosPage = () => {
   const lista = usePedidos();
   const folio = useDetallePedido(lista.seleccionadoId);
+  const { user } = useAuth();
+  const esDueno = user?.rol === "DUENO";
+
+  const handleEliminar = async (p: PedidoResumen) => {
+    if (!window.confirm(`¿Eliminar el folio ${p.folio}? Esta acción no se puede deshacer y también borra su cronograma.`)) {
+      return;
+    }
+    try {
+      await pedidosService.eliminar(p.id);
+      lista.quitarPedido(p.id);
+    } catch (err) {
+      window.alert(mensajeDeError(err, "No se pudo eliminar el pedido"));
+    }
+  };
 
   const handleMarcarEntregado = async () => {
     const actualizado = await folio.cambiarEstado("ENTREGADO");
@@ -38,6 +56,7 @@ const GestionarPedidosPage = () => {
           onSeleccionar={lista.seleccionar}
           cargando={lista.cargando}
           error={lista.error}
+          onEliminar={esDueno ? handleEliminar : undefined}
         />
       </section>
 

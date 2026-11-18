@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
+import { rolLabels, type Empleado } from "../../services/authService";
+import { listarEmpleados } from "../../services/empleadoService";
 import type { CronogramaDetalle } from "../../types/cronograma";
 import { formatFechaCorta, formatFechaLarga, formatNumero } from "../../utils/formato";
 import CronogramaBadge from "./CronogramaBadge";
@@ -27,6 +29,16 @@ const DetalleCronograma = ({
     const { user } = useAuth();
     // Solo el dueño genera o elimina cronogramas, los demás roles solo los consultan
     const esDueno = user?.rol === "DUENO";
+
+    const [empleados, setEmpleados] = useState<Empleado[]>([]);
+
+    // Solo el dueño puede listar empleados, y solo él ve este selector
+    useEffect(() => {
+        if (!esDueno) return;
+        listarEmpleados()
+            .then((data) => setEmpleados(data.filter((e) => e.activo !== false)))
+            .catch(() => setEmpleados([]));
+    }, [esDueno]);
 
     if (cargando || !detalle) {
         return (
@@ -95,17 +107,22 @@ const DetalleCronograma = ({
             )}
 
             {esDueno && (
-            <label className="detalle-folio__campo">
-                ID del empleado responsable
-                <input
-                    className="detalle-folio__input"
-                    type="text"
-                    value={empleadoId}
-                    onChange={(e) => setEmpleadoId(e.target.value)}
-                    placeholder="Ej. 66f1a2b3c4d5e6f7a8b9c0d1"
-                    disabled={!puedeGenerar || guardando}
-                />
-            </label>
+                <label className="detalle-folio__campo">
+                    Empleado responsable
+                    <select
+                        className="detalle-folio__input"
+                        value={empleadoId}
+                        onChange={(e) => setEmpleadoId(e.target.value)}
+                        disabled={!puedeGenerar || guardando}
+                    >
+                        <option value="">Selecciona un empleado</option>
+                        {empleados.map((e) => (
+                            <option key={e.id} value={e.id}>
+                                {e.nombre} · {rolLabels[e.rol]}
+                            </option>
+                        ))}
+                    </select>
+                </label>
             )}
 
             {error && <p className="detalle-folio__error">{error}</p>}

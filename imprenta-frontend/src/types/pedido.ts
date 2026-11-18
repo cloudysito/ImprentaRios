@@ -25,7 +25,8 @@ export interface EventoBitacora {
 
 export interface PedidoDetalle extends PedidoResumen {
   piezasTerminadas: number;
-  versionDisenio: string | null; 
+  versionDisenio: string | null;
+  asignadoA: string | null;
   bitacora: EventoBitacora[];
 }
 

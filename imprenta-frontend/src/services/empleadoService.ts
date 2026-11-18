@@ -17,3 +17,7 @@ export async function crearEmpleado(empleado: NuevoEmpleado): Promise<Empleado> 
   const { data } = await api.post<Empleado>("/empleados", empleado);
   return data;
 }
+
+export async function eliminarEmpleado(id: string): Promise<void> {
+  await api.delete(`/empleados/${id}`);
+}
