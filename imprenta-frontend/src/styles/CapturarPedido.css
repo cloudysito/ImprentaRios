@@ -269,3 +269,23 @@
 .capturar-pedido-container .section-header h2 {
     margin: 0;
 }
+
+.capturar-pedido-container .cliente-seleccionado {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    border: 1px solid #e3ded8;
+    border-radius: 8px;
+    background: #fbf8f4;
+    font-size: 0.9rem;
+}
+
+.capturar-pedido-container .cliente-seleccionado strong {
+    color: #222;
+}
+
+.capturar-pedido-container .cliente-seleccionado span {
+    color: #666;
+}

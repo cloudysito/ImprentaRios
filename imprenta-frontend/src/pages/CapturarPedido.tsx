@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import "../styles/CapturarPedido.css";
 import { useCatalogosPedido } from "../hooks/useCatalogosPedido";
 import { capturaService } from "../services/capturaService";
+import { clienteService } from "../services/clienteService";
 import { mensajeDeError } from "../utils/errores";
 import { ACABADOS, PRIORIDADES, TINTAS, productoVacio } from "../types/captura";
-import type { ProductoForm } from "../types/captura";
+import type { Cliente, ProductoForm } from "../types/captura";
 
 const etiqueta = (v: string) =>
   v.charAt(0) + v.slice(1).toLowerCase().replace(/_/g, " ");
@@ -33,6 +34,29 @@ const CapturarPedido = () => {
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState("");
   const [folio, setFolio] = useState("");
+  const [clientes, setClientes] = useState<Cliente[]>([]);
+  const [clienteExistenteId, setClienteExistenteId] = useState("");
+  const [cargandoClientes, setCargandoClientes] = useState(true);
+  const [errorClientes, setErrorClientes] = useState<string | null>(null);
+
+  useEffect(() => {
+    let vigente = true;
+    clienteService
+      .listar()
+      .then((datos) => {
+        if (vigente) setClientes(datos);
+      })
+      .catch((err) => {
+        if (vigente) setErrorClientes(mensajeDeError(err, "No se pudieron cargar los clientes"));
+      })
+      .finally(() => {
+        if (vigente) setCargandoClientes(false);
+      });
+
+    return () => {
+      vigente = false;
+    };
+  }, []);
 
   const cambiarProducto = (
     i: number,
@@ -53,11 +77,16 @@ const CapturarPedido = () => {
     setError("");
     setEnviando(true);
     try {
-      const nuevoCliente = await capturaService.crearCliente(cliente);
+      const clienteId = clienteExistenteId || (await capturaService.crearCliente(cliente)).id;
+      if (!clienteExistenteId) {
+        const nuevoCliente = { ...cliente, id: clienteId };
+        setClientes((actuales) => [...actuales, nuevoCliente]);
+        setClienteExistenteId(clienteId);
+      }
       const pedido = await capturaService.crearPedido({
         nombreProyecto: proyecto.nombreProyecto,
         fechaEntrega: proyecto.fechaEntrega,
-        clienteId: nuevoCliente.id,
+        clienteId,
         productos: productos.map((p) => ({
           ...p,
           cantidad: Number(p.cantidad),
@@ -82,52 +111,82 @@ const CapturarPedido = () => {
 
           <div className="form-row">
             <div className="form-group">
-              <label>
-                Nombre o razón social <span>*</span>
-              </label>
-              <input
-                required
-                maxLength={100}
-                value={cliente.nombre}
-                onChange={(e) =>
-                  setCliente({ ...cliente, nombre: e.target.value })
-                }
-                placeholder="Ej. Papelería El Trébol S.A. de C.V."
-              />
-            </div>
-            <div className="form-group">
-              <label>
-                Teléfono de contacto <span>*</span>
-              </label>
-              <input
-                required
-                maxLength={15}
-                value={cliente.telefono}
-                onChange={(e) =>
-                  setCliente({ ...cliente, telefono: e.target.value })
-                }
-                placeholder="Ej. 644 118 22 40"
-              />
+              <label htmlFor="cliente-existente">Cliente registrado</label>
+              <select
+                id="cliente-existente"
+                value={clienteExistenteId}
+                onChange={(e) => setClienteExistenteId(e.target.value)}
+              >
+                <option value="">Registrar un cliente nuevo</option>
+                {clientes.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.nombre} · {c.telefono}
+                  </option>
+                ))}
+              </select>
+              {cargandoClientes && <small>Cargando clientes…</small>}
+              {errorClientes && <small className="error-text">{errorClientes}</small>}
             </div>
           </div>
 
-          <div className="form-row">
-            <div className="form-group">
-              <label>
-                Correo electrónico <span>*</span>
-              </label>
-              <input
-                required
-                type="email"
-                maxLength={100}
-                value={cliente.correo}
-                onChange={(e) =>
-                  setCliente({ ...cliente, correo: e.target.value })
-                }
-                placeholder="Ej. compras@eltrebol.mx"
-              />
+          {clienteExistenteId ? (
+            <div className="cliente-seleccionado">
+              <strong>{clientes.find((c) => c.id === clienteExistenteId)?.nombre ?? "Cliente seleccionado"}</strong>
+              <span>{clientes.find((c) => c.id === clienteExistenteId)?.telefono}</span>
+              <span>{clientes.find((c) => c.id === clienteExistenteId)?.correo || "Sin correo registrado"}</span>
             </div>
-          </div>
+          ) : (
+            <>
+              <div className="form-row">
+                <div className="form-group">
+                  <label>
+                    Nombre o razón social <span>*</span>
+                  </label>
+                  <input
+                    required
+                    maxLength={100}
+                    value={cliente.nombre}
+                    onChange={(e) =>
+                      setCliente({ ...cliente, nombre: e.target.value })
+                    }
+                    placeholder="Ej. Papelería El Trébol S.A. de C.V."
+                  />
+                </div>
+                <div className="form-group">
+                  <label>
+                    Teléfono de contacto <span>*</span>
+                  </label>
+                  <input
+                    required
+                    maxLength={15}
+                    value={cliente.telefono}
+                    onChange={(e) =>
+                      setCliente({ ...cliente, telefono: e.target.value })
+                    }
+                    placeholder="Ej. 644 118 22 40"
+                  />
+                </div>
+              </div>
+
+              <div className="form-row">
+                <div className="form-group">
+                  <label>
+                    Correo electrónico <span>*</span>
+                  </label>
+                  <input
+                    required
+                    type="email"
+                    maxLength={100}
+                    value={cliente.correo}
+                    onChange={(e) =>
+                      setCliente({ ...cliente, correo: e.target.value })
+                    }
+                    placeholder="Ej. compras@eltrebol.mx"
+                  />
+                </div>
+              </div>
+            </>
+          )}
 
           <h2 className="section-title mt-4">DATOS DEL PEDIDO</h2>
           <div className="form-row">

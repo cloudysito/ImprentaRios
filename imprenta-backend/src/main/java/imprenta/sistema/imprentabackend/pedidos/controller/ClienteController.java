@@ -9,6 +9,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/cliente")
 @RequiredArgsConstructor
@@ -18,6 +20,12 @@ public class ClienteController {
     @PostMapping
     public ResponseEntity<ClienteResponseDTO> crear(@Valid @RequestBody ClienteRequestDTO dto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(clienteService.crearCliente(dto));
+    }
+
+    @GetMapping
+    public ResponseEntity<List<ClienteResponseDTO>> listar(
+            @RequestParam(required = false) String busqueda) {
+        return ResponseEntity.ok(clienteService.listarClientes(busqueda));
     }
 
     @PutMapping({ "/{id}"})
