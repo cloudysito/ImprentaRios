@@ -26,7 +26,10 @@ public enum CodigoError {
     ACTIVIDAD_YA_TERMINADA(HttpStatus.CONFLICT, "Esta actividad ya se marcó como terminada"),
     PIEZAS_EXCEDEN_TOTAL(HttpStatus.BAD_REQUEST, "Las piezas terminadas no pueden superar el total del pedido"),
     MAQUINA_NO_ENCONTRADA(HttpStatus.NOT_FOUND, "Máquina no encontrada"),
-    DEMASIADOS_INTENTOS(HttpStatus.TOO_MANY_REQUESTS, "Demasiados intentos de inicio de sesión. Intenta nuevamente más tarde");
+    DEMASIADOS_INTENTOS(HttpStatus.TOO_MANY_REQUESTS, "Demasiados intentos de inicio de sesión. Intenta nuevamente más tarde"),
+    NO_PUEDES_ELIMINARTE(HttpStatus.CONFLICT, "No puedes eliminar tu propia cuenta"),
+    NO_PUEDES_DESACTIVARTE(HttpStatus.CONFLICT, "No puedes desactivar tu propia cuenta"),
+    ULTIMO_DUENO(HttpStatus.CONFLICT, "Debe quedar al menos un dueño activo en el sistema");
 
     private final HttpStatus status;
     private final String mensaje;

@@ -1,6 +1,7 @@
 package imprenta.sistema.imprentabackend.usuarios.controller;
 
 import imprenta.sistema.imprentabackend.auth.JwtService;
+import imprenta.sistema.imprentabackend.auth.UsuarioActual;
 import imprenta.sistema.imprentabackend.auth.dto.LoginRequest;
 import imprenta.sistema.imprentabackend.auth.dto.LoginResponse;
 import imprenta.sistema.imprentabackend.usuarios.dtos.EmpleadoRequestDTO;
@@ -71,13 +72,15 @@ public class EmpleadoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<EmpleadoResponseDTO> actualizar(@PathVariable String id, @Valid @RequestBody EmpleadoRequestDTO dto) {
-        return ResponseEntity.ok(empleadoService.actualizarEmpleado(id, dto));
+    public ResponseEntity<EmpleadoResponseDTO> actualizar(@PathVariable String id,
+                                                          @Valid @RequestBody EmpleadoRequestDTO dto) {
+        return ResponseEntity.ok(
+                empleadoService.actualizarEmpleado(id, dto, UsuarioActual.empleadoId()));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> eliminar(@PathVariable String id) {
-        empleadoService.eliminarEmpleado(id);
+        empleadoService.eliminarEmpleado(id, UsuarioActual.empleadoId());
         return ResponseEntity.noContent().build();
     }
 }

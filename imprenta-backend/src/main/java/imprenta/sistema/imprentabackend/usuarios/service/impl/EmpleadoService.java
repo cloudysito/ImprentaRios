@@ -6,6 +6,7 @@ import imprenta.sistema.imprentabackend.usuarios.dtos.EmpleadoRequestDTO;
 import imprenta.sistema.imprentabackend.usuarios.dtos.EmpleadoResponseDTO;
 import imprenta.sistema.imprentabackend.usuarios.mapper.EmpleadoMapper;
 import imprenta.sistema.imprentabackend.usuarios.model.Empleado;
+import imprenta.sistema.imprentabackend.usuarios.model.Rol;
 import imprenta.sistema.imprentabackend.usuarios.repository.EmpleadoRepository;
 import imprenta.sistema.imprentabackend.usuarios.service.IEmpleadoService;
 import lombok.RequiredArgsConstructor;
@@ -41,8 +42,18 @@ public class EmpleadoService implements IEmpleadoService {
     }
 
     @Override
-    public void eliminarEmpleado(String id) {
-        empleadoRepository.delete(buscarPorId(id));
+    public void eliminarEmpleado(String id, String solicitanteId) {
+        Empleado empleado = buscarPorId(id);
+
+        if (empleado.getId().equals(solicitanteId)) {
+            throw new NegocioException(CodigoError.NO_PUEDES_ELIMINARTE);
+        }
+        if (esUltimoDuenoActivo(empleado)) {
+            throw new NegocioException(CodigoError.ULTIMO_DUENO);
+        }
+
+        empleado.setActivo(false);
+        guardar(empleado);
     }
 
     @Override
@@ -58,12 +69,22 @@ public class EmpleadoService implements IEmpleadoService {
     }
 
     @Override
-    public EmpleadoResponseDTO actualizarEmpleado(String id, EmpleadoRequestDTO dto) {
+    public EmpleadoResponseDTO actualizarEmpleado(String id, EmpleadoRequestDTO dto, String solicitanteId) {
         Empleado existente = buscarPorId(id);
 
         Empleado conMismoUsuario = empleadoRepository.findByUsuario(dto.usuario());
         if (conMismoUsuario != null && !conMismoUsuario.getId().equals(id)) {
             throw new NegocioException(CodigoError.USUARIO_YA_REGISTRADO);
+        }
+
+        boolean quedaraInactivo = dto.activo() != null && !dto.activo();
+        boolean dejaraDeSerDueno = dto.rol() != Rol.DUENO;
+
+        if (quedaraInactivo && existente.getId().equals(solicitanteId)) {
+            throw new NegocioException(CodigoError.NO_PUEDES_DESACTIVARTE);
+        }
+        if ((quedaraInactivo || dejaraDeSerDueno) && esUltimoDuenoActivo(existente)) {
+            throw new NegocioException(CodigoError.ULTIMO_DUENO);
         }
 
         existente.setNombre(dto.nombre());
@@ -89,6 +110,12 @@ public class EmpleadoService implements IEmpleadoService {
             throw new NegocioException(CodigoError.EMPLEADO_INACTIVO);
         }
         return EmpleadoMapper.toResponse(empleado);
+    }
+
+    private boolean esUltimoDuenoActivo(Empleado empleado) {
+        return empleado.getRol() == Rol.DUENO
+                && Boolean.TRUE.equals(empleado.getActivo())
+                && empleadoRepository.countByRolAndActivo(Rol.DUENO, true) <= 1;
     }
 
     private boolean passwordCorrecta(Empleado empleado, String password) {
