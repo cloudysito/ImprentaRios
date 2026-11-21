@@ -78,8 +78,8 @@ const MENU: Record<Rol, SeccionMenu[]> = {
     {
       titulo: "Administración",
       items: [
-        { to: "/calendario/generar", label: "Programar entregas", icon: CalendarCheck },
-        { to: "/cronograma/generar", label: "Asignar cronograma", icon: ListTodo },
+        { to: "/cronograma/generar", label: "Programar entregas", icon: CalendarCheck },
+        { to: "/calendario/generar", label: "Calendario operativo", icon: ListTodo },
         { to: "/inventario", label: "Inventario", icon: Package },
         { to: "/mantenimiento", label: "Mantenimiento", icon: Wrench },
         { to: "/empleados", label: "Empleados", icon: Users },

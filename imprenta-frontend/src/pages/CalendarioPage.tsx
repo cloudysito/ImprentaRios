@@ -89,6 +89,9 @@ const CalendarioPage = () => {
                                 <strong>{formatFechaCorta(act.fechaHoraInicio)}</strong>
                                 <span>{act.nombreActividad}</span>
                                 <span style={{ fontSize: '11px', opacity: 0.8, marginTop: '2px' }}>{act.descripcion}</span>
+                                <span className="cal-card__responsable">
+                                    Responsable: {act.empleadoNombre ?? 'Sin asignar'}
+                                </span>
                             </div>
                         );
                     })}
