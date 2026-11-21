@@ -23,7 +23,10 @@ function App() {
           <Route path="/calendario" element={<ConsultarCalendario />} />
           <Route path="/calendario/generar" element={<CalendarioPage />} />
           <Route path="/cronograma" element={<ConsultarCronograma />} />
-          <Route path="/cronograma/generar" element={<GenerarCronogramaPage />} />
+          <Route
+            path="/cronograma/generar"
+            element={<GenerarCronogramaPage />}
+          />
           <Route path="/pedidos" element={<GestionarPedidosPage />} />
           <Route path="/pedidos/nuevo" element={<CapturarPedido />} />
           <Route
@@ -32,7 +35,10 @@ function App() {
           />
           <Route path="/taller" element={<VerificarProgresoPage />} />
           <Route path="/inventario" element={<GestionarStockPage />} />
-          <Route path="/mantenimiento" element={<GestionarMantenimientoPage />} />
+          <Route
+            path="/mantenimiento"
+            element={<GestionarMantenimientoPage />}
+          />
           <Route path="/empleados" element={<GestionarEmpleadosPage />} />
           <Route path="*" element={<Navigate to="/calendario" replace />} />
         </Route>

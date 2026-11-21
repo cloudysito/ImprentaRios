@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import type { ColumnaDia } from "../../types/consulta";
 import CalendarioColumnaDia from "./CalendarioColumnaDia";
 import "../../styles/ConsultarCalendario.css";
@@ -9,12 +10,18 @@ interface CalendarioGrillaProps {
 }
 
 const CalendarioGrilla = ({ columnas, cargando, error }: CalendarioGrillaProps) => {
+    const grillaRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        grillaRef.current?.style.setProperty("--columnas", String(columnas.length));
+    }, [columnas.length]);
+
     if (cargando) return <div className="cc-grilla cc-grilla--mensaje">Cargando calendario…</div>;
     if (error) return <div className="cc-grilla cc-grilla--mensaje is-error">{error}</div>;
 
     return (
         <div className="cc-grilla-scroll">
-            <div className="cc-grilla" style={{ ["--columnas" as string]: columnas.length }}>
+            <div ref={grillaRef} className="cc-grilla">
                 {columnas.map((c) => (
                     <CalendarioColumnaDia key={c.dia.getTime()} {...c} />
                 ))}

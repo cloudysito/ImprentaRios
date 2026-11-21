@@ -62,19 +62,19 @@ const CalendarioPage = () => {
                     </div>
                 </div>
 
-                <div className="calendario-grid" style={{ minHeight: '300px' }}>
+                <div className="calendario-grid calendario-grid--periodo">
                     {cargando && (
-                        <div style={{ gridColumn: 'span 6', padding: '40px', textAlign: 'center', color: '#6f6a63' }}>
+                        <div className="calendario-grid__estado">
                             Cargando cronograma...
                         </div>
                     )}
                     {error && (
-                        <div style={{ gridColumn: 'span 6', padding: '40px', textAlign: 'center', color: '#a63d30' }}>
+                        <div className="calendario-grid__estado calendario-grid__estado--error">
                             <MensajeError mensaje={error} onReintentar={() => window.location.reload()} />
                         </div>
                     )}
                     {!cargando && !error && actividadesVisibles.length === 0 && (
-                        <div style={{ gridColumn: 'span 6', padding: '40px', textAlign: 'center', color: '#6f6a63' }}>
+                        <div className="calendario-grid__estado">
                             No hay actividades registradas en este periodo.
                         </div>
                     )}
@@ -88,7 +88,7 @@ const CalendarioPage = () => {
                             <div key={act.id} className={`cal-card ${claseTipo}`}>
                                 <strong>{formatFechaCorta(act.fechaHoraInicio)}</strong>
                                 <span>{act.nombreActividad}</span>
-                                <span style={{ fontSize: '11px', opacity: 0.8, marginTop: '2px' }}>{act.descripcion}</span>
+                                <span className="cal-card__descripcion">{act.descripcion}</span>
                                 <span className="cal-card__responsable">
                                     Responsable: {act.empleadoNombre ?? 'Sin asignar'}
                                 </span>
@@ -101,7 +101,7 @@ const CalendarioPage = () => {
             <aside className="calendario-sidebar">
                 <div className="cal-sidebar-card">
                     <h3>Panel Operativo</h3>
-                    <p style={{ fontSize: '13px', color: '#6f6a63', lineHeight: 1.5 }}>
+                    <p className="cal-sidebar-card__texto">
                         Gestión sincronizada de turnos, producción y mantenimiento según los registros del backend.
                     </p>
                 </div>

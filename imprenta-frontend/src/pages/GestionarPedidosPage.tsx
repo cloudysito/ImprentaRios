@@ -16,7 +16,11 @@ const GestionarPedidosPage = () => {
   const esDueno = user?.rol === "DUENO";
 
   const handleEliminar = async (p: PedidoResumen) => {
-    if (!window.confirm(`¿Eliminar el folio ${p.folio}? Esta acción no se puede deshacer y también borra su cronograma.`)) {
+    if (
+      !window.confirm(
+        `¿Eliminar el folio ${p.folio}? Esta acción no se puede deshacer y también borra su cronograma.`,
+      )
+    ) {
       return;
     }
     try {

@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import type { FilaCronograma } from "../../types/consulta";
 import { diasEntre } from "../../utils/calendario";
 import "../../styles/ConsultarCronograma.css";
@@ -11,9 +12,14 @@ interface GanttFilaProps {
 }
 
 const GanttFila = ({ fila, primerDia, totalDias, seleccionada, onSeleccionar }: GanttFilaProps) => {
+    const barraRef = useRef<HTMLSpanElement>(null);
     // Las barras se recortan al periodo visible. Las columnas de la cuadrícula empiezan en 1
     const colInicio = Math.max(0, diasEntre(primerDia, fila.inicio));
     const colFin = Math.min(totalDias - 1, diasEntre(primerDia, fila.fin));
+
+    useEffect(() => {
+        barraRef.current?.style.setProperty("grid-column", `${colInicio + 1} / ${colFin + 2}`);
+    }, [colInicio, colFin]);
 
     return (
         <button
@@ -30,8 +36,8 @@ const GanttFila = ({ fila, primerDia, totalDias, seleccionada, onSeleccionar }: 
             </span>
             <span className="cg-pista">
                 <span
+                    ref={barraRef}
                     className={`cg-barra cg-barra--${fila.estado.toLowerCase()}`}
-                    style={{ gridColumn: `${colInicio + 1} / ${colFin + 2}` }}
                     title={fila.etiqueta}
                 >
                     {fila.etiqueta}

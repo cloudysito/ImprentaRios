@@ -24,7 +24,7 @@ const TrabajoEnCurso = ({ asignacion: a }: { asignacion: Asignacion }) => {
         <span>de {formatNumero(a.piezas)} piezas terminadas</span>
       </div>
       <div className={`ui-progreso taller-curso__barra ${a.terminada ? "ui-progreso--completo" : ""}`}>
-        <div className="ui-progreso__barra" style={{ width: `${avance}%` }} />
+        <progress className="ui-progreso__barra" value={avance} max={100} aria-label="Porcentaje de avance" />
       </div>
       <div className="taller-curso__pie">
         <span>{avance} % de avance</span>

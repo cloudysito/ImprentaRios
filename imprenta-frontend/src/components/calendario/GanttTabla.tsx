@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import type { FilaCronograma } from "../../types/consulta";
 import { esDomingo, mismoDia } from "../../utils/calendario";
 import GanttFila from "./GanttFila";
@@ -25,6 +26,12 @@ const GanttTabla = ({
     error,
     rangoInvalido,
 }: GanttTablaProps) => {
+    const diagramaRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        diagramaRef.current?.style.setProperty("--dias", String(dias.length));
+    }, [dias.length]);
+
     const mensaje = cargando
         ? "Cargando cronograma…"
         : error
@@ -42,7 +49,7 @@ const GanttTabla = ({
     return (
         <div className="cg-tabla">
             <div className="cg-scroll">
-                <div className="cg-diagrama" style={{ ["--dias" as string]: dias.length }}>
+                <div ref={diagramaRef} className="cg-diagrama">
                     <div className="cg-cabecera" aria-hidden="true">
                         <span />
                         <span className="cg-dias">

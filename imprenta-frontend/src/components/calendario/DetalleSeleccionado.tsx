@@ -34,7 +34,7 @@ const DetalleSeleccionado = ({ detalle, cargando }: DetalleSeleccionadoProps) =>
                         aria-valuemin={0}
                         aria-valuemax={100}
                     >
-                        <span style={{ width: `${porcentaje}%` }} />
+                        <progress value={porcentaje} max={100} aria-label="Porcentaje de avance" />
                     </div>
                     <p className="cg-detalle__piezas">
                         {formatNumero(detalle.piezasTerminadas)} de {formatNumero(detalle.piezas)} piezas · entrega{" "}
