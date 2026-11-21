@@ -11,6 +11,7 @@ export interface EventoCalendario {
     responsable?: string | null; // nombre del empleado asignado
     inicio: Date;
     fin: Date;
+    estimado?: boolean;
 }
 
 export interface ColumnaDia {

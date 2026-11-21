@@ -17,6 +17,8 @@ public enum CodigoError {
     INSUMO_NO_ENCONTRADO(HttpStatus.NOT_FOUND, "Insumo no encontrado"),
     INVENTARIO_INSUFICIENTE(HttpStatus.CONFLICT, "Inventario insuficiente"),
     TRANSICION_ESTADO_INVALIDA(HttpStatus.CONFLICT, "Solo se puede entregar un pedido terminado"),
+    PEDIDO_ENTREGADO_NO_SE_PUEDE_CANCELAR(HttpStatus.CONFLICT, "Un pedido entregado no se puede cancelar"),
+    PEDIDO_CON_HISTORIAL_NO_SE_PUEDE_ELIMINAR(HttpStatus.CONFLICT, "Solo se pueden eliminar pedidos sin historial"),
     EMPLEADO_NO_ENCONTRADO(HttpStatus.NOT_FOUND, "Empleado no encontrado"),
     USUARIO_YA_REGISTRADO(HttpStatus.CONFLICT, "El nombre de usuario ya está registrado"),
     PASSWORD_REQUERIDA(HttpStatus.BAD_REQUEST, "La contraseña es obligatoria"),

@@ -12,6 +12,7 @@ import VerificarProgresoPage from "../pages/VerificarProgresoPage";
 import GestionarStockPage from "../pages/GestionarStockPage";
 import GestionarMantenimientoPage from "../pages/GestionarMantenimientoPage";
 import GestionarEmpleadosPage from "../pages/GestionarEmpleadosPage";
+import GestionarClientesPage from "../pages/GestionarClientesPage";
 import "../styles/404-error.tiki.css";
 
 export function AppRoutes() {
@@ -33,6 +34,7 @@ export function AppRoutes() {
         <Route path="/inventario" element={<GestionarStockPage />} />
         <Route path="/mantenimiento" element={<GestionarMantenimientoPage />} />
         <Route path="/empleados" element={<GestionarEmpleadosPage />} />
+        <Route path="/clientes" element={<GestionarClientesPage />} />
 
         <Route
           path="*"

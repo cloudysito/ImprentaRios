@@ -72,19 +72,21 @@ const PedidosTabla = ({
                 </td>
                 {onEliminar && (
                   <td>
-                    <button
-                      type="button"
-                      className="ui-btn-x"
-                      title="Eliminar pedido"
-                      aria-label={`Eliminar ${p.folio}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onEliminar(p);
-                      }}
-                      onKeyDown={(e) => e.stopPropagation()}
-                    >
-                      <X size={16} />
-                    </button>
+                    {p.estado === "REGISTRADO" && (
+                      <button
+                        type="button"
+                        className="ui-btn-x"
+                        title="Eliminar pedido"
+                        aria-label={`Eliminar ${p.folio}`}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onEliminar(p);
+                        }}
+                        onKeyDown={(e) => e.stopPropagation()}
+                      >
+                        <X size={16} />
+                      </button>
+                    )}
                   </td>
                 )}
               </tr>

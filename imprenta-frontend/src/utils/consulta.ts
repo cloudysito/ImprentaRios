@@ -4,6 +4,7 @@ import { ESTADO_LABEL, type EstadoPedido, type PedidoResumen } from "../types/pe
 import type { EstadoBarra, EventoCalendario, FilaCronograma, TipoEvento } from "../types/consulta";
 import { aFecha } from "./fechas";
 import { folioCorto, inicioDeDia, sumarDias } from "./calendario";
+import { calcularEtapas } from "./calcularEtapas";
 
 export const finDeActividad = (a: ActividadResponse) => a.fechaHoraFin ?? a.fechaHoraInicio;
 
@@ -32,6 +33,22 @@ export function construirEventos(
         fin: aFecha(finDeActividad(a)),
     }));
 
+    const pedidosConCronograma = new Set(actividades.map((a) => a.pedidoId));
+    const deProduccionEstimada = pedidos
+        .filter((p) => p.estado !== "TERMINADO" && p.estado !== "ENTREGADO" && p.estado !== "CANCELADO")
+        .filter((p) => !pedidosConCronograma.has(p.id))
+        .flatMap<EventoCalendario>((p) =>
+            calcularEtapas(p.fechaEntrega).map((etapa, indice) => ({
+                id: `pedido-${p.id}-estimado-${indice}`,
+                tipo: tipoDeActividad(etapa.nombre),
+                titulo: etapa.nombre,
+                referencia: folioCorto(p.folio),
+                inicio: aFecha(etapa.fechaHoraInicio),
+                fin: aFecha(etapa.fechaHoraFin),
+                estimado: true,
+            })),
+        );
+
     const deMantenimiento = maquinas
         .filter((m) => m.servicioProgramado && m.proximoServicio)
         .map<EventoCalendario>((m) => {
@@ -46,7 +63,9 @@ export function construirEventos(
             };
         });
 
-    return [...deActividades, ...deMantenimiento].sort((a, b) => a.inicio.getTime() - b.inicio.getTime());
+    return [...deActividades, ...deProduccionEstimada, ...deMantenimiento].sort(
+        (a, b) => a.inicio.getTime() - b.inicio.getTime(),
+    );
 }
 
 // ---------- Cronograma ----------

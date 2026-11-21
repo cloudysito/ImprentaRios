@@ -22,6 +22,7 @@ const routeMeta: Record<string, RouteMeta> = {
   "/taller": { seccion: "Taller", titulo: "Verificar progreso de trabajo" },
   "/inventario": { seccion: "Inventario de materiales", titulo: "Gestionar stock" },
   "/empleados": { seccion: "Administración", titulo: "Gestionar empleados" },
+  "/clientes": { seccion: "Seguimiento administrativo", titulo: "Clientes" },
   "/mantenimiento": { seccion: "Historial técnico del equipo", titulo: "Gestionar mantenimiento de maquinaria" },
 };
 

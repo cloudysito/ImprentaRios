@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { pedidosService } from "../services/pedidosService";
 import type { EstadoPedido, PedidoDetalle } from "../types/pedido";
+import { mensajeDeError } from "../utils/errores";
 
 // Guardamos a qué id pertenece cada respuesta para saber si sigue vigente
 interface Resultado {
@@ -45,9 +46,11 @@ export function useDetallePedido(id: string | null) {
       const actualizado = await pedidosService.cambiarEstado(id, estado);
       setResultado({ id, detalle: actualizado, error: null });
       return actualizado;
-    } catch {
+    } catch (err) {
       setResultado((prev) =>
-        prev && prev.id === id ? { ...prev, error: "No se pudo actualizar el estatus" } : prev,
+        prev && prev.id === id
+          ? { ...prev, error: mensajeDeError(err, "No se pudo actualizar el estatus") }
+          : prev,
       );
       return null;
     } finally {

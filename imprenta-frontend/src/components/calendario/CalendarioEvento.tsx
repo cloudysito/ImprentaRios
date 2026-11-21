@@ -8,6 +8,7 @@ const CalendarioEvento = ({ evento }: { evento: EventoCalendario }) => (
         <strong>{etiquetaHoras(evento.inicio, evento.fin)}</strong>
         <span>{evento.titulo}</span>
         <span>{evento.referencia}</span>
+        {evento.estimado && <small className="cc-evento__estimado">Estimado</small>}
         {evento.responsable && (
             <span className="cc-evento__responsable">
                 <User size={14} /> {evento.responsable}

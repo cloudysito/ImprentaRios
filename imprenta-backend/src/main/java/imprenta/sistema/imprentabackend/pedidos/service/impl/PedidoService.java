@@ -87,6 +87,12 @@ public class PedidoService implements IPedidoService {
     @Override
     public void eliminarPedido(String id) {
         Pedido pedido = obtenerPedido(id);
+        EstadoPedido estado = pedido.getEstado();
+        boolean tieneHistorial = (estado != null && estado != EstadoPedido.REGISTRADO)
+                || !actividadRepository.findByPedidoId(id).isEmpty();
+        if (tieneHistorial) {
+            throw new NegocioException(CodigoError.PEDIDO_CON_HISTORIAL_NO_SE_PUEDE_ELIMINAR);
+        }
         actividadRepository.deleteByPedidoId(id);
         pedidoRepository.delete(pedido);
     }
@@ -140,6 +146,9 @@ public class PedidoService implements IPedidoService {
 
         if (nuevoEstado == EstadoPedido.ENTREGADO && pedido.getEstado() != EstadoPedido.TERMINADO) {
             throw new NegocioException(CodigoError.TRANSICION_ESTADO_INVALIDA);
+        }
+        if (nuevoEstado == EstadoPedido.CANCELADO && pedido.getEstado() == EstadoPedido.ENTREGADO) {
+            throw new NegocioException(CodigoError.PEDIDO_ENTREGADO_NO_SE_PUEDE_CANCELAR);
         }
 
         pedido.setEstado(nuevoEstado);

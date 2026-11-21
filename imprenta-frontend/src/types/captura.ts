@@ -45,6 +45,10 @@ export interface ClienteRequest {
     correo: string;
 }
 
+export interface Cliente extends ClienteRequest {
+    id: string;
+}
+
 export interface PedidoRequest {
     nombreProyecto: string;
     fechaEntrega: string;

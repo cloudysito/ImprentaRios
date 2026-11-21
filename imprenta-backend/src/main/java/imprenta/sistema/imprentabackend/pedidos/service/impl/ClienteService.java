@@ -11,6 +11,11 @@ import imprenta.sistema.imprentabackend.pedidos.service.IClienteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.Comparator;
+import java.util.List;
+import java.util.Locale;
+import java.util.stream.Stream;
+
 @Service
 @RequiredArgsConstructor
 public class ClienteService implements IClienteService {
@@ -37,6 +42,28 @@ public class ClienteService implements IClienteService {
     @Override
     public ClienteResponseDTO buscarCliente(String id) {
         return ClienteMapper.toResponse(obtenerCliente(id));
+    }
+
+    @Override
+    public List<ClienteResponseDTO> listarClientes(String busqueda) {
+        Stream<Cliente> clientes = clienteRepository.findAll().stream();
+        if (busqueda != null && !busqueda.isBlank()) {
+            String termino = busqueda.trim().toLowerCase(Locale.ROOT);
+            clientes = clientes.filter(cliente ->
+                    contiene(cliente.getNombre(), termino)
+                            || contiene(cliente.getTelefono(), termino)
+                            || contiene(cliente.getCorreo(), termino));
+        }
+        return clientes
+                .sorted(Comparator.comparing(
+                        Cliente::getNombre,
+                        Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)))
+                .map(ClienteMapper::toResponse)
+                .toList();
+    }
+
+    private boolean contiene(String valor, String termino) {
+        return valor != null && valor.toLowerCase(Locale.ROOT).contains(termino);
     }
 
     private Cliente obtenerCliente(String id) {

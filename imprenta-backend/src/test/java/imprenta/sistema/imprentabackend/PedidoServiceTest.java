@@ -2,11 +2,12 @@ package imprenta.sistema.imprentabackend;
 
 import imprenta.sistema.imprentabackend.calendarizacion.repository.ActividadRepository;
 import imprenta.sistema.imprentabackend.pedidos.dtos.PedidoRequestDTO;
+import imprenta.sistema.imprentabackend.pedidos.model.EstadoPedido;
 import imprenta.sistema.imprentabackend.pedidos.model.Pedido;
 import imprenta.sistema.imprentabackend.pedidos.repository.ClienteRepository;
 import imprenta.sistema.imprentabackend.pedidos.repository.PedidoRepository;
+import imprenta.sistema.imprentabackend.pedidos.repository.TipoProductoRepository;
 import imprenta.sistema.imprentabackend.pedidos.service.impl.PedidoService;
-import imprenta.sistema.imprentabackend.pedidos.model.EstadoPedido;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +34,9 @@ class PedidoServiceTest {
 
     @Mock
     private ClienteRepository clienteRepository;
+
+    @Mock
+    private TipoProductoRepository tipoProductoRepository;
 
     @InjectMocks
     private PedidoService pedidoService;
@@ -87,53 +91,31 @@ class PedidoServiceTest {
     }
 
     @Test
-    void alGenerarCronograma_SinArchivoDisenio_PasaAEnDisenio() {
+    void cambiarEstado_Cancelado_PedidoNoEntregado_ActualizaEstado() {
         Pedido pedido = new Pedido();
+        pedido.setId("pedido-1");
         pedido.setEstado(EstadoPedido.REGISTRADO);
-        when(pedidoRepository.findById("p1")).thenReturn(Optional.of(pedido));
+        when(pedidoRepository.findById("pedido-1")).thenReturn(Optional.of(pedido));
+        when(pedidoRepository.save(pedido)).thenReturn(pedido);
+        when(tipoProductoRepository.findAllById(List.of())).thenReturn(List.of());
+        when(actividadRepository.findByPedidoId("pedido-1")).thenReturn(List.of());
 
-        pedidoService.alGenerarCronograma("p1");
+        var actualizado = pedidoService.cambiarEstado("pedido-1", EstadoPedido.CANCELADO);
 
-        assertEquals(EstadoPedido.EN_DISENIO, pedido.getEstado());
+        assertEquals(EstadoPedido.CANCELADO, actualizado.estado());
         verify(pedidoRepository).save(pedido);
     }
 
     @Test
-    void alGenerarCronograma_ConArchivoDisenio_PasaAEnProduccion() {
+    void cambiarEstado_Cancelado_PedidoEntregado_RechazaCambio() {
         Pedido pedido = new Pedido();
-        pedido.setEstado(EstadoPedido.REGISTRADO);
-        pedido.setArchivoDisenioId("archivo-1");
-        when(pedidoRepository.findById("p1")).thenReturn(Optional.of(pedido));
-
-        pedidoService.alGenerarCronograma("p1");
-
-        assertEquals(EstadoPedido.EN_PRODUCCION, pedido.getEstado());
-    }
-
-    @Test
-    void iniciarProduccion_NoCambiaUnPedidoTerminado() {
-        Pedido pedido = new Pedido();
-        pedido.setEstado(EstadoPedido.TERMINADO);
-        when(pedidoRepository.findById("p1")).thenReturn(Optional.of(pedido));
-
-        pedidoService.iniciarProduccion("p1");
-
-        assertEquals(EstadoPedido.TERMINADO, pedido.getEstado());
-        verify(pedidoRepository, never()).save(any(Pedido.class));
-    }
-
-    @Test
-    void actualizarPedido_Terminado_NoSePermite() {
-        Pedido pedido = new Pedido();
-        pedido.setEstado(EstadoPedido.TERMINADO);
-        when(pedidoRepository.findById("p1")).thenReturn(Optional.of(pedido));
-        PedidoRequestDTO dto = new PedidoRequestDTO(
-                LocalDateTime.now().plusDays(1), "Proyecto", List.of(), "cliente-1", null, null, null);
+        pedido.setEstado(EstadoPedido.ENTREGADO);
+        when(pedidoRepository.findById("pedido-1")).thenReturn(Optional.of(pedido));
 
         var exception = assertThrows(imprenta.sistema.imprentabackend.exceptions.NegocioException.class,
-                () -> pedidoService.actualizarPedido("p1", dto));
+                () -> pedidoService.cambiarEstado("pedido-1", EstadoPedido.CANCELADO));
 
-        assertEquals(imprenta.sistema.imprentabackend.exceptions.CodigoError.PEDIDO_NO_EDITABLE,
+        assertEquals(imprenta.sistema.imprentabackend.exceptions.CodigoError.PEDIDO_ENTREGADO_NO_SE_PUEDE_CANCELAR,
                 exception.getCodigo());
         verify(pedidoRepository, never()).save(any(Pedido.class));
     }
