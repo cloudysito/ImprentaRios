@@ -72,7 +72,11 @@ public class ActividadController {
     public ResponseEntity<List<ActividadResponeDTO>> generarCronograma(
             @PathVariable String pedidoId,
             @RequestParam String empleadoId) {
-        return ResponseEntity.ok(actividadService.generarCronograma(pedidoId, empleadoId));
+        return ResponseEntity.ok(actividadService.generarCronograma(
+                pedidoId,
+                empleadoId,
+                UsuarioActual.empleadoId()
+        ));
     }
 
     @DeleteMapping("/cronograma/{pedidoId}")

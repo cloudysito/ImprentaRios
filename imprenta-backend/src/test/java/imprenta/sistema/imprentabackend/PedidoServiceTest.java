@@ -8,9 +8,12 @@ import imprenta.sistema.imprentabackend.pedidos.repository.ClienteRepository;
 import imprenta.sistema.imprentabackend.pedidos.repository.PedidoRepository;
 import imprenta.sistema.imprentabackend.pedidos.repository.TipoProductoRepository;
 import imprenta.sistema.imprentabackend.pedidos.service.impl.PedidoService;
+import imprenta.sistema.imprentabackend.usuarios.model.Empleado;
+import imprenta.sistema.imprentabackend.usuarios.repository.EmpleadoRepository;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -37,6 +40,9 @@ class PedidoServiceTest {
 
     @Mock
     private TipoProductoRepository tipoProductoRepository;
+
+    @Mock
+    private EmpleadoRepository empleadoRepository;
 
     @InjectMocks
     private PedidoService pedidoService;
@@ -99,6 +105,12 @@ class PedidoServiceTest {
         var respuesta = pedidoService.capturarPedido(dto, "empleado-1");
 
         assertEquals(prefijo + "0003", respuesta.folio());
+        ArgumentCaptor<Pedido> pedidoCaptor = ArgumentCaptor.forClass(Pedido.class);
+        verify(pedidoRepository).save(pedidoCaptor.capture());
+        Pedido guardado = pedidoCaptor.getValue();
+        assertEquals(EstadoPedido.REGISTRADO, guardado.getHistorialEstados().get(0).getEstado());
+        assertEquals("empleado-1", guardado.getHistorialEstados().get(0).getEmpleadoId());
+        assertNotNull(guardado.getHistorialEstados().get(0).getFecha());
     }
 
     @Test
@@ -125,9 +137,12 @@ class PedidoServiceTest {
         when(pedidoRepository.findById("p1"))
                 .thenReturn(Optional.of(pedido));
 
-        pedidoService.alGenerarCronograma("p1");
+        pedidoService.alGenerarCronograma("p1", "empleado-1");
 
         assertEquals(EstadoPedido.EN_DISENIO, pedido.getEstado());
+        assertEquals(1, pedido.getHistorialEstados().size());
+        assertEquals("empleado-1", pedido.getHistorialEstados().get(0).getEmpleadoId());
+        assertNotNull(pedido.getHistorialEstados().get(0).getFecha());
         verify(pedidoRepository).save(pedido);
     }
 
@@ -140,7 +155,7 @@ class PedidoServiceTest {
         when(pedidoRepository.findById("p1"))
                 .thenReturn(Optional.of(pedido));
 
-        pedidoService.alGenerarCronograma("p1");
+        pedidoService.alGenerarCronograma("p1", "empleado-1");
 
         assertEquals(EstadoPedido.EN_PRODUCCION, pedido.getEstado());
     }
@@ -153,7 +168,7 @@ class PedidoServiceTest {
         when(pedidoRepository.findById("p1"))
                 .thenReturn(Optional.of(pedido));
 
-        pedidoService.iniciarProduccion("p1");
+        pedidoService.iniciarProduccion("p1", "empleado-1");
 
         assertEquals(EstadoPedido.TERMINADO, pedido.getEstado());
         verify(pedidoRepository, never()).save(any(Pedido.class));
@@ -179,7 +194,7 @@ class PedidoServiceTest {
 
         var exception = assertThrows(
                 imprenta.sistema.imprentabackend.exceptions.NegocioException.class,
-                () -> pedidoService.actualizarPedido("p1", dto)
+                () -> pedidoService.actualizarPedido("p1", dto, "empleado-1")
         );
 
         assertEquals(
@@ -200,6 +215,8 @@ class PedidoServiceTest {
                 .thenReturn(Optional.of(pedido));
 
         when(pedidoRepository.save(pedido)).thenReturn(pedido);
+        when(empleadoRepository.findById("empleado-1"))
+                .thenReturn(Optional.of(new Empleado("empleado-1", "Ana", "ana", null, null, true)));
 
         when(tipoProductoRepository.findAllById(List.of()))
                 .thenReturn(List.of());
@@ -209,10 +226,15 @@ class PedidoServiceTest {
 
         var actualizado = pedidoService.cambiarEstado(
                 "pedido-1",
-                EstadoPedido.CANCELADO
+                EstadoPedido.CANCELADO,
+                "empleado-1"
         );
 
         assertEquals(EstadoPedido.CANCELADO, actualizado.estado());
+        assertEquals(1, actualizado.bitacora().size());
+        assertEquals("Ana", actualizado.bitacora().get(0).usuario());
+        assertEquals("Estado cambiado a cancelado", actualizado.bitacora().get(0).descripcion());
+        assertNotNull(actualizado.bitacora().get(0).fecha());
         verify(pedidoRepository).save(pedido);
     }
 
@@ -228,7 +250,8 @@ class PedidoServiceTest {
                 imprenta.sistema.imprentabackend.exceptions.NegocioException.class,
                 () -> pedidoService.cambiarEstado(
                         "pedido-1",
-                        EstadoPedido.CANCELADO
+                        EstadoPedido.CANCELADO,
+                        "empleado-1"
                 )
         );
 

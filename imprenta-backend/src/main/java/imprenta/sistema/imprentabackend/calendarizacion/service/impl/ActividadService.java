@@ -8,6 +8,7 @@ import imprenta.sistema.imprentabackend.calendarizacion.mapper.ActividadMapper;
 import imprenta.sistema.imprentabackend.calendarizacion.model.Actividad;
 import imprenta.sistema.imprentabackend.calendarizacion.repository.ActividadRepository;
 import imprenta.sistema.imprentabackend.calendarizacion.service.IActividadService;
+import imprenta.sistema.imprentabackend.auth.UsuarioActual;
 import imprenta.sistema.imprentabackend.exceptions.CodigoError;
 import imprenta.sistema.imprentabackend.exceptions.NegocioException;
 import imprenta.sistema.imprentabackend.pedidos.dtos.PedidoDetalleDTO;
@@ -36,7 +37,7 @@ public class ActividadService implements IActividadService {
 
     @Override
     public ActividadResponeDTO agregarActividad(ActividadRequestDTO dto) {
-        pedidoService.alGenerarCronograma(dto.pedidoId());
+        pedidoService.alGenerarCronograma(dto.pedidoId(), UsuarioActual.empleadoId());
         Actividad guardado = actividadRepository.save(ActividadMapper.toEntity(dto));
         return  ActividadMapper.toResponse(guardado);
     }
@@ -55,7 +56,11 @@ public class ActividadService implements IActividadService {
 
     @Override
     @Transactional
-    public List<ActividadResponeDTO> generarCronograma(String pedidoId, String empleadoId) {
+    public List<ActividadResponeDTO> generarCronograma(
+            String pedidoId,
+            String empleadoId,
+            String solicitanteId
+    ) {
         PedidoDetalleDTO pedido = pedidoService.obtenerDetalle(pedidoId);
         if (pedido.fechaEntrega() == null) {
             throw new NegocioException(CodigoError.PEDIDO_NO_ENCONTRADO);
@@ -77,6 +82,7 @@ public class ActividadService implements IActividadService {
                         null, null, null, null, null, false))
                 .toList();
         List<Actividad> guardadas = actividadRepository.saveAll(creadas);
+        pedidoService.alGenerarCronograma(pedidoId, solicitanteId);
         return guardadas.stream().map(ActividadMapper::toResponse).toList();
     }
 
@@ -181,7 +187,7 @@ public class ActividadService implements IActividadService {
 
         Actividad guardada = actividadRepository.save(actividad);
 
-        pedidoService.iniciarProduccion(actividad.getPedidoId());
+        pedidoService.iniciarProduccion(actividad.getPedidoId(), UsuarioActual.empleadoId());
         pedido = pedidoService.obtenerDetalle(actividad.getPedidoId());   // actualiza el estado
 
         return aAsignacion(guardada, pedido);
@@ -202,7 +208,7 @@ public class ActividadService implements IActividadService {
         actividad.setUltimoReporte(LocalDateTime.now());
         Actividad guardada = actividadRepository.save(actividad);
 
-        pedidoService.iniciarProduccion(actividad.getPedidoId());
+        pedidoService.iniciarProduccion(actividad.getPedidoId(), UsuarioActual.empleadoId());
         pedido = pedidoService.obtenerDetalle(actividad.getPedidoId());   // actualiza el estado
 
         // Si ya terminaron todas las actividades del pedido, el pedido pasa a Terminado
@@ -214,7 +220,11 @@ public class ActividadService implements IActividadService {
                 && pedido.estado() != EstadoPedido.ENTREGADO
                 && pedido.estado() != EstadoPedido.CANCELADO;
         if (todasTerminadas && puedeTerminar) {
-            pedido = pedidoService.cambiarEstado(actividad.getPedidoId(), EstadoPedido.TERMINADO);
+            pedido = pedidoService.cambiarEstado(
+                    actividad.getPedidoId(),
+                    EstadoPedido.TERMINADO,
+                    UsuarioActual.empleadoId()
+            );
         }
 
         return aAsignacion(guardada, pedido);

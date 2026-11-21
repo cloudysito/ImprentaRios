@@ -13,12 +13,14 @@ const GenerarCronogramaPage = () => {
     const actualizado = await folio.generar(empleadoId);
     if (actualizado)
       lista.actualizarEstado(actualizado.id, actualizado.estadoCronograma);
+    return actualizado;
   };
 
   const handleEliminar = async () => {
     const actualizado = await folio.eliminar();
     if (actualizado)
       lista.actualizarEstado(actualizado.id, actualizado.estadoCronograma);
+    return actualizado;
   };
 
   return (

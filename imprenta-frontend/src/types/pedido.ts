@@ -20,6 +20,7 @@ export interface PedidoResumen {
 export interface EventoBitacora {
   fecha: string;
   descripcion: string;
+  usuario: string;
 }
 
 

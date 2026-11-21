@@ -1,5 +1,5 @@
 import type { PedidoDetalle } from "../../types/pedido";
-import { formatFechaCorta, formatFechaLarga, formatNumero } from "../../utils/formato";
+import { formatFechaHora, formatFechaLarga, formatNumero } from "../../utils/formato";
 import "../../styles/DetalleFolio.css";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
@@ -86,7 +86,7 @@ const DetalleFolio = ({
       <ul className="detalle-folio__bitacora">
         {detalle.bitacora.map((evento, i) => (
           <li key={i}>
-            <strong>{formatFechaCorta(evento.fecha)}</strong> · {evento.descripcion}
+            <strong>{formatFechaHora(evento.fecha)}</strong> · {evento.descripcion} · {evento.usuario}
           </li>
         ))}
       </ul>

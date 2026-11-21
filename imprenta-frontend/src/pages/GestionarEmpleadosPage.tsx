@@ -15,6 +15,7 @@ import { mensajeDeError } from "../utils/errores";
 import "../styles/UI.css";
 import "../styles/GestionarEmpleados.css";
 import { Cargando } from "../components/Cargando";
+import Modal from "../components/ui/Modal";
 
 const formularioInicial: NuevoEmpleado = {
   nombre: "",
@@ -40,6 +41,9 @@ function GestionarEmpleados() {
   const [errorListado, setErrorListado] = useState<string | null>(null);
   const [errorFormulario, setErrorFormulario] = useState<string | null>(null);
   const [exito, setExito] = useState<string | null>(null);
+  const [empleadoPorEliminar, setEmpleadoPorEliminar] = useState<Empleado | null>(null);
+  const [errorEliminar, setErrorEliminar] = useState<string | null>(null);
+  const [eliminando, setEliminando] = useState(false);
 
   useEffect(() => {
     let vigente = true;
@@ -65,19 +69,18 @@ function GestionarEmpleados() {
     };
   }, []);
 
-  async function eliminar(empleado: Empleado) {
-    if (
-      !window.confirm(
-        `¿Eliminar a ${empleado.nombre}? Sus actividades asignadas quedarán sin responsable.`,
-      )
-    ) {
-      return;
-    }
+  async function confirmarEliminacion() {
+    if (!empleadoPorEliminar || eliminando) return;
+    setEliminando(true);
+    setErrorEliminar(null);
     try {
-      await eliminarEmpleado(empleado.id);
-      setEmpleados((actuales) => actuales.filter((e) => e.id !== empleado.id));
+      await eliminarEmpleado(empleadoPorEliminar.id);
+      setEmpleados((actuales) => actuales.filter((e) => e.id !== empleadoPorEliminar.id));
+      setEmpleadoPorEliminar(null);
     } catch (err) {
-      window.alert(mensajeDeError(err, "No se pudo eliminar el empleado"));
+      setErrorEliminar(mensajeDeError(err, "No se pudo eliminar el empleado"));
+    } finally {
+      setEliminando(false);
     }
   }
 
@@ -266,7 +269,10 @@ function GestionarEmpleados() {
                         <button
                           type="button"
                           className="ui-btn-x"
-                          onClick={() => eliminar(empleado)}
+                          onClick={() => {
+                            setErrorEliminar(null);
+                            setEmpleadoPorEliminar(empleado);
+                          }}
                           aria-label={`Eliminar a ${empleado.nombre}`}
                           title="Eliminar"
                         >
@@ -281,6 +287,38 @@ function GestionarEmpleados() {
           </div>
         )}
       </section>
+      {empleadoPorEliminar && (
+        <Modal
+          titulo="Eliminar empleado"
+          onCerrar={() => {
+            if (!eliminando) setEmpleadoPorEliminar(null);
+          }}
+        >
+          <p>
+            ¿Eliminar a <strong>{empleadoPorEliminar.nombre}</strong>? Sus actividades asignadas
+            quedarán sin responsable.
+          </p>
+          {errorEliminar && <p className="ui-error" role="alert">{errorEliminar}</p>}
+          <div className="ui-modal__acciones">
+            <button
+              type="button"
+              className="ui-btn ui-btn--contorno"
+              onClick={() => setEmpleadoPorEliminar(null)}
+              disabled={eliminando}
+            >
+              Volver
+            </button>
+            <button
+              type="button"
+              className="ui-btn ui-btn--primario"
+              onClick={() => void confirmarEliminacion()}
+              disabled={eliminando}
+            >
+              {eliminando ? "Eliminando…" : "Sí, eliminar"}
+            </button>
+          </div>
+        </Modal>
+      )}
     </div>
   );
 }

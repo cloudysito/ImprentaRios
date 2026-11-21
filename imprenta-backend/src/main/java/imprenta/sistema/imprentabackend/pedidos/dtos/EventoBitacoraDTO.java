@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 
 public record EventoBitacoraDTO(
         LocalDateTime fecha,
-        String descripcion
+        String descripcion,
+        String usuario
 ) {
 }

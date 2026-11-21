@@ -10,6 +10,7 @@ import imprenta.sistema.imprentabackend.pedidos.dtos.PedidoRequestDTO;
 import imprenta.sistema.imprentabackend.pedidos.dtos.PedidoResponseDTO;
 import imprenta.sistema.imprentabackend.pedidos.dtos.PedidoResumenDTO;
 import imprenta.sistema.imprentabackend.pedidos.dtos.ProductoRequestDTO;
+import imprenta.sistema.imprentabackend.pedidos.model.CambioEstadoPedido;
 import imprenta.sistema.imprentabackend.inventario.service.IMaterialService;
 import imprenta.sistema.imprentabackend.pedidos.mappers.PedidoMapper;
 import imprenta.sistema.imprentabackend.pedidos.model.EstadoPedido;
@@ -27,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.ArrayList;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
@@ -52,6 +54,9 @@ public class PedidoService implements IPedidoService {
         pedido.setFechaRegistro(LocalDateTime.now());
         pedido.setEstado(EstadoPedido.REGISTRADO);
         pedido.setEmpleadoId(empleadoId);
+        pedido.setHistorialEstados(new ArrayList<>(List.of(
+                nuevoEventoEstado(EstadoPedido.REGISTRADO, empleadoId, pedido.getFechaRegistro())
+        )));
         return PedidoMapper.toResponse(pedidoRepository.save(pedido));
     }
 
@@ -103,7 +108,7 @@ public class PedidoService implements IPedidoService {
     }
 
     @Override
-    public PedidoResponseDTO actualizarPedido(String id, PedidoRequestDTO dto) {
+    public PedidoResponseDTO actualizarPedido(String id, PedidoRequestDTO dto, String empleadoId) {
         Pedido pedido = obtenerPedido(id);
         EstadoPedido estado = pedido.getEstado();
         if (estado == EstadoPedido.TERMINADO || estado == EstadoPedido.ENTREGADO
@@ -114,7 +119,7 @@ public class PedidoService implements IPedidoService {
         PedidoMapper.actualizarEntidad(pedido, dto);
         // Si estaba esperando el diseño y ya tiene archivo, pasa a producción
         if (pedido.getEstado() == EstadoPedido.EN_DISENIO && tieneArchivoDisenio(pedido)) {
-            pedido.setEstado(EstadoPedido.EN_PRODUCCION);
+            cambiarEstadoYRegistrar(pedido, EstadoPedido.EN_PRODUCCION, empleadoId);
         }
         return PedidoMapper.toResponse(pedidoRepository.save(pedido));
     }
@@ -146,7 +151,7 @@ public class PedidoService implements IPedidoService {
     }
 
     @Override
-    public PedidoDetalleDTO cambiarEstado(String id, EstadoPedido nuevoEstado) {
+    public PedidoDetalleDTO cambiarEstado(String id, EstadoPedido nuevoEstado, String empleadoId) {
         Pedido pedido = obtenerPedido(id);
 
         if (nuevoEstado == EstadoPedido.ENTREGADO && pedido.getEstado() != EstadoPedido.TERMINADO) {
@@ -156,31 +161,82 @@ public class PedidoService implements IPedidoService {
             throw new NegocioException(CodigoError.PEDIDO_ENTREGADO_NO_SE_PUEDE_CANCELAR);
         }
 
-        pedido.setEstado(nuevoEstado);
+        cambiarEstadoYRegistrar(pedido, nuevoEstado, empleadoId);
         return aDetalle(pedidoRepository.save(pedido));
     }
 
     @Override
-    public void alGenerarCronograma(String id) {
+    public void alGenerarCronograma(String id, String empleadoId) {
         Pedido pedido = obtenerPedido(id);
         if (pedido.getEstado() == EstadoPedido.REGISTRADO) {
-            pedido.setEstado(tieneArchivoDisenio(pedido)
-                    ? EstadoPedido.EN_PRODUCCION
-                    : EstadoPedido.EN_DISENIO);
+            cambiarEstadoYRegistrar(
+                    pedido,
+                    tieneArchivoDisenio(pedido) ? EstadoPedido.EN_PRODUCCION : EstadoPedido.EN_DISENIO,
+                    empleadoId
+            );
             pedidoRepository.save(pedido);
         }
     }
 
     @Override
-    public void iniciarProduccion(String id) {
+    public void iniciarProduccion(String id, String empleadoId) {
         Pedido pedido = obtenerPedido(id);
         EstadoPedido estado = pedido.getEstado();
         if (estado == EstadoPedido.REGISTRADO
                 || estado == EstadoPedido.EN_DISENIO
                 || estado == EstadoPedido.PENDIENTE_DE_MATERIAL) {
-            pedido.setEstado(EstadoPedido.EN_PRODUCCION);
+            cambiarEstadoYRegistrar(pedido, EstadoPedido.EN_PRODUCCION, empleadoId);
             pedidoRepository.save(pedido);
         }
+    }
+
+    private void cambiarEstadoYRegistrar(Pedido pedido, EstadoPedido nuevoEstado, String empleadoId) {
+        if (pedido.getEstado() == nuevoEstado) {
+            return;
+        }
+
+        if (pedido.getHistorialEstados() == null) {
+            pedido.setHistorialEstados(new ArrayList<>());
+        }
+        if (pedido.getHistorialEstados().isEmpty() && pedido.getFechaRegistro() != null) {
+            pedido.getHistorialEstados().add(nuevoEventoEstado(
+                    EstadoPedido.REGISTRADO, pedido.getEmpleadoId(), pedido.getFechaRegistro()
+            ));
+        }
+
+        pedido.setEstado(nuevoEstado);
+        pedido.getHistorialEstados().add(nuevoEventoEstado(
+                nuevoEstado, empleadoId, LocalDateTime.now()
+        ));
+    }
+
+    private CambioEstadoPedido nuevoEventoEstado(
+            EstadoPedido estado,
+            String empleadoId,
+            LocalDateTime fecha
+    ) {
+        return new CambioEstadoPedido(estado, fecha, empleadoId, nombreEmpleado(empleadoId));
+    }
+
+    private String nombreEmpleado(String empleadoId) {
+        if (empleadoId == null || empleadoId.isBlank()) {
+            return "Sistema";
+        }
+        return empleadoRepository.findById(empleadoId)
+                .map(empleado -> Objects.requireNonNullElse(empleado.getNombre(), empleadoId))
+                .orElse(empleadoId);
+    }
+
+    private String descripcionEstado(EstadoPedido estado) {
+        return switch (estado) {
+            case REGISTRADO -> "Pedido registrado";
+            case PENDIENTE_DE_MATERIAL -> "Estado cambiado a pendiente de material";
+            case EN_DISENIO -> "Estado cambiado a en diseño";
+            case EN_PRODUCCION -> "Estado cambiado a en producción";
+            case TERMINADO -> "Estado cambiado a terminado";
+            case ENTREGADO -> "Estado cambiado a entregado";
+            case CANCELADO -> "Estado cambiado a cancelado";
+        };
     }
 
     private boolean tieneArchivoDisenio(Pedido pedido) {
@@ -226,9 +282,21 @@ public class PedidoService implements IPedidoService {
                 .max(Integer::compare)
                 .orElse(0);
 
-        List<EventoBitacoraDTO> bitacora = p.getFechaRegistro() == null
-                ? List.of()
-                : List.of(new EventoBitacoraDTO(p.getFechaRegistro(), "Pedido registrado"));
+        List<EventoBitacoraDTO> bitacora = p.getHistorialEstados() == null || p.getHistorialEstados().isEmpty()
+                ? (p.getFechaRegistro() == null
+                        ? List.of()
+                        : List.of(new EventoBitacoraDTO(
+                                p.getFechaRegistro(),
+                                "Pedido registrado",
+                                nombreEmpleado(p.getEmpleadoId())
+                        )))
+                : p.getHistorialEstados().stream()
+                        .map(evento -> new EventoBitacoraDTO(
+                                evento.getFecha(),
+                                descripcionEstado(evento.getEstado()),
+                                evento.getEmpleadoNombre()
+                        ))
+                        .toList();
 
         List<String> idsArchivos = PedidoMapper.archivosDe(p);
         String versionDisenio = null;

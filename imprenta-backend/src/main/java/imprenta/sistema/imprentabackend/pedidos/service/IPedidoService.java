@@ -12,14 +12,14 @@ public interface IPedidoService {
 
     PedidoResponseDTO capturarPedido(PedidoRequestDTO dto, String empleadoId);
     void eliminarPedido(String id);
-    PedidoResponseDTO actualizarPedido(String id, PedidoRequestDTO dto);
+    PedidoResponseDTO actualizarPedido(String id, PedidoRequestDTO dto, String empleadoId);
     PedidoResponseDTO buscarPedido(String id);
 
     // Pantalla "Gestionar pedidos"
     List<PedidoResumenDTO> listarPedidos();
     PedidoDetalleDTO obtenerDetalle(String id);
-    PedidoDetalleDTO cambiarEstado(String id, EstadoPedido nuevoEstado);
-    void alGenerarCronograma(String id);
-    void iniciarProduccion(String id);
+    PedidoDetalleDTO cambiarEstado(String id, EstadoPedido nuevoEstado, String empleadoId);
+    void alGenerarCronograma(String id, String empleadoId);
+    void iniciarProduccion(String id, String empleadoId);
 
 }

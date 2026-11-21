@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { cronogramaService } from "../services/cronogramaService";
 import type { CronogramaDetalle } from "../types/cronograma";
+import { mensajeDeError } from "../utils/errores";
 
 interface Resultado {
     id: string;
@@ -21,8 +22,14 @@ export function useDetalleCronograma(id: string | null) {
             .then((data) => {
                 if (!cancelado) setResultado({ id, detalle: data, error: null });
             })
-            .catch(() => {
-                if (!cancelado) setResultado({ id, detalle: null, error: "No se pudo cargar el folio" });
+            .catch((err) => {
+                if (!cancelado) {
+                    setResultado({
+                        id,
+                        detalle: null,
+                        error: mensajeDeError(err, "No se pudo cargar el folio"),
+                    });
+                }
             });
 
         return () => {
@@ -45,9 +52,11 @@ export function useDetalleCronograma(id: string | null) {
             const actualizado = await accion(id);
             setResultado({ id, detalle: actualizado, error: null });
             return actualizado;
-        } catch {
+        } catch (err) {
             setResultado((prev) =>
-                prev && prev.id === id ? { ...prev, error: mensajeError } : prev,
+                prev && prev.id === id
+                    ? { ...prev, error: mensajeDeError(err, mensajeError) }
+                    : prev,
             );
             return null;
         } finally {
