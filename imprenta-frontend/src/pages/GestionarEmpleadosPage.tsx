@@ -7,7 +7,7 @@ import {
   listarEmpleados,
 } from "../services/empleadoService";
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../context/AuthContext";
 import { rolLabels } from "../services/authService";
 import type { Empleado } from "../services/authService";
 import type { NuevoEmpleado } from "../services/empleadoService";

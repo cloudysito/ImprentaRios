@@ -17,9 +17,9 @@ export function useCatalogosPedido() {
             capturaService.archivosDisenio(),
         ])
             .then(([t, m, a]) => {
-                setTipos(t);
-                setMateriales(m);
-                setArchivos(a);
+                setTipos(Array.isArray(t) ? t : []);
+                setMateriales(Array.isArray(m) ? m : []);
+                setArchivos(Array.isArray(a) ? a : []);
             })
             .catch((err) => setError(mensajeDeError(err, "No se pudieron cargar los catálogos")))
             .finally(() => setCargando(false));

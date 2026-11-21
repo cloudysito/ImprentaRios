@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { AlertCircle, Eye, EyeOff } from "lucide-react";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../context/AuthContext";
 import "../styles/LoginPage.css";
 
 // Fuera del componente para no llamar a Date en cada render

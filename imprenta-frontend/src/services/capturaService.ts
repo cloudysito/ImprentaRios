@@ -6,12 +6,12 @@ import type {
 export const capturaService = {
     tiposProducto: async () => {
         const { data } = await api.get<TipoProducto[]>("/tipo-producto");
-        return data;
+        return Array.isArray(data) ? data : [];
     },
 
     materiales: async () => {
         const { data } = await api.get<Material[]>("/material");
-        return data;
+        return Array.isArray(data) ? data : [];
     },
 
     crearCliente: async (cliente: ClienteRequest) => {
@@ -26,7 +26,7 @@ export const capturaService = {
 
     archivosDisenio: async () => {
         const { data } = await api.get<ArchivoDisenio[]>("/archivo_disenio");
-        return data;
+        return Array.isArray(data) ? data : [];
     },
 
     obtenerPedido: async (id: string) => {

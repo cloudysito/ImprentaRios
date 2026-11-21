@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../../context/AuthContext";
 import { rolLabels, type Empleado } from "../../services/authService";
 import { listarEmpleados } from "../../services/empleadoService";
 import type { CronogramaDetalle } from "../../types/cronograma";

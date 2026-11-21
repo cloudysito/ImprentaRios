@@ -75,6 +75,7 @@ export function useConsultarCalendario() {
     const proximasEntregas = useMemo<EntregaProxima[]>(
         () =>
             pedidos
+                .filter((p) => p && typeof p.fechaEntrega === "string")
                 .filter((p) => p.estado !== "ENTREGADO" && p.estado !== "CANCELADO")
                 .filter((p) => aFecha(p.fechaEntrega).getTime() >= hoy.getTime())
                 .sort((a, b) => aFecha(a.fechaEntrega).getTime() - aFecha(b.fechaEntrega).getTime())

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { Search } from "lucide-react";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../context/AuthContext";
 import { clienteService } from "../services/clienteService";
 import type { Cliente } from "../types/captura";
 import { mensajeDeError } from "../utils/errores";

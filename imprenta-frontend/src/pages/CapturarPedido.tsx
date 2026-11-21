@@ -80,7 +80,7 @@ const CapturarPedido = () => {
             .listar()
             .then((datos) => {
                 if (vigente) {
-                    setClientes(datos);
+                    setClientes(Array.isArray(datos) ? datos : []);
                 }
             })
             .catch((err) => {
@@ -273,7 +273,8 @@ const CapturarPedido = () => {
         );
     }
 
-    const clienteSeleccionado = clientes.find(
+    const clientesSeguros = Array.isArray(clientes) ? clientes : [];
+    const clienteSeleccionado = clientesSeguros.find(
         (c) => c.id === clienteExistenteId,
     );
 
@@ -304,7 +305,7 @@ const CapturarPedido = () => {
                                 >
                                     <option value="">Registrar un cliente nuevo</option>
 
-                                    {clientes.map((c) => (
+                                    {clientesSeguros.map((c) => (
                                         <option key={c.id} value={c.id}>
                                             {c.nombre} · {c.telefono}
                                         </option>
@@ -466,7 +467,7 @@ const CapturarPedido = () => {
                                         Array.from(e.target.selectedOptions, (option) => option.value),
                                     )}
                                 >
-                                    {archivos.map((a) => (
+                                    {(Array.isArray(archivos) ? archivos : []).map((a) => (
                                         <option key={a.id} value={a.id}>
                                             {a.nombreArchivo} (v{a.version ?? 1})
                                         </option>

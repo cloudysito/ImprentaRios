@@ -21,8 +21,8 @@ export function useStock() {
     ])
       .then(([lista, movimientos]) => {
         if (cancelado) return;
-        setInsumos(lista);
-        setMovimientosMes(movimientos.length);
+        setInsumos(Array.isArray(lista) ? lista : []);
+        setMovimientosMes(Array.isArray(movimientos) ? movimientos.length : 0);
       })
       .catch((err) => {
         if (!cancelado) setError(mensajeDeError(err, "No se pudo cargar el inventario"));
@@ -38,6 +38,7 @@ export function useStock() {
         if (cancelado) return;
         setFolios(
           pedidos
+            .filter((p) => p && typeof p.folio === "string")
             .filter((p) => p.estado !== "ENTREGADO" && p.estado !== "CANCELADO")
             .map((p) => p.folio),
         );
@@ -50,7 +51,9 @@ export function useStock() {
   }, []);
 
   const ordenados = useMemo(
-    () => [...insumos].sort((a, b) => a.nombre.localeCompare(b.nombre, "es")),
+    () => (Array.isArray(insumos) ? [...insumos] : [])
+      .filter((i) => i && typeof i.nombre === "string")
+      .sort((a, b) => a.nombre.localeCompare(b.nombre, "es")),
     [insumos],
   );
 

@@ -21,9 +21,12 @@ export function construirEventos(
     pedidos: PedidoResumen[],
     maquinas: MaquinaResumen[],
 ): EventoCalendario[] {
-    const folios = new Map(pedidos.map((p) => [p.id, p.folio]));
+    const actividadesSeguras = Array.isArray(actividades) ? actividades : [];
+    const pedidosSeguros = Array.isArray(pedidos) ? pedidos : [];
+    const maquinasSeguras = Array.isArray(maquinas) ? maquinas : [];
+    const folios = new Map(pedidosSeguros.map((p) => [p.id, p.folio]));
 
-    const deActividades = actividades.map<EventoCalendario>((a) => ({
+    const deActividades = actividadesSeguras.map<EventoCalendario>((a) => ({
         id: a.id,
         tipo: tipoDeActividad(a.nombreActividad),
         titulo: a.nombreActividad,
@@ -33,8 +36,8 @@ export function construirEventos(
         fin: aFecha(finDeActividad(a)),
     }));
 
-    const pedidosConCronograma = new Set(actividades.map((a) => a.pedidoId));
-    const deProduccionEstimada = pedidos
+    const pedidosConCronograma = new Set(actividadesSeguras.map((a) => a.pedidoId));
+    const deProduccionEstimada = pedidosSeguros
         .filter((p) => p.estado !== "TERMINADO" && p.estado !== "ENTREGADO" && p.estado !== "CANCELADO")
         .filter((p) => !pedidosConCronograma.has(p.id))
         .flatMap<EventoCalendario>((p) =>
@@ -49,7 +52,7 @@ export function construirEventos(
             })),
         );
 
-    const deMantenimiento = maquinas
+    const deMantenimiento = maquinasSeguras
         .filter((m) => m.servicioProgramado && m.proximoServicio)
         .map<EventoCalendario>((m) => {
             const fecha = aFecha(m.proximoServicio as string);
@@ -88,14 +91,19 @@ export function construirFilas(
     pedidos: PedidoResumen[],
     maquinas: MaquinaResumen[],
 ): FilaCronograma[] {
+    const actividadesSeguras = Array.isArray(actividades) ? actividades : [];
+    const pedidosSeguros = Array.isArray(pedidos) ? pedidos : [];
+    const maquinasSeguras = Array.isArray(maquinas) ? maquinas : [];
     const porPedido = new Map<string, ActividadResponse[]>();
-    for (const a of actividades) {
+    for (const a of actividadesSeguras) {
         porPedido.set(a.pedidoId, [...(porPedido.get(a.pedidoId) ?? []), a]);
     }
 
     const filas: FilaCronograma[] = [];
 
-    for (const p of [...pedidos].sort((a, b) => a.folio.localeCompare(b.folio))) {
+    for (const p of [...pedidosSeguros]
+        .filter((pedido) => pedido && typeof pedido.folio === "string")
+        .sort((a, b) => a.folio.localeCompare(b.folio))) {
         if (p.estado === "CANCELADO") continue;
         const acts = porPedido.get(p.id) ?? [];
         const estado = estadoDeBarra(p.estado);
@@ -131,7 +139,7 @@ export function construirFilas(
         }
     }
 
-    const paros = maquinas
+    const paros = maquinasSeguras
         .filter((m) => m.servicioProgramado && m.proximoServicio)
         .map<FilaCronograma>((m) => {
             const dia = inicioDeDia(aFecha(m.proximoServicio as string));

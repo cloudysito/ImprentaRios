@@ -10,7 +10,7 @@ export interface NuevoEmpleado {
 
 export async function listarEmpleados(): Promise<Empleado[]> {
   const { data } = await api.get<Empleado[]>("/empleados");
-  return data;
+  return Array.isArray(data) ? data : [];
 }
 
 export async function crearEmpleado(empleado: NuevoEmpleado): Promise<Empleado> {

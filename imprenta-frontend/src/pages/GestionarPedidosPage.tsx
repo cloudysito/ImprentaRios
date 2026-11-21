@@ -5,7 +5,7 @@ import DetalleFolio from "../components/pedidos/DetalleFolio";
 import Modal from "../components/ui/Modal";
 import { usePedidos } from "../hooks/usePedidos";
 import { useDetallePedido } from "../hooks/useDetallePedido";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../context/AuthContext";
 import { pedidosService } from "../services/pedidosService";
 import { mensajeDeError } from "../utils/errores";
 import type { PedidoResumen } from "../types/pedido";

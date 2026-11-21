@@ -2,7 +2,7 @@ import type { PedidoDetalle } from "../../types/pedido";
 import { formatFechaHora, formatFechaLarga, formatNumero } from "../../utils/formato";
 import "../../styles/DetalleFolio.css";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "../../context/AuthContext";
 import { Cargando } from "../Cargando";
 
 interface DetalleFolioProps {

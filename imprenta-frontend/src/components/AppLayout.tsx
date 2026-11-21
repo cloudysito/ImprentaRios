@@ -2,7 +2,7 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import Sidebar from "./SideBar";
 import Navbar from "./Navbar";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../context/AuthContext";
 import { rolLabels } from "../services/authService";
 
 interface RouteMeta {

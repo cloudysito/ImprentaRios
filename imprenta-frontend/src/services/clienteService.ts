@@ -6,6 +6,6 @@ export const clienteService = {
     const { data } = await api.get<Cliente[]>("/cliente", {
       params: busqueda.trim() ? { busqueda: busqueda.trim() } : undefined,
     });
-    return data;
+    return Array.isArray(data) ? data : [];
   },
 };

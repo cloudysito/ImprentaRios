@@ -15,7 +15,7 @@ export function useTaller() {
     tallerService
       .misAsignaciones()
       .then((data) => {
-        if (!cancelado) setAsignaciones(data);
+        if (!cancelado) setAsignaciones(Array.isArray(data) ? data : []);
       })
       .catch((err) => {
         if (!cancelado) setError(mensajeDeError(err, "No se pudieron cargar tus asignaciones"));
