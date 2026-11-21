@@ -10,4 +10,6 @@ public interface PedidoRepository extends MongoRepository<Pedido, String> {
     boolean existsByClienteId(String clienteId);
     boolean existsByArchivoDisenioId(String archivoDeDisenioId);
     boolean existsByProductosMaterialId(String materialId);
+    boolean existsByProductosTipoProductoId(String tipoProductoId);
+    boolean existsByEmpleadoId(String empleadoId);
 }

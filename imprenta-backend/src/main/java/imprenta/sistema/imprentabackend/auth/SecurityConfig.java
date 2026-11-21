@@ -120,6 +120,15 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/actividad/*")
                         .hasRole("DUENO")
 
+                        .requestMatchers(HttpMethod.POST, "/api/actividad/cronograma/*")
+                        .hasRole("DUENO")
+
+                        .requestMatchers(HttpMethod.DELETE, "/api/actividad/cronograma/*")
+                        .hasRole("DUENO")
+
+                        .requestMatchers(HttpMethod.DELETE, "/api/tipo-producto/*")
+                        .hasRole("DUENO")
+
                         .requestMatchers(HttpMethod.GET, "/api/tipo-producto")
                         .hasAnyRole("DUENO", "SECRETARIA", "DISENADOR", "MANUFACTURA")
 
