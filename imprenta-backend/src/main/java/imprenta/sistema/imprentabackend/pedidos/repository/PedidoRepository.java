@@ -6,4 +6,8 @@ import java.util.Optional;
 
 public interface PedidoRepository extends MongoRepository<Pedido, String> {
     Optional<Pedido> findByFolio(String folio);
+
+    boolean existsByClienteId(String clienteId);
+    boolean existsByArchivoDisenioId(String archivoDeDisenioId);
+    boolean existsByProductosMaterialId(String materialId);
 }
