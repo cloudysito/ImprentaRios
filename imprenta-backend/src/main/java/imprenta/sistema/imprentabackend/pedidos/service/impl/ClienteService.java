@@ -7,6 +7,7 @@ import imprenta.sistema.imprentabackend.pedidos.dtos.ClienteResponseDTO;
 import imprenta.sistema.imprentabackend.pedidos.mappers.ClienteMapper;
 import imprenta.sistema.imprentabackend.pedidos.model.Cliente;
 import imprenta.sistema.imprentabackend.pedidos.repository.ClienteRepository;
+import imprenta.sistema.imprentabackend.pedidos.repository.PedidoRepository;
 import imprenta.sistema.imprentabackend.pedidos.service.IClienteService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ import java.util.stream.Stream;
 @RequiredArgsConstructor
 public class ClienteService implements IClienteService {
     private final ClienteRepository clienteRepository;
+    private final PedidoRepository pedidoRepository;
 
     @Override
     public ClienteResponseDTO crearCliente(ClienteRequestDTO dto) {
@@ -29,7 +31,11 @@ public class ClienteService implements IClienteService {
 
     @Override
     public void eliminarCliente(String id) {
-        clienteRepository.delete(obtenerCliente(id));
+        Cliente cliente = obtenerCliente(id);
+        if (pedidoRepository.existsByClienteId(cliente.getId())) {
+            throw new NegocioException(CodigoError.CLIENTE_EN_USO);
+        }
+        clienteRepository.delete(cliente);
     }
 
     @Override

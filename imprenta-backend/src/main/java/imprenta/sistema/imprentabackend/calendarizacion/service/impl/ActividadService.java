@@ -16,6 +16,7 @@ import imprenta.sistema.imprentabackend.pedidos.service.IPedidoService;
 import imprenta.sistema.imprentabackend.usuarios.repository.EmpleadoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -50,6 +51,67 @@ public class ActividadService implements IActividadService {
         Actividad actividad = obtenerActividad(id);
         ActividadMapper.actualizarEntidad(actividad, dto);
         return ActividadMapper.toResponse(actividadRepository.save(actividad));
+    }
+
+    @Override
+    @Transactional
+    public List<ActividadResponeDTO> generarCronograma(String pedidoId, String empleadoId) {
+        PedidoDetalleDTO pedido = pedidoService.obtenerDetalle(pedidoId);
+        if (pedido.fechaEntrega() == null) {
+            throw new NegocioException(CodigoError.PEDIDO_NO_ENCONTRADO);
+        }
+        if (!empleadoRepository.existsById(empleadoId)) {
+            throw new NegocioException(CodigoError.EMPLEADO_NO_ENCONTRADO);
+        }
+
+        actividadRepository.deleteByPedidoId(pedidoId);
+        List<Actividad> creadas = calcularEtapas(pedido.fechaEntrega()).stream()
+                .map(etapa -> new Actividad(
+                        null,
+                        etapa.nombre(),
+                        etapa.nombre() + " del folio " + pedido.folio(),
+                        etapa.inicio(),
+                        etapa.fin(),
+                        pedidoId,
+                        empleadoId,
+                        null, null, null, null, null, false))
+                .toList();
+        List<Actividad> guardadas = actividadRepository.saveAll(creadas);
+        return guardadas.stream().map(ActividadMapper::toResponse).toList();
+    }
+
+    @Override
+    @Transactional
+    public List<ActividadResponeDTO> eliminarCronograma(String pedidoId) {
+        pedidoService.obtenerDetalle(pedidoId);
+        actividadRepository.deleteByPedidoId(pedidoId);
+        return List.of();
+    }
+
+    private record EtapaCronograma(String nombre, LocalDateTime inicio, LocalDateTime fin) {}
+
+    private List<EtapaCronograma> calcularEtapas(LocalDateTime entrega) {
+        LocalDate fechaFin = entrega.toLocalDate();
+        List<EtapaCronograma> etapas = new ArrayList<>();
+
+        EtapaCronograma entregaEtapa = crearEtapa("Entrega", fechaFin, 1);
+        EtapaCronograma acabado = crearEtapa("Acabado", fechaFin.minusDays(1), 2);
+        EtapaCronograma impresion = crearEtapa("Impresión", acabado.inicio().toLocalDate().minusDays(1), 3);
+        EtapaCronograma diseno = crearEtapa("Diseño", impresion.inicio().toLocalDate().minusDays(1), 2);
+
+        etapas.add(diseno);
+        etapas.add(impresion);
+        etapas.add(acabado);
+        etapas.add(entregaEtapa);
+        return etapas;
+    }
+
+    private EtapaCronograma crearEtapa(String nombre, LocalDate fechaFin, int dias) {
+        LocalDate inicio = fechaFin.minusDays(dias - 1);
+        return new EtapaCronograma(
+                nombre,
+                inicio.atTime(8, 0),
+                fechaFin.atTime(17, 0));
     }
 
     @Override

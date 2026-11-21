@@ -7,6 +7,7 @@ import imprenta.sistema.imprentabackend.pedidos.dtos.ArchivoDisenioResponseDTO;
 import imprenta.sistema.imprentabackend.pedidos.mappers.ArchivoDisenioMapper;
 import imprenta.sistema.imprentabackend.pedidos.model.ArchivoDisenio;
 import imprenta.sistema.imprentabackend.pedidos.repository.ArchivoDisenioRepository;
+import imprenta.sistema.imprentabackend.pedidos.repository.PedidoRepository;
 import imprenta.sistema.imprentabackend.pedidos.service.IArchivoDisenioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ArchivoDisenioService implements IArchivoDisenioService {
     private final ArchivoDisenioRepository archivoDisenioRepository;
+    private final PedidoRepository pedidoRepository;
 
     @Override
     public ArchivoDisenioResponseDTO registrarArchivoDisenio(ArchivoDisenioRequestDTO dto) {
@@ -46,7 +48,11 @@ public class ArchivoDisenioService implements IArchivoDisenioService {
 
     @Override
     public void eliminarArchivoDisenio(String id) {
-        archivoDisenioRepository.delete(obtenerArchivoDisenio(id));
+        ArchivoDisenio archivo = obtenerArchivoDisenio(id);
+        if (pedidoRepository.existsByArchivoDisenioId(id)) {
+            throw new NegocioException(CodigoError.ARCHIVO_DE_DISENIO_EN_USO);
+        }
+        archivoDisenioRepository.delete(archivo);
     }
 
     private ArchivoDisenio obtenerArchivoDisenio(String id) {

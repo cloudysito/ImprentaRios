@@ -9,6 +9,7 @@ import imprenta.sistema.imprentabackend.inventario.model.Material;
 import imprenta.sistema.imprentabackend.inventario.repository.InsumoRepository;
 import imprenta.sistema.imprentabackend.inventario.repository.MaterialRepository;
 import imprenta.sistema.imprentabackend.inventario.service.IMaterialService;
+import imprenta.sistema.imprentabackend.pedidos.repository.PedidoRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,10 +18,12 @@ import java.util.List;
 public class MaterialService implements IMaterialService {
     private final MaterialRepository materialRepository;
     private final InsumoRepository insumoRepository;
+    private final PedidoRepository pedidoRepository;
 
-    public MaterialService(MaterialRepository materialRepository, InsumoRepository insumoRepository) {
+    public MaterialService(MaterialRepository materialRepository, InsumoRepository insumoRepository, PedidoRepository pedidoRepository) {
         this.materialRepository = materialRepository;
         this.insumoRepository = insumoRepository;
+        this.pedidoRepository = pedidoRepository;
     }
 
     @Override
@@ -62,6 +65,9 @@ public class MaterialService implements IMaterialService {
         Material material = materialRepository.findById(idMaterial)
                 .orElseThrow(() -> new NegocioException(CodigoError.MATERIAL_NO_ENCONTRADO));
 
+        if (pedidoRepository.existsByProductosMaterialId(idMaterial)) {
+            throw new NegocioException(CodigoError.MATERIAL_EN_USO);
+        }
         materialRepository.delete(material);
     }
 
