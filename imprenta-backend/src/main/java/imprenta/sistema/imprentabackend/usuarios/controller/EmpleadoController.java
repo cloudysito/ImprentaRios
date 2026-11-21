@@ -11,6 +11,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import imprenta.sistema.imprentabackend.auth.LoginAttemptService;
+import imprenta.sistema.imprentabackend.exceptions.CodigoError;
+import imprenta.sistema.imprentabackend.exceptions.NegocioException;
+import jakarta.servlet.http.HttpServletRequest;
 
 import java.util.List;
 
@@ -20,22 +24,35 @@ import java.util.List;
 public class EmpleadoController {
     private final IEmpleadoService empleadoService;
     private final JwtService jwtService;
+    private final LoginAttemptService loginAttemptService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> autenticar(@RequestBody LoginRequest request) {
-        EmpleadoResponseDTO empleado = empleadoService.autenticarEmpleado(
-                request.usuario(),
-                request.password()
-        );
+    public ResponseEntity<LoginResponse> autenticar(@RequestBody LoginRequest request,
+                                                    HttpServletRequest http) {
+        String usuario = request.usuario() == null ? "" : request.usuario().trim().toLowerCase();
+        String clave = usuario + "|" + http.getRemoteAddr();
 
-        String token = jwtService.generarToken(
-                empleado.usuario(),
-                empleado.rol().name(),
-                empleado.nombre(),
-                empleado.id()
-        );
+        loginAttemptService.verificarNoBloqueado(clave);
+        try {
+            EmpleadoResponseDTO empleado = empleadoService.autenticarEmpleado(
+                    request.usuario(),
+                    request.password()
+            );
+            loginAttemptService.registrarExito(clave);
 
-        return ResponseEntity.ok(new LoginResponse(token, empleado));
+            String token = jwtService.generarToken(
+                    empleado.usuario(),
+                    empleado.rol().name(),
+                    empleado.nombre(),
+                    empleado.id()
+            );
+            return ResponseEntity.ok(new LoginResponse(token, empleado));
+        } catch (NegocioException e) {
+            if (e.getCodigo() == CodigoError.CREDENCIALES_INVALIDAS) {
+                loginAttemptService.registrarFallo(clave);
+            }
+            throw e;
+        }
     }
 
     @PostMapping
