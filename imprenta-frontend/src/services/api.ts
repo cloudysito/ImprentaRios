@@ -1,6 +1,6 @@
 import axios, { type AxiosResponse } from "axios";
 
-const API_URL = import.meta.env.VITE_API_URL || "/api";
+const API_URL = import.meta.env.VITE_API_URL || "/api"; // Valor por defecto si no se encuentra la variable de entorno
 export const api = axios.create({
   baseURL: API_URL, // Vite manda todo lo que empieza con /api al backend (puerto 8080)
   timeout: 5000,
