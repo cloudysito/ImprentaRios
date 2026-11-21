@@ -19,6 +19,6 @@ public record PedidoResponseDTO(
         String empleadoId,
         String personaSolicita,
         BigDecimal precioAcordado,
-        String archivoDisenioId
+        List<String> archivosDisenioIds
 ) {
 }

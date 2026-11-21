@@ -99,10 +99,10 @@ class PedidoServiceTest {
     }
 
     @Test
-    void alGenerarCronograma_ConArchivoDisenio_PasaAEnProduccion() {
+    void alGenerarCronograma_ConArchivoDelCampoAnterior_PasaAEnProduccion() {
         Pedido pedido = new Pedido();
         pedido.setEstado(EstadoPedido.REGISTRADO);
-        pedido.setArchivoDisenioId("archivo-1");
+        pedido.setArchivoDisenioId("archivo-viejo");
         when(pedidoRepository.findById("p1")).thenReturn(Optional.of(pedido));
 
         pedidoService.alGenerarCronograma("p1");

@@ -23,5 +23,5 @@ public record PedidoRequestDTO(
         String personaSolicita,
         @DecimalMin(value = "0.0", message = "El precio no puede ser negativo")
         BigDecimal precioAcordado,
-        String archivoDisenioId
+        List<String> archivosDisenioIds
 ) {}

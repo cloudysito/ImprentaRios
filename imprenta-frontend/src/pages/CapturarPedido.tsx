@@ -20,7 +20,7 @@ const CapturarPedido = () => {
     const [cliente, setCliente] = useState({ nombre: "", telefono: "", correo: "" });
     const [proyecto, setProyecto] = useState({ nombreProyecto: "", fechaEntrega: "" });
     const [productos, setProductos] = useState<ProductoForm[]>([productoVacio()]);
-    const [archivoDisenioId, setArchivoDisenioId] = useState("");
+    const [archivosIds, setArchivosIds] = useState<string[]>([""]);
     const [enviando, setEnviando] = useState(false);
     const [error, setError] = useState("");
     const [folio, setFolio] = useState("");
@@ -53,7 +53,7 @@ const CapturarPedido = () => {
                     nombreProyecto: pedido.nombreProyecto,
                     fechaEntrega: pedido.fechaEntrega.slice(0, 16), // formato de datetime-local
                 });
-                setArchivoDisenioId(pedido.archivoDisenioId ?? "");
+                setArchivosIds(pedido.archivosDisenioIds?.length ? pedido.archivosDisenioIds : [""]);
                 setConservar({
                     personaSolicita: pedido.personaSolicita,
                     precioAcordado: pedido.precioAcordado,
@@ -86,6 +86,11 @@ const CapturarPedido = () => {
     setProductos((prev) => [...prev, productoVacio()]);
   const quitarProducto = (i: number) =>
     setProductos((prev) => prev.filter((_, idx) => idx !== i));
+    const cambiarArchivo = (i: number, valor: string) =>
+        setArchivosIds((prev) => prev.map((a, idx) => (idx === i ? valor : a)));
+    const agregarArchivo = () => setArchivosIds((prev) => [...prev, ""]);
+    const quitarArchivo = (i: number) =>
+        setArchivosIds((prev) => (prev.length === 1 ? [""] : prev.filter((_, idx) => idx !== i)));
 
     const enviar = async (e: FormEvent) => {
         e.preventDefault();
@@ -96,7 +101,7 @@ const CapturarPedido = () => {
                 nombreProyecto: proyecto.nombreProyecto,
                 fechaEntrega: proyecto.fechaEntrega,
                 productos: productos.map((p) => ({ ...p, cantidad: Number(p.cantidad) })),
-                archivoDisenioId: archivoDisenioId || null,
+                archivosDisenioIds: archivosIds.filter(Boolean),
             };
 
             if (id) {
@@ -213,19 +218,35 @@ const CapturarPedido = () => {
                         </div>
                     </div>
                     <div className="form-row">
-                        <div className="form-group">
-                            <label>Archivo de diseño</label>
-                            <select
-                                value={archivoDisenioId}
-                                onChange={(e) => setArchivoDisenioId(e.target.value)}
+                        <div className="form-group full-width">
+                            <label>Archivos de diseño</label>
+                            {archivosIds.map((aid, i) => (
+                                <div className="archivo-fila" key={i}>
+                                    <select value={aid} onChange={(e) => cambiarArchivo(i, e.target.value)}>
+                                        <option value="">Sin archivo</option>
+                                        {archivos
+                                            .filter((a) => a.id === aid || !archivosIds.includes(a.id))
+                                            .map((a) => (
+                                                <option key={a.id} value={a.id}>
+                                                    {a.nombreArchivo} (v{a.version ?? 1})
+                                                </option>
+                                            ))}
+                                    </select>
+                                    {(archivosIds.length > 1 || aid) && (
+                                        <button type="button" className="btn-link" onClick={() => quitarArchivo(i)}>
+                                            Quitar
+                                        </button>
+                                    )}
+                                </div>
+                            ))}
+                            <button
+                                type="button"
+                                className="btn-secondary mt-2"
+                                onClick={agregarArchivo}
+                                disabled={archivosIds.includes("") || archivosIds.length >= archivos.length}
                             >
-                                <option value="">Sin archivo</option>
-                                {archivos.map((a) => (
-                                    <option key={a.id} value={a.id}>
-                                        {a.nombreArchivo} (v{a.version ?? 1})
-                                    </option>
-                                ))}
-                            </select>
+                                + Agregar otro archivo de diseño
+                            </button>
                         </div>
                     </div>
                     {productos.map((p, i) => (
