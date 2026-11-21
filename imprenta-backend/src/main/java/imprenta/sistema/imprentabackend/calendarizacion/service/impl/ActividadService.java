@@ -140,6 +140,11 @@ public class ActividadService implements IActividadService {
         actividad.setUltimoReporte(LocalDateTime.now());
         Actividad guardada = actividadRepository.save(actividad);
 
+        pedidoService.iniciarProduccion(actividad.getPedidoId());
+        pedido = pedidoService.obtenerDetalle(actividad.getPedidoId());   // actualiza el estado
+
+        // Si ya terminaron todas las actividades del pedido, el pedido pasa a Terminado
+
         // Si ya terminaron todas las actividades del pedido, el pedido pasa a Terminado
         boolean todasTerminadas = actividadRepository.findByPedidoId(actividad.getPedidoId()).stream()
                 .allMatch(a -> Boolean.TRUE.equals(a.getTerminada()));

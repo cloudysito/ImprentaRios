@@ -26,8 +26,9 @@ export function AppRoutes() {
         <Route path="/cronograma" element={<ConsultarCronograma />} />
         <Route path="/cronograma/generar" element={<GenerarCronogramaPage />} />
         <Route path="/pedidos" element={<GestionarPedidosPage />} />
-        <Route path="/pedidos/nuevo" element={<CapturarPedido />} />
+        <Route path="/pedidos/nuevo" element={<CapturarPedido key="nuevo" />} />
         <Route path="/archivos-de-diseno/registrar" element={<RegistrarDisenio />} />
+          <Route path="/pedidos/:id/editar" element={<CapturarPedido key="editar" />} />
         <Route path="/taller" element={<VerificarProgresoPage />} />
         <Route path="/inventario" element={<GestionarStockPage />} />
         <Route path="/mantenimiento" element={<GestionarMantenimientoPage />} />
