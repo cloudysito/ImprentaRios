@@ -6,6 +6,7 @@ import imprenta.sistema.imprentabackend.pedidos.model.Pedido;
 import imprenta.sistema.imprentabackend.pedidos.repository.ClienteRepository;
 import imprenta.sistema.imprentabackend.pedidos.repository.PedidoRepository;
 import imprenta.sistema.imprentabackend.pedidos.service.impl.PedidoService;
+import imprenta.sistema.imprentabackend.pedidos.model.EstadoPedido;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -83,5 +84,41 @@ class PedidoServiceTest {
                 () -> pedidoService.buscarPedido("999"));
         assertEquals(imprenta.sistema.imprentabackend.exceptions.CodigoError.PEDIDO_NO_ENCONTRADO,
                 exception.getCodigo());
+    }
+
+    @Test
+    void alGenerarCronograma_SinArchivoDisenio_PasaAEnDisenio() {
+        Pedido pedido = new Pedido();
+        pedido.setEstado(EstadoPedido.REGISTRADO);
+        when(pedidoRepository.findById("p1")).thenReturn(Optional.of(pedido));
+
+        pedidoService.alGenerarCronograma("p1");
+
+        assertEquals(EstadoPedido.EN_DISENIO, pedido.getEstado());
+        verify(pedidoRepository).save(pedido);
+    }
+
+    @Test
+    void alGenerarCronograma_ConArchivoDisenio_PasaAEnProduccion() {
+        Pedido pedido = new Pedido();
+        pedido.setEstado(EstadoPedido.REGISTRADO);
+        pedido.setArchivoDisenioId("archivo-1");
+        when(pedidoRepository.findById("p1")).thenReturn(Optional.of(pedido));
+
+        pedidoService.alGenerarCronograma("p1");
+
+        assertEquals(EstadoPedido.EN_PRODUCCION, pedido.getEstado());
+    }
+
+    @Test
+    void iniciarProduccion_NoCambiaUnPedidoTerminado() {
+        Pedido pedido = new Pedido();
+        pedido.setEstado(EstadoPedido.TERMINADO);
+        when(pedidoRepository.findById("p1")).thenReturn(Optional.of(pedido));
+
+        pedidoService.iniciarProduccion("p1");
+
+        assertEquals(EstadoPedido.TERMINADO, pedido.getEstado());
+        verify(pedidoRepository, never()).save(any(Pedido.class));
     }
 }

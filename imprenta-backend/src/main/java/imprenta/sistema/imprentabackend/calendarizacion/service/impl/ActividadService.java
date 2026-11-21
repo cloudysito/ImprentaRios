@@ -35,6 +35,7 @@ public class ActividadService implements IActividadService {
 
     @Override
     public ActividadResponeDTO agregarActividad(ActividadRequestDTO dto) {
+        pedidoService.alGenerarCronograma(dto.pedidoId());
         Actividad guardado = actividadRepository.save(ActividadMapper.toEntity(dto));
         return  ActividadMapper.toResponse(guardado);
     }
@@ -116,7 +117,12 @@ public class ActividadService implements IActividadService {
         actividad.setObservaciones(textoONull(dto.observaciones()));
         actividad.setUltimoReporte(LocalDateTime.now());
 
-        return aAsignacion(actividadRepository.save(actividad), pedido);
+        Actividad guardada = actividadRepository.save(actividad);
+
+        pedidoService.iniciarProduccion(actividad.getPedidoId());
+        pedido = pedidoService.obtenerDetalle(actividad.getPedidoId());   // actualiza el estado
+
+        return aAsignacion(guardada, pedido);
     }
 
     @Override

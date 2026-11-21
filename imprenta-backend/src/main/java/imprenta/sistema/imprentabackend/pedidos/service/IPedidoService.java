@@ -19,5 +19,7 @@ public interface IPedidoService {
     List<PedidoResumenDTO> listarPedidos();
     PedidoDetalleDTO obtenerDetalle(String id);
     PedidoDetalleDTO cambiarEstado(String id, EstadoPedido nuevoEstado);
+    void alGenerarCronograma(String id);
+    void iniciarProduccion(String id);
 
 }

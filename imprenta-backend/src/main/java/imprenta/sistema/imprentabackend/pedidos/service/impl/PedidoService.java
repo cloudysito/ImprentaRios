@@ -92,6 +92,9 @@ public class PedidoService implements IPedidoService {
         Pedido pedido = obtenerPedido(id);
         validarArchivoDisenio(dto.archivoDisenioId());
         PedidoMapper.actualizarEntidad(pedido, dto);
+        if (pedido.getEstado() == EstadoPedido.EN_DISENIO && tieneArchivoDisenio(pedido)) {
+            pedido.setEstado(EstadoPedido.EN_PRODUCCION);
+        }
         return PedidoMapper.toResponse(pedidoRepository.save(pedido));
     }
 
@@ -131,6 +134,33 @@ public class PedidoService implements IPedidoService {
 
         pedido.setEstado(nuevoEstado);
         return aDetalle(pedidoRepository.save(pedido));
+    }
+
+    @Override
+    public void alGenerarCronograma(String id) {
+        Pedido pedido = obtenerPedido(id);
+        if (pedido.getEstado() == EstadoPedido.REGISTRADO) {
+            pedido.setEstado(tieneArchivoDisenio(pedido)
+                    ? EstadoPedido.EN_PRODUCCION
+                    : EstadoPedido.EN_DISENIO);
+            pedidoRepository.save(pedido);
+        }
+    }
+
+    @Override
+    public void iniciarProduccion(String id) {
+        Pedido pedido = obtenerPedido(id);
+        EstadoPedido estado = pedido.getEstado();
+        if (estado == EstadoPedido.REGISTRADO
+                || estado == EstadoPedido.EN_DISENIO
+                || estado == EstadoPedido.PENDIENTE_DE_MATERIAL) {
+            pedido.setEstado(EstadoPedido.EN_PRODUCCION);
+            pedidoRepository.save(pedido);
+        }
+    }
+
+    private boolean tieneArchivoDisenio(Pedido pedido) {
+        return pedido.getArchivoDisenioId() != null && !pedido.getArchivoDisenioId().isBlank();
     }
 
     private PedidoResumenDTO aResumen(Pedido p, Map<String, String> clientes, Map<String, String> tipos) {
