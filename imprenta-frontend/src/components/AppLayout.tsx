@@ -29,7 +29,10 @@ const routeMeta: Record<string, RouteMeta> = {
 const AppLayout = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
-  const { seccion, titulo } = routeMeta[location.pathname] ?? { titulo: "Imprenta Ríos" };
+  const esEdicion = /^\/pedidos\/[^/]+\/editar$/.test(location.pathname);
+  const { seccion, titulo } = esEdicion
+      ? { seccion: "Pedidos", titulo: "Editar pedido" }
+      : (routeMeta[location.pathname] ?? { titulo: "Imprenta Ríos" });
 
   useEffect(() => {
     document.title = titulo == "Imprenta Ríos" ? "Imprenta Ríos" : `${titulo} | Imprenta Ríos`;

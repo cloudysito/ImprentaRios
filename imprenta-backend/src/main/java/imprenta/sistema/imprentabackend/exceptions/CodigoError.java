@@ -25,6 +25,7 @@ public enum CodigoError {
     ACTIVIDAD_NO_ASIGNADA(HttpStatus.FORBIDDEN, "Esta actividad está asignada a otro empleado"),
     ACTIVIDAD_YA_TERMINADA(HttpStatus.CONFLICT, "Esta actividad ya se marcó como terminada"),
     PIEZAS_EXCEDEN_TOTAL(HttpStatus.BAD_REQUEST, "Las piezas terminadas no pueden superar el total del pedido"),
+    PEDIDO_NO_EDITABLE(HttpStatus.CONFLICT, "Solo se pueden editar pedidos que no estén terminados, entregados o cancelados"),
     MAQUINA_NO_ENCONTRADA(HttpStatus.NOT_FOUND, "Máquina no encontrada");
 
     private final HttpStatus status;

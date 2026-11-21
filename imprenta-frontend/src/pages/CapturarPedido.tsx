@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import "../styles/CapturarPedido.css";
 import { useCatalogosPedido } from "../hooks/useCatalogosPedido";
 import { capturaService } from "../services/capturaService";
@@ -12,14 +12,71 @@ const etiqueta = (v: string) => v.charAt(0) + v.slice(1).toLowerCase().replace(/
 
 const CapturarPedido = () => {
     const navigate = useNavigate();
-    const { tipos, materiales, cargando, error: errorCatalogos } = useCatalogosPedido();
+    const { id } = useParams(); // si hay id, estamos editando un pedido
+    const editando = Boolean(id);
+    const { tipos, materiales, archivos, cargando, error: errorCatalogos } = useCatalogosPedido();
 
     const [cliente, setCliente] = useState({ nombre: "", telefono: "", correo: "" });
     const [proyecto, setProyecto] = useState({ nombreProyecto: "", fechaEntrega: "" });
     const [productos, setProductos] = useState<ProductoForm[]>([productoVacio()]);
+    const [archivoDisenioId, setArchivoDisenioId] = useState("");
     const [enviando, setEnviando] = useState(false);
     const [error, setError] = useState("");
     const [folio, setFolio] = useState("");
+
+    // Solo para edición
+    const [clienteId, setClienteId] = useState("");
+    const [folioEdicion, setFolioEdicion] = useState("");
+    const [conservar, setConservar] = useState<{
+        personaSolicita: string | null;
+        precioAcordado: number | null;
+    }>({ personaSolicita: null, precioAcordado: null });
+    const [cargandoPedido, setCargandoPedido] = useState(editando);
+
+    useEffect(() => {
+        if (!id) return;
+        let vigente = true;
+
+        const cargarPedido = async () => {
+            try {
+                const pedido = await capturaService.obtenerPedido(id);
+                const clienteActual = await capturaService.obtenerCliente(pedido.clienteId);
+                if (!vigente) return;
+                setClienteId(pedido.clienteId);
+                setCliente({
+                    nombre: clienteActual.nombre,
+                    telefono: clienteActual.telefono,
+                    correo: clienteActual.correo ?? "",
+                });
+                setProyecto({
+                    nombreProyecto: pedido.nombreProyecto,
+                    fechaEntrega: pedido.fechaEntrega.slice(0, 16), // formato de datetime-local
+                });
+                setArchivoDisenioId(pedido.archivoDisenioId ?? "");
+                setConservar({
+                    personaSolicita: pedido.personaSolicita,
+                    precioAcordado: pedido.precioAcordado,
+                });
+                setProductos(
+                    pedido.productos.map((p) => ({
+                        ...p,
+                        cantidad: String(p.cantidad),
+                        observaciones: p.observaciones ?? "",
+                    })),
+                );
+                setFolioEdicion(pedido.folio);
+            } catch (err) {
+                if (vigente) setError(mensajeDeError(err, "No se pudo cargar el pedido"));
+            } finally {
+                if (vigente) setCargandoPedido(false);
+            }
+        };
+
+        void cargarPedido();
+        return () => {
+            vigente = false;
+        };
+    }, [id]);
 
     const cambiarProducto = (i: number, campo: keyof ProductoForm, valor: string) =>
         setProductos((prev) => prev.map((p, idx) => (idx === i ? { ...p, [campo]: valor } : p)));
@@ -33,20 +90,41 @@ const CapturarPedido = () => {
         setError("");
         setEnviando(true);
         try {
-            const nuevoCliente = await capturaService.crearCliente(cliente);
-            const pedido = await capturaService.crearPedido({
+            const datosPedido = {
                 nombreProyecto: proyecto.nombreProyecto,
                 fechaEntrega: proyecto.fechaEntrega,
-                clienteId: nuevoCliente.id,
                 productos: productos.map((p) => ({ ...p, cantidad: Number(p.cantidad) })),
-            });
+                archivoDisenioId: archivoDisenioId || null,
+            };
+
+            if (id) {
+                await capturaService.actualizarCliente(clienteId, cliente);
+                await capturaService.actualizarPedido(id, { ...datosPedido, clienteId, ...conservar });
+                navigate("/pedidos");
+                return;
+            }
+
+            const nuevoCliente = await capturaService.crearCliente(cliente);
+            const pedido = await capturaService.crearPedido({ ...datosPedido, clienteId: nuevoCliente.id });
             setFolio(pedido.folio);
         } catch (err) {
-            setError(mensajeDeError(err, "No se pudo registrar el pedido"));
+            setError(mensajeDeError(err, editando ? "No se pudo guardar el pedido" : "No se pudo registrar el pedido"));
         } finally {
             setEnviando(false);
         }
     };
+
+    if (cargandoPedido) return <p>Cargando pedido…</p>;
+    if (editando && !clienteId) {
+        return (
+            <div className="capturar-pedido-container">
+                <p className="error-text">{error || "No se pudo cargar el pedido"}</p>
+                <button type="button" className="btn-secondary" onClick={() => navigate("/pedidos")}>
+                    Volver a pedidos
+                </button>
+            </div>
+        );
+    }
 
     return (
         <form className="capturar-pedido-container" onSubmit={enviar}>
@@ -115,9 +193,27 @@ const CapturarPedido = () => {
                                 value={proyecto.fechaEntrega}
                                 onChange={(e) => setProyecto({ ...proyecto, fechaEntrega: e.target.value })}
                             />
+                            {editando && (
+                                <small>Si cambias la fecha, regenera el cronograma en "Asignar cronograma".</small>
+                            )}
                         </div>
                     </div>
-
+                    <div className="form-row">
+                        <div className="form-group">
+                            <label>Archivo de diseño</label>
+                            <select
+                                value={archivoDisenioId}
+                                onChange={(e) => setArchivoDisenioId(e.target.value)}
+                            >
+                                <option value="">Sin archivo</option>
+                                {archivos.map((a) => (
+                                    <option key={a.id} value={a.id}>
+                                        {a.nombreArchivo} (v{a.version ?? 1})
+                                    </option>
+                                ))}
+                            </select>
+                        </div>
+                    </div>
                     {productos.map((p, i) => (
                         <div className="producto-bloque" key={i}>
                             <h2 className="section-title">PRODUCTO {i + 1}</h2>
@@ -229,10 +325,10 @@ const CapturarPedido = () => {
                 <aside className="summary-sidebar">
                     <div className="summary-card">
                         <h3>FOLIO</h3>
-                        <h2 className="folio-number">{folio || "Se asigna al registrar"}</h2>
+                        <h2 className="folio-number">{folio || folioEdicion || "Se asigna al registrar"}</h2>
                         <span className={folio ? "badge" : "badge draft"}>
-              {folio ? "Pedido registrado" : "Sin registrar"}
-            </span>
+                            {folio ? "Pedido registrado" : editando ? "Editando pedido" : "Sin registrar"}
+                        </span>
                     </div>
 
                     {errorCatalogos && <p className="error-text">{errorCatalogos}</p>}
@@ -245,7 +341,9 @@ const CapturarPedido = () => {
                             </button>
                         ) : (
                             <button className="btn-primary" type="submit" disabled={enviando || cargando}>
-                                {enviando ? "Registrando..." : "Registrar pedido"}
+                                {enviando
+                                    ? (editando ? "Guardando..." : "Registrando...")
+                                    : (editando ? "Guardar cambios" : "Registrar pedido")}
                             </button>
                         )}
                     </div>

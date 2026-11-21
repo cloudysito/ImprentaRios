@@ -121,4 +121,20 @@ class PedidoServiceTest {
         assertEquals(EstadoPedido.TERMINADO, pedido.getEstado());
         verify(pedidoRepository, never()).save(any(Pedido.class));
     }
+
+    @Test
+    void actualizarPedido_Terminado_NoSePermite() {
+        Pedido pedido = new Pedido();
+        pedido.setEstado(EstadoPedido.TERMINADO);
+        when(pedidoRepository.findById("p1")).thenReturn(Optional.of(pedido));
+        PedidoRequestDTO dto = new PedidoRequestDTO(
+                LocalDateTime.now().plusDays(1), "Proyecto", List.of(), "cliente-1", null, null, null);
+
+        var exception = assertThrows(imprenta.sistema.imprentabackend.exceptions.NegocioException.class,
+                () -> pedidoService.actualizarPedido("p1", dto));
+
+        assertEquals(imprenta.sistema.imprentabackend.exceptions.CodigoError.PEDIDO_NO_EDITABLE,
+                exception.getCodigo());
+        verify(pedidoRepository, never()).save(any(Pedido.class));
+    }
 }

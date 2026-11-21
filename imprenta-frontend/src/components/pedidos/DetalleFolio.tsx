@@ -1,6 +1,8 @@
 import type { PedidoDetalle } from "../../types/pedido";
 import { formatFechaCorta, formatFechaLarga, formatNumero } from "../../utils/formato";
 import "../../styles/DetalleFolio.css";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../hooks/useAuth";
 
 interface DetalleFolioProps {
   detalle: PedidoDetalle | null;
@@ -19,6 +21,8 @@ const DetalleFolio = ({
   onMarcarEntregado,
   onCerrarFolio,
 }: DetalleFolioProps) => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   if (cargando || !detalle) {
     return (
       <aside className="detalle-folio detalle-folio--vacio">
@@ -29,6 +33,11 @@ const DetalleFolio = ({
 
   // Regla de negocio, solo se entrega lo que ya está terminado
   const puedeEntregar = detalle.estado === "TERMINADO";
+
+  // Igual que el backend: solo dueño y secretaria, y mientras el pedido siga abierto
+  const puedeEditar =
+      (user?.rol === "DUENO" || user?.rol === "SECRETARIA") &&
+      !["TERMINADO", "ENTREGADO", "CANCELADO"].includes(detalle.estado);
 
   return (
     <aside className="detalle-folio">
@@ -92,6 +101,16 @@ const DetalleFolio = ({
         <button type="button" className="detalle-folio__btn" onClick={onCerrarFolio}>
           Cerrar folio
         </button>
+        {puedeEditar && (
+            <button
+                type="button"
+                className="detalle-folio__btn"
+                onClick={() => navigate(`/pedidos/${detalle.id}/editar`)}
+                disabled={guardando}
+            >
+              Editar pedido
+            </button>
+        )}
       </div>
     </aside>
   );

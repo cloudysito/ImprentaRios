@@ -44,6 +44,18 @@ public class PedidoService implements IPedidoService {
 
     @Override
     public PedidoResponseDTO capturarPedido(PedidoRequestDTO dto, String empleadoId) {
+        validarReferencias(dto);
+        // TODO: verificar existencias de insumo cuando la imprenta defina la respuesta.
+
+        Pedido pedido = PedidoMapper.toEntity(dto);
+        pedido.setFolio(generarFolio());
+        pedido.setFechaRegistro(LocalDateTime.now());
+        pedido.setEstado(EstadoPedido.REGISTRADO);
+        pedido.setEmpleadoId(empleadoId);
+        return PedidoMapper.toResponse(pedidoRepository.save(pedido));
+    }
+
+    private void validarReferencias(PedidoRequestDTO dto) {
         if (!clienteRepository.existsById(dto.clienteId())) {
             throw new NegocioException(CodigoError.CLIENTE_NO_ENCONTRADO);
         }
@@ -54,14 +66,6 @@ public class PedidoService implements IPedidoService {
             materialService.buscarMaterialPorId(p.materialId());
         }
         validarArchivoDisenio(dto.archivoDisenioId());
-        // TODO: verificar existencias de insumo cuando la imprenta defina la respuesta.
-
-        Pedido pedido = PedidoMapper.toEntity(dto);
-        pedido.setFolio(generarFolio());
-        pedido.setFechaRegistro(LocalDateTime.now());
-        pedido.setEstado(EstadoPedido.REGISTRADO);
-        pedido.setEmpleadoId(empleadoId);
-        return PedidoMapper.toResponse(pedidoRepository.save(pedido));
     }
 
     private void validarArchivoDisenio(String archivoDisenioId) {
@@ -90,8 +94,14 @@ public class PedidoService implements IPedidoService {
     @Override
     public PedidoResponseDTO actualizarPedido(String id, PedidoRequestDTO dto) {
         Pedido pedido = obtenerPedido(id);
-        validarArchivoDisenio(dto.archivoDisenioId());
+        EstadoPedido estado = pedido.getEstado();
+        if (estado == EstadoPedido.TERMINADO || estado == EstadoPedido.ENTREGADO
+                || estado == EstadoPedido.CANCELADO) {
+            throw new NegocioException(CodigoError.PEDIDO_NO_EDITABLE);
+        }
+        validarReferencias(dto);
         PedidoMapper.actualizarEntidad(pedido, dto);
+        // Si estaba esperando el diseño y ya tiene archivo, pasa a producción
         if (pedido.getEstado() == EstadoPedido.EN_DISENIO && tieneArchivoDisenio(pedido)) {
             pedido.setEstado(EstadoPedido.EN_PRODUCCION);
         }

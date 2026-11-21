@@ -1,6 +1,6 @@
 import { api } from "./api";
 import type {
-    ClienteRequest, Material, PedidoCreado, PedidoRequest, TipoProducto,
+    ArchivoDisenio, ClienteCompleto, ClienteRequest, Material, PedidoCompleto, PedidoCreado, PedidoRequest, TipoProducto,
 } from "../types/captura";
 
 export const capturaService = {
@@ -21,6 +21,30 @@ export const capturaService = {
 
     crearPedido: async (pedido: PedidoRequest) => {
         const { data } = await api.post<PedidoCreado>("/pedidos", pedido);
+        return data;
+    },
+
+    archivosDisenio: async () => {
+        const { data } = await api.get<ArchivoDisenio[]>("/archivo_disenio");
+        return data;
+    },
+
+    obtenerPedido: async (id: string) => {
+        const { data } = await api.get<PedidoCompleto>(`/pedidos/${id}`);
+        return data;
+    },
+
+    obtenerCliente: async (id: string) => {
+        const { data } = await api.get<ClienteCompleto>(`/cliente/${id}`);
+        return data;
+    },
+
+    actualizarCliente: async (id: string, cliente: ClienteRequest) => {
+        await api.put(`/cliente/${id}`, cliente);
+    },
+
+    actualizarPedido: async (id: string, pedido: PedidoRequest) => {
+        const { data } = await api.put<PedidoCreado>(`/pedidos/${id}`, pedido);
         return data;
     },
 };
