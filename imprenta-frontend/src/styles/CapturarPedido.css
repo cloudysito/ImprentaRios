@@ -280,3 +280,14 @@
 .capturar-pedido-container .archivo-fila select {
     flex: 1;
 }
+
+.capturar-pedido-container .archivo-fila {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.capturar-pedido-container .archivo-fila select {
+    flex: 1;
+}
