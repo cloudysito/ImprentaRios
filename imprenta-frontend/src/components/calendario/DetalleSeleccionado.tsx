@@ -3,6 +3,7 @@ import { diaMes } from "../../utils/fechas";
 import { formatNumero } from "../../utils/formato";
 import "../../styles/Consulta.css";
 import "../../styles/ConsultarCronograma.css";
+import { Cargando } from "../Cargando";
 
 interface DetalleSeleccionadoProps {
     detalle: PedidoDetalle | null;
@@ -19,7 +20,9 @@ const DetalleSeleccionado = ({ detalle, cargando }: DetalleSeleccionadoProps) =>
         <section className="cons-tarjeta">
             <h2 className="cons-tarjeta__titulo">Detalle seleccionado</h2>
             {cargando || !detalle ? (
-                <p className="cons-vacio">{cargando ? "Cargando pedido…" : "Selecciona un pedido del cronograma."}</p>
+                cargando
+                    ? <Cargando />
+                    : <p className="cons-vacio">Selecciona un pedido del cronograma.</p>
             ) : (
                 <>
                     <p className="cg-detalle__folio">{detalle.folio}</p>

@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import type { ColumnaDia } from "../../types/consulta";
 import CalendarioColumnaDia from "./CalendarioColumnaDia";
 import "../../styles/ConsultarCalendario.css";
+import { Cargando } from "../Cargando";
 
 interface CalendarioGrillaProps {
     columnas: ColumnaDia[];
@@ -16,7 +17,7 @@ const CalendarioGrilla = ({ columnas, cargando, error }: CalendarioGrillaProps) 
         grillaRef.current?.style.setProperty("--columnas", String(columnas.length));
     }, [columnas.length]);
 
-    if (cargando) return <div className="cc-grilla cc-grilla--mensaje">Cargando calendario…</div>;
+    if (cargando) return <div className="cc-grilla cc-grilla--mensaje"><Cargando /></div>;
     if (error) return <div className="cc-grilla cc-grilla--mensaje is-error">{error}</div>;
 
     return (

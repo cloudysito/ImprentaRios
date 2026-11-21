@@ -8,6 +8,7 @@ import ProgramarAlertaModal from "../components/mantenimiento/ProgramarAlertaMod
 import { useMantenimiento } from "../hooks/useMantenimiento";
 import "../styles/UI.css";
 import "../styles/Mantenimiento.css";
+import { Cargando } from "../components/Cargando";
 
 const GestionarMantenimientoPage = () => {
   const mant = useMantenimiento();
@@ -31,7 +32,7 @@ const GestionarMantenimientoPage = () => {
         </span>
 
         {mant.cargando ? (
-          <p className="ui-vacio">Cargando maquinaria…</p>
+          <Cargando />
         ) : mant.error ? (
           <p className="ui-error">{mant.error}</p>
         ) : mant.maquinas.length === 0 ? (
@@ -67,10 +68,10 @@ const GestionarMantenimientoPage = () => {
               <HistorialTecnico servicios={d.historial} />
             </div>
           </>
+        ) : mant.cargandoDetalle ? (
+          <Cargando />
         ) : mant.errorDetalle ? (
           <p className="ui-error">{mant.errorDetalle}</p>
-        ) : mant.cargandoDetalle ? (
-          <p className="ui-card ui-vacio">Cargando máquina…</p>
         ) : (
           !mant.cargando && (
             <p className="ui-card ui-vacio">

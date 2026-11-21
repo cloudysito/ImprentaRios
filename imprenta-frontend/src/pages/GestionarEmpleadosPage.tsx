@@ -14,6 +14,7 @@ import type { NuevoEmpleado } from "../services/empleadoService";
 import { mensajeDeError } from "../utils/errores";
 import "../styles/UI.css";
 import "../styles/GestionarEmpleados.css";
+import { Cargando } from "../components/Cargando";
 
 const formularioInicial: NuevoEmpleado = {
   nombre: "",
@@ -223,9 +224,7 @@ function GestionarEmpleados() {
       >
         <h2 id="empleados-titulo">Empleados registrados</h2>
         {cargando ? (
-          <p className="ui-vacio" role="status">
-            Cargando empleados…
-          </p>
+          <Cargando />
         ) : errorListado ? (
           <p className="ui-error" role="alert">
             {errorListado}

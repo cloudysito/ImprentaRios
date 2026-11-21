@@ -5,6 +5,7 @@ import { useTaller } from "../hooks/useTaller";
 import { horaMinutos } from "../utils/fechas";
 import "../styles/UI.css";
 import "../styles/VerificarProgreso.css";
+import { Cargando } from "../components/Cargando";
 
 const VerificarProgresoPage = () => {
   const taller = useTaller();
@@ -19,7 +20,7 @@ const VerificarProgresoPage = () => {
         <span className="ui-eyebrow taller__titulo-lista">Mis asignaciones de hoy</span>
 
         {taller.cargando ? (
-          <p className="ui-vacio">Cargando asignaciones…</p>
+          <Cargando />
         ) : taller.error ? (
           <p className="ui-error">{taller.error}</p>
         ) : taller.asignaciones.length === 0 ? (

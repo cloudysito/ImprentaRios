@@ -54,6 +54,7 @@
 .cg-scroll { overflow-x: auto; }
 .cg-diagrama {
     --ancho-titulo: 150px;
+    --dias: 10;
     display: flex;
     flex-direction: column;
     gap: 8px;

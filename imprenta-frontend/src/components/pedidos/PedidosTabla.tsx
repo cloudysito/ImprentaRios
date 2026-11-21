@@ -4,6 +4,7 @@ import { formatFechaCorta, formatNumero } from "../../utils/formato";
 import EstatusBadges from "./EstatusBadges";
 import "../../styles/PedidosTabla.css";
 import "../../styles/UI.css";
+import { Cargando } from "../Cargando";
 
 interface PedidosTablaProps {
   pedidos: PedidoResumen[];
@@ -22,9 +23,7 @@ const PedidosTabla = ({
   error,
   onEliminar,
 }: PedidosTablaProps) => {
-  const mensaje = cargando
-    ? "Cargando pedidos…"
-    : error ?? (pedidos.length === 0 ? "No hay pedidos con ese filtro" : null);
+  const mensaje = error ?? (pedidos.length === 0 ? "No hay pedidos con ese filtro" : null);
 
   return (
     <div className="pedidos-tabla">
@@ -41,7 +40,13 @@ const PedidosTabla = ({
           </tr>
         </thead>
         <tbody>
-          {mensaje ? (
+          {cargando ? (
+            <tr>
+              <td colSpan={onEliminar ? 7 : 6}>
+                <Cargando />
+              </td>
+            </tr>
+          ) : mensaje ? (
             <tr>
               <td colSpan={onEliminar ? 7 : 6} className="pedidos-tabla__mensaje">
                 {mensaje}

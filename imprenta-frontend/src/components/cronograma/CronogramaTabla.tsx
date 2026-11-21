@@ -2,6 +2,7 @@ import type { CronogramaResumen } from "../../types/cronograma";
 import { formatFechaCorta, formatNumero } from "../../utils/formato";
 import CronogramaBadge from "./CronogramaBadge";
 import "../../styles/PedidosTabla.css";
+import { Cargando } from "../Cargando";
 
 interface CronogramaTablaProps {
     items: CronogramaResumen[];
@@ -18,9 +19,7 @@ const CronogramaTabla = ({
                              cargando,
                              error,
                          }: CronogramaTablaProps) => {
-    const mensaje = cargando
-        ? "Cargando pedidos…"
-        : error ?? (items.length === 0 ? "No hay pedidos con ese filtro" : null);
+    const mensaje = error ?? (items.length === 0 ? "No hay pedidos con ese filtro" : null);
 
     return (
         <div className="pedidos-tabla">
@@ -36,7 +35,13 @@ const CronogramaTabla = ({
                 </tr>
                 </thead>
                 <tbody>
-                {mensaje ? (
+                {cargando ? (
+                    <tr>
+                        <td colSpan={6}>
+                            <Cargando />
+                        </td>
+                    </tr>
+                ) : mensaje ? (
                     <tr>
                         <td colSpan={6} className="pedidos-tabla__mensaje">
                             {mensaje}

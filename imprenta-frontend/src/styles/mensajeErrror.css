@@ -14,4 +14,9 @@
 .error .boton {
     margin-top: 0.8rem;
     background: var(--rojo);
+    padding: 0.4rem 1.2rem;
+    border: 1px solid var(--rojo);
+    border-radius: var(--radio);
+    color: white;
+    font-weight: bold;
 }

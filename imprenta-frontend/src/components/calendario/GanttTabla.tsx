@@ -4,6 +4,7 @@ import { esDomingo, mismoDia } from "../../utils/calendario";
 import GanttFila from "./GanttFila";
 import "../../styles/Consulta.css";
 import "../../styles/ConsultarCronograma.css";
+import { Cargando } from "../Cargando";
 
 interface GanttTablaProps {
     dias: Date[];
@@ -32,15 +33,17 @@ const GanttTabla = ({
         diagramaRef.current?.style.setProperty("--dias", String(dias.length));
     }, [dias.length]);
 
-    const mensaje = cargando
-        ? "Cargando cronograma…"
-        : error
+    const mensaje = error
           ? error
           : rangoInvalido
             ? "El rango de fechas no es válido: «Hasta» debe ser igual o posterior a «Desde»."
             : filas.length === 0
               ? "No hay actividades en este periodo."
               : null;
+
+    if (cargando) {
+        return <div className="cg-tabla cons-mensaje"><Cargando /></div>;
+    }
 
     if (mensaje) {
         return <div className={`cg-tabla cons-mensaje ${error ? "is-error" : ""}`}>{mensaje}</div>;

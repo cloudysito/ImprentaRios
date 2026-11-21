@@ -1,6 +1,7 @@
 import type { PedidoDetalle } from "../../types/pedido";
 import { formatFechaCorta, formatFechaLarga, formatNumero } from "../../utils/formato";
 import "../../styles/DetalleFolio.css";
+import { Cargando } from "../Cargando";
 
 interface DetalleFolioProps {
   detalle: PedidoDetalle | null;
@@ -22,7 +23,7 @@ const DetalleFolio = ({
   if (cargando || !detalle) {
     return (
       <aside className="detalle-folio detalle-folio--vacio">
-        {cargando ? "Cargando folio…" : "Selecciona un pedido para ver su detalle"}
+        {cargando ? <Cargando /> : "Selecciona un pedido para ver su detalle"}
       </aside>
     );
   }
