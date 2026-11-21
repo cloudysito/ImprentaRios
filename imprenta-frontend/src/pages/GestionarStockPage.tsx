@@ -37,7 +37,9 @@ const GestionarStockPage = () => {
     for (const [id, valor] of Object.entries(puntos)) {
       const n = Number(valor);
       if (valor.trim() === "" || !Number.isInteger(n) || n < 0) {
-        setErrorPuntos("Los puntos de reorden deben ser números enteros, 0 o mayores");
+        setErrorPuntos(
+          "Los puntos de reorden deben ser números enteros, 0 o mayores",
+        );
         return;
       }
       const actual = stock.insumos.find((i) => i.id === id);
@@ -51,7 +53,9 @@ const GestionarStockPage = () => {
       setEditando(false);
       setPuntos({});
     } catch (err) {
-      setErrorPuntos(mensajeDeError(err, "No se pudieron guardar los puntos de reorden"));
+      setErrorPuntos(
+        mensajeDeError(err, "No se pudieron guardar los puntos de reorden"),
+      );
     } finally {
       setGuardandoPuntos(false);
     }
@@ -63,10 +67,19 @@ const GestionarStockPage = () => {
         <div className="stock__toolbar">
           {editando ? (
             <div className="stock__toolbar-grupo">
-              <button type="button" className="ui-btn ui-btn--oscuro" onClick={() => void guardarPuntos()} disabled={guardandoPuntos}>
+              <button
+                type="button"
+                className="ui-btn ui-btn--oscuro"
+                onClick={() => void guardarPuntos()}
+                disabled={guardandoPuntos}
+              >
                 {guardandoPuntos ? "Guardando…" : "Guardar puntos de reorden"}
               </button>
-              <button type="button" className="ui-btn ui-btn--contorno" onClick={cancelarEdicion}>
+              <button
+                type="button"
+                className="ui-btn ui-btn--contorno"
+                onClick={cancelarEdicion}
+              >
                 Cancelar
               </button>
             </div>
@@ -80,7 +93,11 @@ const GestionarStockPage = () => {
               Editar puntos de reorden
             </button>
           )}
-          <button type="button" className="ui-btn ui-btn--primario" onClick={() => setNuevoAbierto(true)}>
+          <button
+            type="button"
+            className="ui-btn ui-btn--primario"
+            onClick={() => setNuevoAbierto(true)}
+          >
             Nuevo material
           </button>
         </div>
@@ -100,16 +117,27 @@ const GestionarStockPage = () => {
           error={stock.error}
           editando={editando}
           puntos={puntos}
-          onPuntoChange={(id, valor) => setPuntos((prev) => ({ ...prev, [id]: valor }))}
+          onPuntoChange={(id, valor) =>
+            setPuntos((prev) => ({ ...prev, [id]: valor }))
+          }
         />
       </section>
 
       <aside className="stock__lateral">
-        <MovimientoForm insumos={stock.insumos} folios={stock.folios} onGuardar={stock.registrarMovimiento} />
+        <MovimientoForm
+          insumos={stock.insumos}
+          folios={stock.folios}
+          onGuardar={stock.registrarMovimiento}
+        />
         <AlertasDesabasto insumos={stock.conAlerta} />
       </aside>
 
-      {nuevoAbierto && <NuevoInsumoModal onCerrar={() => setNuevoAbierto(false)} onCrear={stock.crearInsumo} />}
+      {nuevoAbierto && (
+        <NuevoInsumoModal
+          onCerrar={() => setNuevoAbierto(false)}
+          onCrear={stock.crearInsumo}
+        />
+      )}
     </div>
   );
 };

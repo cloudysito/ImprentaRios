@@ -1,6 +1,7 @@
 import { ESTATUS_STOCK_CLASE, ESTATUS_STOCK_LABEL, type Insumo } from "../../types/inventario";
 import { formatNumero } from "../../utils/formato";
 import { diaMes } from "../../utils/fechas";
+import { Cargando } from "../Cargando";
 
 interface StockTablaProps {
   insumos: Insumo[];
@@ -12,9 +13,7 @@ interface StockTablaProps {
 }
 
 const StockTabla = ({ insumos, cargando, error, editando, puntos, onPuntoChange }: StockTablaProps) => {
-  const mensaje = cargando
-    ? "Cargando inventario…"
-    : error ?? (insumos.length === 0 ? "Todavía no hay materiales registrados" : null);
+  const mensaje = error ?? (insumos.length === 0 ? "Todavía no hay materiales registrados" : null);
 
   return (
     <div className="ui-card stock-tabla">
@@ -30,7 +29,13 @@ const StockTabla = ({ insumos, cargando, error, editando, puntos, onPuntoChange 
           </tr>
         </thead>
         <tbody>
-          {mensaje ? (
+          {cargando ? (
+            <tr>
+              <td colSpan={6}>
+                <Cargando />
+              </td>
+            </tr>
+          ) : mensaje ? (
             <tr>
               <td colSpan={6} className="ui-vacio">
                 {mensaje}

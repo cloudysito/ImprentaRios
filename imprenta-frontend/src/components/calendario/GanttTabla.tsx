@@ -1,8 +1,10 @@
+import { useEffect, useRef } from "react";
 import type { FilaCronograma } from "../../types/consulta";
 import { esDomingo, mismoDia } from "../../utils/calendario";
 import GanttFila from "./GanttFila";
 import "../../styles/Consulta.css";
 import "../../styles/ConsultarCronograma.css";
+import { Cargando } from "../Cargando";
 
 interface GanttTablaProps {
     dias: Date[];
@@ -25,15 +27,23 @@ const GanttTabla = ({
     error,
     rangoInvalido,
 }: GanttTablaProps) => {
-    const mensaje = cargando
-        ? "Cargando cronograma…"
-        : error
+    const diagramaRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        diagramaRef.current?.style.setProperty("--dias", String(dias.length));
+    }, [dias.length]);
+
+    const mensaje = error
           ? error
           : rangoInvalido
             ? "El rango de fechas no es válido: «Hasta» debe ser igual o posterior a «Desde»."
             : filas.length === 0
               ? "No hay actividades en este periodo."
               : null;
+
+    if (cargando) {
+        return <div className="cg-tabla cons-mensaje"><Cargando /></div>;
+    }
 
     if (mensaje) {
         return <div className={`cg-tabla cons-mensaje ${error ? "is-error" : ""}`}>{mensaje}</div>;
@@ -42,7 +52,7 @@ const GanttTabla = ({
     return (
         <div className="cg-tabla">
             <div className="cg-scroll">
-                <div className="cg-diagrama" style={{ ["--dias" as string]: dias.length }}>
+                <div ref={diagramaRef} className="cg-diagrama">
                     <div className="cg-cabecera" aria-hidden="true">
                         <span />
                         <span className="cg-dias">

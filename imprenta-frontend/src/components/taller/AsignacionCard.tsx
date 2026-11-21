@@ -37,7 +37,7 @@ const AsignacionCard = ({ asignacion: a, seleccionada, onSeleccionar }: Asignaci
         {a.producto} · {formatNumero(a.piezas)} pzas
       </span>
       <span className={`ui-progreso ${a.terminada ? "ui-progreso--completo" : ""}`}>
-        <span className="ui-progreso__barra" style={{ width: `${a.terminada ? 100 : avance}%` }} />
+        <progress className="ui-progreso__barra" value={a.terminada ? 100 : avance} max={100} aria-label="Porcentaje de avance" />
       </span>
       <span className="taller-card__avance">
         {a.terminada || a.piezasTerminadas > 0

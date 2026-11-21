@@ -174,13 +174,35 @@ select.ui-input {
 }
 
 .ui-progreso__barra {
+    display: block;
+    width: 100%;
     height: 100%;
+    border: 0;
+    border-radius: inherit;
+    background: transparent;
+    appearance: none;
+}
+.ui-progreso__barra::-webkit-progress-bar {
+    border-radius: inherit;
+    background: transparent;
+}
+.ui-progreso__barra::-webkit-progress-value {
     border-radius: inherit;
     background: #a63d30;
     transition: width 0.3s ease;
 }
+.ui-progreso__barra::-moz-progress-bar {
+    border-radius: inherit;
+    background: #a63d30;
+}
 
 .ui-progreso--completo .ui-progreso__barra {
+    background: #2f5e4e;
+}
+.ui-progreso--completo .ui-progreso__barra::-webkit-progress-value {
+    background: #2f5e4e;
+}
+.ui-progreso--completo .ui-progreso__barra::-moz-progress-bar {
     background: #2f5e4e;
 }
 

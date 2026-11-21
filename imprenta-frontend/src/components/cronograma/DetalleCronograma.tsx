@@ -7,6 +7,7 @@ import { formatFechaCorta, formatFechaLarga, formatNumero } from "../../utils/fo
 import CronogramaBadge from "./CronogramaBadge";
 import "../../styles/DetalleFolio.css";
 import "../../styles/GenerarCronograma.css";
+import { Cargando } from "../Cargando";
 
 interface DetalleCronogramaProps {
     detalle: CronogramaDetalle | null;
@@ -43,7 +44,7 @@ const DetalleCronograma = ({
     if (cargando || !detalle) {
         return (
             <aside className="detalle-folio detalle-folio--vacio">
-                {cargando ? "Cargando pedido…" : "Selecciona un pedido para generar su cronograma"}
+                {cargando ? <Cargando /> : "Selecciona un pedido para generar su cronograma"}
             </aside>
         );
     }

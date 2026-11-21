@@ -3,6 +3,7 @@ import { formatFechaCorta, formatFechaLarga, formatNumero } from "../../utils/fo
 import "../../styles/DetalleFolio.css";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
+import { Cargando } from "../Cargando";
 
 interface DetalleFolioProps {
   detalle: PedidoDetalle | null;
@@ -26,7 +27,7 @@ const DetalleFolio = ({
   if (cargando || !detalle) {
     return (
       <aside className="detalle-folio detalle-folio--vacio">
-        {cargando ? "Cargando folio…" : "Selecciona un pedido para ver su detalle"}
+        {cargando ? <Cargando /> : "Selecciona un pedido para ver su detalle"}
       </aside>
     );
   }
