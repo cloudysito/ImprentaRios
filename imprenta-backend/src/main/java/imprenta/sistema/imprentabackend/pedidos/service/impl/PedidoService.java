@@ -65,13 +65,18 @@ public class PedidoService implements IPedidoService {
             }
             materialService.buscarMaterialPorId(p.materialId());
         }
-        validarArchivoDisenio(dto.archivoDisenioId());
+        validarArchivosDisenio(dto.archivosDisenioIds());
     }
 
-    private void validarArchivoDisenio(String archivoDisenioId) {
-        if (archivoDisenioId != null && !archivoDisenioId.isBlank()
-                && !archivoDisenioRepository.existsById(archivoDisenioId)) {
-            throw new NegocioException(CodigoError.ARCHIVO_DE_DISENIO_NO_ENCONTRADO);
+    private void validarArchivosDisenio(List<String> ids) {
+        if (ids == null) {
+            return;
+        }
+        for (String archivoId : ids) {
+            if (archivoId != null && !archivoId.isBlank()
+                    && !archivoDisenioRepository.existsById(archivoId)) {
+                throw new NegocioException(CodigoError.ARCHIVO_DE_DISENIO_NO_ENCONTRADO);
+            }
         }
     }
 
@@ -179,7 +184,7 @@ public class PedidoService implements IPedidoService {
     }
 
     private boolean tieneArchivoDisenio(Pedido pedido) {
-        return pedido.getArchivoDisenioId() != null && !pedido.getArchivoDisenioId().isBlank();
+        return !PedidoMapper.archivosDe(pedido).isEmpty();
     }
 
     private PedidoResumenDTO aResumen(Pedido p, Map<String, String> clientes, Map<String, String> tipos) {
@@ -225,10 +230,15 @@ public class PedidoService implements IPedidoService {
                 ? List.of()
                 : List.of(new EventoBitacoraDTO(p.getFechaRegistro(), "Pedido registrado"));
 
-        String versionDisenio = p.getArchivoDisenioId() == null ? null
-                : archivoDisenioRepository.findById(p.getArchivoDisenioId())
-                        .map(a -> "v" + Objects.requireNonNullElse(a.getVersion(), 1))
-                        .orElse(null);
+        List<String> idsArchivos = PedidoMapper.archivosDe(p);
+        String versionDisenio = null;
+        if (idsArchivos.size() == 1) {
+            versionDisenio = archivoDisenioRepository.findById(idsArchivos.get(0))
+                    .map(a -> "v" + Objects.requireNonNullElse(a.getVersion(), 1))
+                    .orElse(null);
+        } else if (idsArchivos.size() > 1) {
+            versionDisenio = idsArchivos.size() + " archivos";
+        }
 
         List<String> asignados = actividadRepository.findByPedidoId(p.getId()).stream()
                 .map(Actividad::getEmpleadoId)

@@ -29,5 +29,6 @@ public class Pedido {
     private String empleadoId;
     private String personaSolicita;
     private BigDecimal precioAcordado;
+    private List<String> archivosDisenioIds;
     private String archivoDisenioId;
 }

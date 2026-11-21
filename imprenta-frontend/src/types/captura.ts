@@ -56,7 +56,7 @@ export interface PedidoRequest {
     productos: (Omit<ProductoForm, "cantidad"> & { cantidad: number })[];
     personaSolicita?: string | null;
     precioAcordado?: number | null;
-    archivoDisenioId?: string | null;
+    archivosDisenioIds?: string[];
 }
 
 export interface PedidoCreado {
@@ -83,7 +83,7 @@ export interface PedidoCompleto {
     clienteId: string;
     personaSolicita: string | null;
     precioAcordado: number | null;
-    archivoDisenioId: string | null;
+    archivosDisenioIds: string[];
     productos: (Omit<ProductoForm, "cantidad" | "observaciones"> & {
         cantidad: number;
         observaciones: string | null;
