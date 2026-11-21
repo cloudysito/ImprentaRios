@@ -116,6 +116,7 @@
 .cc-evento--produccion { background: #ece8f6; border-color: #57478a; color: #3d3163; }
 .cc-evento--entrega { background: #e3f0ea; border-color: #2f6b52; color: #24523f; }
 .cc-evento--mantenimiento { background: #f7ecdc; border-color: #b5801f; color: #6b4a14; }
+.cc-evento__estimado { font-size: 10px; font-style: italic; opacity: 0.8; }
 
 .cc-libre {
     display: flex;

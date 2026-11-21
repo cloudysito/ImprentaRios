@@ -9,6 +9,7 @@ interface DetalleFolioProps {
   guardando: boolean;
   error: string | null;
   onMarcarEntregado: () => void;
+  onCancelarPedido: () => void;
   onCerrarFolio: () => void;
 }
 
@@ -18,6 +19,7 @@ const DetalleFolio = ({
   guardando,
   error,
   onMarcarEntregado,
+  onCancelarPedido,
   onCerrarFolio,
 }: DetalleFolioProps) => {
   if (cargando || !detalle) {
@@ -30,6 +32,7 @@ const DetalleFolio = ({
 
   // Regla de negocio, solo se entrega lo que ya está terminado
   const puedeEntregar = detalle.estado === "TERMINADO";
+  const puedeCancelar = detalle.estado !== "ENTREGADO" && detalle.estado !== "CANCELADO";
 
   return (
     <aside className="detalle-folio">
@@ -89,6 +92,14 @@ const DetalleFolio = ({
           disabled={!puedeEntregar || guardando}
         >
           {guardando ? "Guardando…" : "Marcar como entregado"}
+        </button>
+        <button
+          type="button"
+          className="detalle-folio__btn"
+          onClick={onCancelarPedido}
+          disabled={!puedeCancelar || guardando}
+        >
+          {guardando ? "Guardando…" : "Cancelar pedido"}
         </button>
         <button type="button" className="detalle-folio__btn" onClick={onCerrarFolio}>
           Cerrar folio
