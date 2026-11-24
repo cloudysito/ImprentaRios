@@ -25,6 +25,7 @@ const RegistrarServicioForm = ({ responsable, onGuardar }: RegistrarServicioForm
     const horas = paro.trim() === "" ? null : Number(paro);
     if (!fecha || fecha > hoy) return setError("Solo se registran servicios ya realizados. Para uno futuro usa Programar alerta");
     if (!tecnico.trim()) return setError("Escribe el técnico responsable");
+    if (tecnico.trim().length > 80) return setError("El nombre del técnico no puede superar 80 caracteres");
     if (horas !== null && (Number.isNaN(horas) || horas < 0)) return setError("El paro estimado debe ser 0 o más horas");
 
     setGuardando(true);
@@ -71,7 +72,7 @@ const RegistrarServicioForm = ({ responsable, onGuardar }: RegistrarServicioForm
         </label>
         <label className="ui-campo">
           <span>Técnico responsable</span>
-          <input className="ui-input" value={tecnico} onChange={(e) => setTecnico(e.target.value)} />
+          <input className="ui-input" value={tecnico} maxLength={80} onChange={(e) => setTecnico(e.target.value)} />
         </label>
         <label className="ui-campo">
           <span>Paro estimado</span>

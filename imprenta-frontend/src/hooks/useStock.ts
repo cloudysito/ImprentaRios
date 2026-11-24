@@ -19,31 +19,31 @@ export function useStock() {
       inventarioService.listarInsumos(),
       inventarioService.listarMovimientosDelMes().catch((): Movimiento[] => []),
     ])
-      .then(([lista, movimientos]) => {
-        if (cancelado) return;
-        setInsumos(Array.isArray(lista) ? lista : []);
-        setMovimientosMes(Array.isArray(movimientos) ? movimientos.length : 0);
-      })
-      .catch((err) => {
-        if (!cancelado) setError(mensajeDeError(err, "No se pudo cargar el inventario"));
-      })
-      .finally(() => {
-        if (!cancelado) setCargando(false);
-      });
+        .then(([lista, movimientos]) => {
+          if (cancelado) return;
+          setInsumos(Array.isArray(lista) ? lista : []);
+          setMovimientosMes(Array.isArray(movimientos) ? movimientos.length : 0);
+        })
+        .catch((err) => {
+          if (!cancelado) setError(mensajeDeError(err, "No se pudo cargar el inventario"));
+        })
+        .finally(() => {
+          if (!cancelado) setCargando(false);
+        });
 
     // Folios activos, para poder ligar una salida a un pedido. Si falla no pasa nada
     pedidosService
-      .listar()
-      .then((pedidos) => {
-        if (cancelado) return;
-        setFolios(
-          pedidos
-            .filter((p) => p && typeof p.folio === "string")
-            .filter((p) => p.estado !== "ENTREGADO" && p.estado !== "CANCELADO")
-            .map((p) => p.folio),
-        );
-      })
-      .catch(() => {});
+        .listar()
+        .then((pedidos) => {
+          if (cancelado) return;
+          setFolios(
+              pedidos
+                  .filter((p) => p && typeof p.folio === "string")
+                  .filter((p) => p.estado !== "ENTREGADO" && p.estado !== "CANCELADO")
+                  .map((p) => p.folio),
+          );
+        })
+        .catch(() => {});
 
     return () => {
       cancelado = true;
@@ -51,16 +51,16 @@ export function useStock() {
   }, []);
 
   const ordenados = useMemo(
-    () => (Array.isArray(insumos) ? [...insumos] : [])
-      .filter((i) => i && typeof i.nombre === "string")
-      .sort((a, b) => a.nombre.localeCompare(b.nombre, "es")),
-    [insumos],
+      () => (Array.isArray(insumos) ? [...insumos] : [])
+          .filter((i) => i && typeof i.nombre === "string")
+          .sort((a, b) => a.nombre.localeCompare(b.nombre, "es")),
+      [insumos],
   );
 
   const conAlerta = useMemo(() => ordenados.filter((i) => i.estatus !== "SUFICIENTE"), [ordenados]);
 
   const reemplazar = (actualizado: Insumo) =>
-    setInsumos((prev) => prev.map((i) => (i.id === actualizado.id ? actualizado : i)));
+      setInsumos((prev) => prev.map((i) => (i.id === actualizado.id ? actualizado : i)));
 
   const registrarMovimiento = async (insumoId: string, dto: MovimientoRequest) => {
     const actualizado = await inventarioService.registrarMovimiento(insumoId, dto);
@@ -77,19 +77,30 @@ export function useStock() {
     return nuevo;
   };
 
+  const actualizarInsumo = async (id: string, dto: InsumoRequest) => {
+    const actualizado = await inventarioService.actualizarInsumo(id, dto);
+    reemplazar(actualizado);
+    return actualizado;
+  };
+
+  const eliminarInsumo = async (id: string) => {
+    await inventarioService.eliminarInsumo(id);
+    setInsumos((prev) => prev.filter((i) => i.id !== id));
+  };
+
   // cambios = { idInsumo: nuevoPuntoDeReorden }
   const guardarPuntos = async (cambios: Record<string, number>) => {
     const pendientes = insumos.filter((i) => cambios[i.id] !== undefined);
     const actualizados = await Promise.all(
-      pendientes.map((i) =>
-        inventarioService.actualizarInsumo(i.id, {
-          nombre: i.nombre,
-          tipoInsumo: i.tipoInsumo,
-          unidad: i.unidad,
-          cantidadDisponible: i.cantidadDisponible,
-          puntoReorden: cambios[i.id],
-        }),
-      ),
+        pendientes.map((i) =>
+            inventarioService.actualizarInsumo(i.id, {
+              nombre: i.nombre,
+              tipoInsumo: i.tipoInsumo,
+              unidad: i.unidad,
+              cantidadDisponible: i.cantidadDisponible,
+              puntoReorden: cambios[i.id],
+            }),
+        ),
     );
     actualizados.forEach(reemplazar);
   };
@@ -103,6 +114,8 @@ export function useStock() {
     error,
     registrarMovimiento,
     crearInsumo,
+    actualizarInsumo,
+    eliminarInsumo,
     guardarPuntos,
   };
 }

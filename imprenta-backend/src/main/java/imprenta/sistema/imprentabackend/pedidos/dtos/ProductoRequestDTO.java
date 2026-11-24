@@ -11,6 +11,8 @@ public record ProductoRequestDTO(
 
         @NotBlank(message = "Las medidas son obligatorias")
         @Size(max = 30)
+        @Pattern(regexp = "^\\d+([.,]\\d+)?\\s*[xX×]\\s*\\d+([.,]\\d+)?(\\s*(?i:cm|mm|m|in|pulg))?$",
+                message = "La medida debe verse así: 21.5 x 14 cm")
         String medidas,
 
         @NotNull(message = "El tipo de tinta es obligatorio")

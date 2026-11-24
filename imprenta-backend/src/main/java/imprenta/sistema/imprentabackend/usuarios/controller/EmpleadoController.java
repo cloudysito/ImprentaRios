@@ -28,7 +28,7 @@ public class EmpleadoController {
     private final LoginAttemptService loginAttemptService;
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> autenticar(@RequestBody LoginRequest request,
+    public ResponseEntity<LoginResponse> autenticar(@Valid @RequestBody LoginRequest request,
                                                     HttpServletRequest http) {
         String usuario = request.usuario() == null ? "" : request.usuario().trim().toLowerCase();
         String clave = usuario + "|" + http.getRemoteAddr();
