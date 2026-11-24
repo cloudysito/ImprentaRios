@@ -328,14 +328,25 @@ const CapturarPedido = () => {
                     {!editando && clienteExistenteId ? (
                         <div className="cliente-seleccionado">
                             <strong>
-                                {clienteSeleccionado?.nombre ?? "Cliente seleccionado"}
+                                Nombre del cliente o razón social
                             </strong>
-
+                            <p> </p>
+                            <label>
+                                {clienteSeleccionado?.nombre ?? "Cliente seleccionado"}
+                            </label>
+                            <p> </p>
+                            <strong>
+                                Teléfono de contacto
+                            </strong>
+                            <p> </p>
                             <span>{clienteSeleccionado?.telefono}</span>
-
-                            <span>
-                {clienteSeleccionado?.correo || "Sin correo registrado"}
-              </span>
+                            <p> </p>
+                            <strong>
+                                Correo electrónico
+                            </strong>
+                            <p> </p>
+                            <p> </p>
+                            <span> {clienteSeleccionado?.correo || "Sin correo registrado"} </span>
                         </div>
                     ) : (
                         <>
