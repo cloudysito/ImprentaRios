@@ -328,7 +328,7 @@ const CapturarPedido = () => {
                     {!editando && clienteExistenteId ? (
                         <div className="cliente-seleccionado">
                             <strong>
-                                Nombre del cliente o razón social
+                                Nombre del cliente o razón social:
                             </strong>
                             <p> </p>
                             <label>
@@ -336,13 +336,13 @@ const CapturarPedido = () => {
                             </label>
                             <p> </p>
                             <strong>
-                                Teléfono de contacto
+                                Teléfono de contacto:
                             </strong>
                             <p> </p>
                             <span>{clienteSeleccionado?.telefono}</span>
                             <p> </p>
                             <strong>
-                                Correo electrónico
+                                Correo electrónico:
                             </strong>
                             <p> </p>
                             <p> </p>
