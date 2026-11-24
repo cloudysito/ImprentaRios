@@ -1,5 +1,7 @@
 package imprenta.sistema.imprentabackend.auth;
 
+import imprenta.sistema.imprentabackend.usuarios.model.Empleado;
+import imprenta.sistema.imprentabackend.usuarios.repository.EmpleadoRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -15,11 +17,12 @@ import java.util.List;
 
 @Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
     private final JwtService jwtService;
+    private final EmpleadoRepository empleadoRepository;
 
-    public JwtAuthenticationFilter(JwtService jwtService) {
+    public JwtAuthenticationFilter(JwtService jwtService, EmpleadoRepository empleadoRepository) {
         this.jwtService = jwtService;
+        this.empleadoRepository = empleadoRepository;
     }
 
     @Override
@@ -34,24 +37,25 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String token = authorization.substring(7).trim();
 
             if (!token.isEmpty() && jwtService.esTokenValido(token)) {
-                String usuario = jwtService.extraerUsuario(token);
-                String rol = jwtService.extraerRol(token);
+                String empleadoId = jwtService.extraerEmpleadoId(token);
 
-                List<SimpleGrantedAuthority> authorities = rol == null
-                        ? List.of()
-                        : List.of(new SimpleGrantedAuthority("ROLE_" + rol));
+                Empleado empleado = empleadoId == null
+                        ? null
+                        : empleadoRepository.findById(empleadoId).orElse(null);
 
-                var authentication = new UsernamePasswordAuthenticationToken(
-                        usuario,
-                        null,
-                        authorities
-                );
-                authentication.setDetails(jwtService.extraerEmpleadoId(token));
-
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                if (empleado != null
+                        && Boolean.TRUE.equals(empleado.getActivo())
+                        && empleado.getRol() != null) {
+                    var authentication = new UsernamePasswordAuthenticationToken(
+                            empleado.getUsuario(),
+                            null,
+                            List.of(new SimpleGrantedAuthority("ROLE_" + empleado.getRol().name()))
+                    );
+                    authentication.setDetails(empleado.getId());
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
             }
         }
-
         filterChain.doFilter(request, response);
     }
 }
