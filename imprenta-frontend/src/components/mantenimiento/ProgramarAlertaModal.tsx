@@ -19,6 +19,9 @@ const ProgramarAlertaModal = ({ maquina, onCerrar, onProgramar }: ProgramarAlert
   const guardar = async () => {
     if (!fecha || fecha < hoy) return setError("La alerta debe ser para hoy o una fecha futura");
     if (!horaServicio) return setError("Elige la hora del servicio");
+    if (new Date(`${fecha}T${horaServicio}:00`) < new Date()) {
+      return setError("La alerta debe ser para ahora o una fecha y hora futuras");
+    }
 
     setGuardando(true);
     setError(null);

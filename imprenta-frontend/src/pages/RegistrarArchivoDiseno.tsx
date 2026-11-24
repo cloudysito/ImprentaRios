@@ -1,14 +1,19 @@
 import React, { useState } from "react";
 import "../styles/RegistrarArchivoDiseno.css";
 import { registrarArchivoDisenio } from "../services/archivoDisenioService";
+import { hoyISO } from "../utils/fechas";
+import { mensajeDeError } from "../utils/errores";
+
+const EXTENSIONES_PERMITIDAS = [".pdf", ".ai", ".tif", ".tiff", ".eps"];
+const TAMANO_MAXIMO_MB = 200;
 
 const RegistrarDisenio: React.FC = () => {
   const [archivo, setArchivo] = useState<File | null>(null);
   const [mensaje, setMensaje] = useState("");
   const [guardando, setGuardando] = useState(false);
   const [formulario, setFormulario] = useState({
-    fechaRecepcion: "2026-09-21",
-    fechaEntrega: "2026-09-28",
+    fechaRecepcion: hoyISO(),
+    fechaEntrega: hoyISO(),
     resolucion: 300,
     modoColor: "CMYK",
     sangrado: 3,
@@ -26,11 +31,66 @@ const RegistrarDisenio: React.FC = () => {
     }));
   };
 
+  const validar = (): string | null => {
+    if (!archivo) return "Selecciona un archivo antes de registrar el diseño.";
+    const nombre = archivo.name.toLowerCase();
+    if (!EXTENSIONES_PERMITIDAS.some((ext) => nombre.endsWith(ext))) {
+      return "Formato no permitido. Usa PDF, AI, TIFF o EPS.";
+    }
+    if (archivo.size > TAMANO_MAXIMO_MB * 1024 * 1024) {
+      return `El archivo supera el máximo de ${TAMANO_MAXIMO_MB} MB.`;
+    }
+    if (archivo.name.length > 255) return "El nombre del archivo no puede superar 255 caracteres.";
+    if (!formulario.fechaRecepcion) return "Indica la fecha de recepción.";
+    if (!formulario.fechaEntrega) return "Indica la fecha de entrega.";
+    if (formulario.fechaEntrega < formulario.fechaRecepcion) {
+      return "La fecha de entrega no puede ser anterior a la de recepción.";
+    }
+    if (!formulario.medidaArchivo.trim()) return "Escribe la medida del archivo.";
+    if (!Number.isInteger(formulario.sangrado) || formulario.sangrado < 0) {
+      return "El sangrado debe ser un número entero, 0 o mayor.";
+    }
+    return null;
+  };
+
+  const punto = archivo ? archivo.name.lastIndexOf(".") : -1;
+  const extension = archivo && punto >= 0 ? archivo.name.slice(punto).toLowerCase() : "";
+  const verificaciones: { ok: boolean; texto: string }[] = [
+    !archivo
+        ? { ok: false, texto: "Aún no seleccionas un archivo" }
+        : EXTENSIONES_PERMITIDAS.includes(extension)
+            ? { ok: true, texto: `Formato ${extension.slice(1).toUpperCase()} aceptado` }
+            : { ok: false, texto: "Formato no permitido (usa PDF, AI, TIFF o EPS)" },
+    ...(archivo
+        ? [
+          archivo.size <= TAMANO_MAXIMO_MB * 1024 * 1024
+              ? { ok: true, texto: `Tamaño dentro del límite de ${TAMANO_MAXIMO_MB} MB` }
+              : { ok: false, texto: `El archivo supera los ${TAMANO_MAXIMO_MB} MB` },
+        ]
+        : []),
+    formulario.resolucion >= 300
+        ? { ok: true, texto: `Resolución de ${formulario.resolucion} dpi` }
+        : { ok: false, texto: `Resolución de ${formulario.resolucion} dpi: se recomienda 300 dpi como mínimo` },
+    formulario.modoColor === "CMYK"
+        ? { ok: true, texto: "Perfil de color CMYK" }
+        : { ok: false, texto: "Modo RGB: conviértelo a CMYK para imprimir" },
+    formulario.sangrado >= 3
+        ? { ok: true, texto: `Sangrado de ${formulario.sangrado} mm` }
+        : { ok: false, texto: `Sangrado de ${formulario.sangrado} mm: se recomienda al menos 3 mm` },
+    formulario.fechaRecepcion &&
+    formulario.fechaEntrega &&
+    formulario.fechaEntrega >= formulario.fechaRecepcion
+        ? { ok: true, texto: "Fechas de recepción y entrega coherentes" }
+        : { ok: false, texto: "Revisa las fechas: la entrega no puede ser anterior a la recepción" },
+  ];
+
   const registrar = async () => {
-    if (!archivo) {
-      setMensaje("Selecciona un archivo antes de registrar el diseño.");
+    const errorValidacion = validar();
+    if (errorValidacion) {
+      setMensaje(errorValidacion);
       return;
     }
+    if (!archivo) return;
 
     setGuardando(true);
     setMensaje("");
@@ -41,8 +101,8 @@ const RegistrarDisenio: React.FC = () => {
         version: 1,
       });
       setMensaje("Diseño registrado correctamente.");
-    } catch {
-      setMensaje("No se pudo registrar el diseño.");
+    } catch (err) {
+      setMensaje(mensajeDeError(err, "No se pudo registrar el diseño."));
     } finally {
       setGuardando(false);
     }
@@ -136,7 +196,7 @@ const RegistrarDisenio: React.FC = () => {
                 </span>
               </div>
               <div className="file-status">
-                <span className="status-dot green"></span> Listo para validar
+                {archivo ? <><span className="status-dot green"></span> Listo para validar</> : "Sin archivo"}
               </div>
             </div>
           </section>
@@ -173,6 +233,8 @@ const RegistrarDisenio: React.FC = () => {
                 <input
                   type="number"
                   name="sangrado"
+                  min={0}
+                  step={1}
                   value={formulario.sangrado}
                   onChange={(e) => actualizar("sangrado", e.target.value)}
                 />
@@ -184,6 +246,7 @@ const RegistrarDisenio: React.FC = () => {
                 <label>Medida del archivo</label>
                 <input
                   type="text"
+                  maxLength={50}
                   name="medidaArchivo"
                   value={formulario.medidaArchivo}
                   onChange={(e) => actualizar("medidaArchivo", e.target.value)}
@@ -224,20 +287,12 @@ const RegistrarDisenio: React.FC = () => {
           <div className="summary-card">
             <h3>VALIDACIÓN AUTOMÁTICA</h3>
             <ul className="validation-list">
-              <li className="valid">
-                <span className="icon check">✓</span> Resolución mínima de 300
-                dpi
-              </li>
-              <li className="valid">
-                <span className="icon check">✓</span> Perfil de color CMYK
-              </li>
-              <li className="valid">
-                <span className="icon check">✓</span> Tipografías incrustadas
-              </li>
-              <li className="warning">
-                <span className="icon alert">!</span> Sangrado detectado de 3 mm
-                en tres lados
-              </li>
+              {verificaciones.map((v) => (
+                  <li key={v.texto} className={v.ok ? "valid" : "warning"}>
+                    <span className={`icon ${v.ok ? "check" : "alert"}`}>{v.ok ? "✓" : "!"}</span>{" "}
+                    {v.texto}
+                  </li>
+              ))}
             </ul>
           </div>
           <div className="summary-card">

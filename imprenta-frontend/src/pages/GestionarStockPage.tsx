@@ -9,6 +9,9 @@ import { nombreMes } from "../utils/fechas";
 import { mensajeDeError } from "../utils/errores";
 import "../styles/UI.css";
 import "../styles/GestionarStock.css";
+import type {Insumo} from "../types/inventario.ts";
+import Modal from "../components/ui/Modal.tsx";
+import { useAuth } from "../context/AuthContext";
 
 const GestionarStockPage = () => {
   const stock = useStock();
@@ -20,6 +23,14 @@ const GestionarStockPage = () => {
   const [guardandoPuntos, setGuardandoPuntos] = useState(false);
   const [errorPuntos, setErrorPuntos] = useState<string | null>(null);
 
+  const { user } = useAuth();
+  const puedeEditar = user?.rol === "DUENO" || user?.rol === "MANUFACTURA";
+  const puedeEliminar = user?.rol === "DUENO";
+  const [insumoEditar, setInsumoEditar] = useState<Insumo | null>(null);
+  const [insumoEliminar, setInsumoEliminar] = useState<Insumo | null>(null);
+  const [eliminando, setEliminando] = useState(false);
+  const [errorEliminar, setErrorEliminar] = useState<string | null>(null);
+
   const iniciarEdicion = () => {
     setPuntos({});
     setErrorPuntos(null);
@@ -30,6 +41,20 @@ const GestionarStockPage = () => {
     setEditando(false);
     setPuntos({});
     setErrorPuntos(null);
+  };
+
+  const confirmarEliminacion = async () => {
+    if (!insumoEliminar || eliminando) return;
+    setEliminando(true);
+    setErrorEliminar(null);
+    try {
+      await stock.eliminarInsumo(insumoEliminar.id);
+      setInsumoEliminar(null);
+    } catch (err) {
+      setErrorEliminar(mensajeDeError(err, "No se pudo eliminar el material"));
+    } finally {
+      setEliminando(false);
+    }
   };
 
   const guardarPuntos = async () => {
@@ -112,14 +137,16 @@ const GestionarStockPage = () => {
         />
 
         <StockTabla
-          insumos={stock.insumos}
-          cargando={stock.cargando}
-          error={stock.error}
-          editando={editando}
-          puntos={puntos}
-          onPuntoChange={(id, valor) =>
-            setPuntos((prev) => ({ ...prev, [id]: valor }))
-          }
+            insumos={stock.insumos}
+            cargando={stock.cargando}
+            error={stock.error}
+            editando={editando}
+            puntos={puntos}
+            onPuntoChange={(id, valor) =>
+                setPuntos((prev) => ({ ...prev, [id]: valor }))
+            }
+            onEditar={puedeEditar ? setInsumoEditar : undefined}
+            onEliminar={puedeEliminar ? (insumo) => { setErrorEliminar(null); setInsumoEliminar(insumo); } : undefined}
         />
       </section>
 
@@ -137,6 +164,25 @@ const GestionarStockPage = () => {
           onCerrar={() => setNuevoAbierto(false)}
           onCrear={stock.crearInsumo}
         />
+      )}
+      {insumoEditar && (
+          <NuevoInsumoModal
+              insumo={insumoEditar}
+              onCerrar={() => setInsumoEditar(null)}
+              onCrear={(dto) => stock.actualizarInsumo(insumoEditar.id, dto)}
+          />
+      )}
+      {insumoEliminar && (
+          <Modal titulo="Eliminar material" onCerrar={() => { if (!eliminando) setInsumoEliminar(null); }}>
+            <p>¿Eliminar <strong>{insumoEliminar.nombre}</strong>? Solo se puede si no está ligado a un material de pedidos ni tiene movimientos registrados.</p>
+            {errorEliminar && <p className="ui-error" role="alert">{errorEliminar}</p>}
+            <div className="ui-modal__acciones">
+              <button type="button" className="ui-btn ui-btn--contorno" onClick={() => setInsumoEliminar(null)} disabled={eliminando}>Volver</button>
+              <button type="button" className="ui-btn ui-btn--primario" onClick={() => void confirmarEliminacion()} disabled={eliminando}>
+                {eliminando ? "Eliminando…" : "Sí, eliminar"}
+              </button>
+            </div>
+          </Modal>
       )}
     </div>
   );

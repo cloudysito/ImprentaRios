@@ -183,8 +183,61 @@ const CapturarPedido = () => {
         setProductos((prev) => prev.filter((_, idx) => idx !== i));
     };
 
+    const REGEX_CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const REGEX_TELEFONO = /^[0-9+()\s-]{7,15}$/;
+    const REGEX_MEDIDA = /^\d+([.,]\d+)?\s*[xX×]\s*\d+([.,]\d+)?(\s*(cm|mm|m|in|pulg))?$/i;
+
+    const validar = (): string | null => {
+        if (editando || !clienteExistenteId) {
+            const nombre = cliente.nombre.trim();
+            if (!nombre) return "Escribe el nombre del cliente";
+            if (nombre.length > 100) return "El nombre del cliente no puede superar 100 caracteres";
+            if (!cliente.telefono.trim()) return "Escribe un teléfono de contacto";
+            if (!REGEX_TELEFONO.test(cliente.telefono.trim())) {
+                return "El teléfono no es válido (solo números, de 7 a 15 caracteres)";
+            }
+            if (!cliente.correo.trim()) return "Escribe el correo electrónico";
+            if (!REGEX_CORREO.test(cliente.correo.trim())) return "El correo no es válido";
+            if (cliente.correo.trim().length > 100) return "El correo no puede superar 100 caracteres";
+        }
+
+        const proyectoNombre = proyecto.nombreProyecto.trim();
+        if (proyectoNombre.length < 3) return "El nombre del proyecto debe tener al menos 3 caracteres";
+        if (proyectoNombre.length > 150) return "El nombre del proyecto no puede superar 150 caracteres";
+
+        if (!proyecto.fechaEntrega) return "Elige la fecha de entrega";
+        if (!editando && new Date(proyecto.fechaEntrega) <= new Date()) {
+            return "La fecha de entrega debe ser posterior a este momento";
+        }
+
+        if (productos.length === 0) return "Agrega al menos un producto";
+        for (let i = 0; i < productos.length; i++) {
+            const p = productos[i];
+            const n = `Producto ${i + 1}`;
+            if (!p.tipoProductoId) return `${n}: Elige el tipo de producto`;
+            const cantidad = Number(p.cantidad);
+            if (!p.cantidad || !Number.isInteger(cantidad) || cantidad < 1) {
+                return `${n}: La cantidad debe ser un número entero mayor a 0`;
+            }
+            if (!p.materialId) return `${n}: Elige el material`;
+            if (!p.medidas.trim()) return `${n}: Escribe la medida final`;
+            if (p.medidas.trim().length > 30) return `${n}: La medida no puede superar 30 caracteres`;
+            if (!REGEX_MEDIDA.test(p.medidas.trim())) return `${n}: La medida debe verse así: 21.5 x 14 cm`;
+            const numeros = p.medidas.match(/\d+([.,]\d+)?/g) ?? [];
+            if (numeros.some((x) => Number(x.replace(",", ".")) <= 0)) return `${n}: Las medidas deben ser mayores a 0`;
+            if (!p.tinta) return `${n}: Elige las tintas`;
+            if (p.observaciones.length > 500) return `${n}: Las observaciones no pueden superar 500 caracteres`;
+        }
+        return null;
+    };
+
     const enviar = async (e: FormEvent) => {
         e.preventDefault();
+        const errorValidacion = validar();
+        if (errorValidacion) {
+            setError(errorValidacion);
+            return;
+        }
         setError("");
         setEnviando(true);
 
@@ -279,7 +332,7 @@ const CapturarPedido = () => {
     );
 
     return (
-        <form className="capturar-pedido-container" onSubmit={enviar}>
+        <form className="capturar-pedido-container" noValidate onSubmit={enviar}>
             <div className="content-grid">
                 <section className="form-card">
                     <div className="section-header">

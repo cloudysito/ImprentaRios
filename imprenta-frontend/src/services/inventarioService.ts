@@ -17,6 +17,10 @@ export const inventarioService = {
     return data;
   },
 
+  eliminarInsumo: async (id: string) => {
+    await api.delete(`/insumo/${id}`);
+  },
+
   registrarMovimiento: async (id: string, dto: MovimientoRequest) => {
     const { data } = await api.post<Insumo>(`/insumo/${id}/movimientos`, dto);
     return data;
