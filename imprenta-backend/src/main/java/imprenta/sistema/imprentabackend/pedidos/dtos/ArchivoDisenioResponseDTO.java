@@ -13,6 +13,7 @@ public record ArchivoDisenioResponseDTO(
         String medidaArchivo,
         Integer caras,
         String prensa,
-        Integer version
+        Integer version,
+        String grupoId
 ) {
 }

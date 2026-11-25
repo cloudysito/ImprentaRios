@@ -1,4 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/RegistrarArchivoDiseno.css";
 import { registrarArchivoDisenio } from "../services/archivoDisenioService";
 import { hoyISO } from "../utils/fechas";
@@ -8,6 +9,7 @@ const EXTENSIONES_PERMITIDAS = [".pdf", ".jpg", ".jpeg", ".cdr"];
 const TAMANO_MAXIMO_MB = 200;
 
 const RegistrarDisenio: React.FC = () => {
+  const navigate = useNavigate();
   const [archivo, setArchivo] = useState<File | null>(null);
   const [urlVistaPrevia, setUrlVistaPrevia] = useState<string | null>(null);
   const urlVistaPreviaRef = useRef<string | null>(null);
@@ -114,7 +116,7 @@ const RegistrarDisenio: React.FC = () => {
         nombreArchivo: archivo.name,
         version: 1,
       });
-      setMensaje("Diseño registrado correctamente.");
+      setMensaje("Diseño registrado correctamente. Ya puedes editarlo o registrar una nueva versión en Archivos de diseño.");
     } catch (err) {
       setMensaje(mensajeDeError(err, "No se pudo registrar el diseño."));
     } finally {
@@ -325,18 +327,19 @@ const RegistrarDisenio: React.FC = () => {
             </ul>
           </div>
           <div className="summary-card">
-            <h3>HISTORIAL DE VERSIONES</h3>
-            <ul className="history-list">
-              <li>
-                <strong>v3</strong> · hoy 11:42 · corrección de sangrado
-              </li>
-              <li>
-                <strong>v2</strong> · 19 sep · cambio de tipografía
-              </li>
-              <li>
-                <strong>v1</strong> · 18 sep · propuesta inicial
-              </li>
-            </ul>
+            <h3>VERSIONES</h3>
+            <p className="history-note">
+              Este formulario registra la versión 1 de un diseño nuevo. Para
+              editar un archivo o registrar una nueva versión, usa la sección de
+              archivos de diseño.
+            </p>
+            <button
+              type="button"
+              className="btn-secondary outline"
+              onClick={() => navigate("/archivos-de-diseno")}
+            >
+              Ver archivos de diseño
+            </button>
           </div>
           <div className="action-buttons">
             <button

@@ -62,7 +62,7 @@ const MENU: Record<Rol, SeccionMenu[]> = {
             items: [
                 calendario,
                 cronograma,
-                {to: "/archivos-de-diseno/registrar", label: "Archivos de diseño", icon: FolderOpen},
+                {to: "/archivos-de-diseno", label: "Archivos de diseño", icon: FolderOpen},
             ],
         },
     ],
@@ -78,7 +78,7 @@ const MENU: Record<Rol, SeccionMenu[]> = {
                 {to: "/pedidos", label: "Pedidos", icon: FileText},
                 {to: "/pedidos/nuevo", label: "Capturar pedido", icon: Plus},
                 {to: "/clientes", label: "Clientes", icon: Users},
-                {to: "/archivos-de-diseno/registrar", label: "Archivos de diseño", icon: FolderOpen},
+                {to: "/archivos-de-diseno", label: "Archivos de diseño", icon: FolderOpen},
             ],
         },
         {

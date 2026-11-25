@@ -11,6 +11,8 @@ public final class ArchivoDisenioMapper {
     public static ArchivoDisenio toEntity(ArchivoDisenioRequestDTO dto) {
         ArchivoDisenio archivo = new ArchivoDisenio();
         actualizarEntidad(archivo, dto);
+        archivo.setVersion(dto.version());
+        archivo.setGrupoId(dto.grupoId());
         return archivo;
     }
 
@@ -24,7 +26,6 @@ public final class ArchivoDisenioMapper {
         archivo.setMedidaArchivo(dto.medidaArchivo());
         archivo.setCaras(dto.caras());
         archivo.setPrensa(dto.prensa());
-        archivo.setVersion(dto.version());
     }
 
     public static ArchivoDisenioResponseDTO toResponse(ArchivoDisenio archivo) {
@@ -39,7 +40,8 @@ public final class ArchivoDisenioMapper {
                 archivo.getMedidaArchivo(),
                 archivo.getCaras(),
                 archivo.getPrensa(),
-                archivo.getVersion()
+                archivo.getVersion(),
+                archivo.getGrupoId()
         );
     }
 }
