@@ -70,46 +70,48 @@ const CalendarioPage = () => {
           </div>
         </div>
 
-        <div className="calendario-grid calendario-grid--periodo">
-          {cargando && (
-            <div className="calendario-grid__estado">
-              <Cargando />
-            </div>
-          )}
-          {!cargando && error && (
-            <div className="calendario-grid__estado calendario-grid__estado--error">
-              <MensajeError
-                mensaje={error}
-                onReintentar={() => window.location.reload()}
-              />
-            </div>
-          )}
-          {!cargando && !error && actividadesVisibles.length === 0 && (
-            <div className="calendario-grid__estado">
-              No hay actividades registradas en este periodo.
-            </div>
-          )}
-          {!cargando &&
-            !error &&
-            actividadesVisibles.map((act) => {
-              const nombre = act.nombreActividad.toLowerCase();
-              let claseTipo = "produccion";
-              if (nombre.includes("mantenimiento")) claseTipo = "mantenimiento";
-              else if (nombre.includes("entrega")) claseTipo = "entrega";
+        <div className="calendario-grid-scroll" role="region" aria-label="Actividades del calendario" tabIndex={0}>
+          <div className="calendario-grid calendario-grid--periodo">
+            {cargando && (
+              <div className="calendario-grid__estado">
+                <Cargando />
+              </div>
+            )}
+            {!cargando && error && (
+              <div className="calendario-grid__estado calendario-grid__estado--error">
+                <MensajeError
+                  mensaje={error}
+                  onReintentar={() => window.location.reload()}
+                />
+              </div>
+            )}
+            {!cargando && !error && actividadesVisibles.length === 0 && (
+              <div className="calendario-grid__estado">
+                No hay actividades registradas en este periodo.
+              </div>
+            )}
+            {!cargando &&
+              !error &&
+              actividadesVisibles.map((act) => {
+                const nombre = act.nombreActividad.toLowerCase();
+                let claseTipo = "produccion";
+                if (nombre.includes("mantenimiento")) claseTipo = "mantenimiento";
+                else if (nombre.includes("entrega")) claseTipo = "entrega";
 
-              return (
-                <div key={act.id} className={`cal-card ${claseTipo}`}>
-                  <strong>{formatFechaCorta(act.fechaHoraInicio)}</strong>
-                  <span>{act.nombreActividad}</span>
-                  <span className="cal-card__descripcion">
-                    {act.descripcion}
-                  </span>
-                  <span className="cal-card__responsable">
-                    Responsable: {act.empleadoNombre ?? "Sin asignar"}
-                  </span>
-                </div>
-              );
-            })}
+                return (
+                  <div key={act.id} className={`cal-card ${claseTipo}`}>
+                    <strong>{formatFechaCorta(act.fechaHoraInicio)}</strong>
+                    <span>{act.nombreActividad}</span>
+                    <span className="cal-card__descripcion">
+                      {act.descripcion}
+                    </span>
+                    <span className="cal-card__responsable">
+                      Responsable: {act.empleadoNombre ?? "Sin asignar"}
+                    </span>
+                  </div>
+                );
+              })}
+          </div>
         </div>
       </div>
 

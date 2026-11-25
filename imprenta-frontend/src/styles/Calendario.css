@@ -10,6 +10,7 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    min-width: 0;
 }
 
 /* Toolbar */
@@ -112,6 +113,11 @@
     border-radius: 14px;
     box-shadow: 0 1px 2px rgba(28, 25, 22, 0.05);
 }
+
+.calendario-grid-scroll {
+    min-width: 0;
+}
+
 .calendario-grid--periodo { min-height: 300px; }
 .calendario-grid__estado {
     grid-column: span 6;
@@ -308,8 +314,52 @@
     .calendario-container {
         grid-template-columns: 1fr;
     }
-    .calendario-grid {
+
+    .calendario-main,
+    .calendario-sidebar {
+        min-width: 0;
+    }
+
+    .calendario-grid-scroll {
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-x: contain;
+    }
+
+    .calendario-grid {
         min-width: 800px;
+    }
+}
+
+@media (max-width: 640px) {
+    .calendario-toolbar__top {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .calendario-toggle,
+    .calendario-date-nav {
+        align-self: flex-start;
+        max-width: 100%;
+    }
+
+    .calendario-date-nav {
+        gap: 10px;
+        font-size: 13px;
+    }
+
+    .calendario-filtros {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .cal-sidebar-card {
+        padding: 16px;
+    }
+
+    .cal-sidebar-card h3 {
+        overflow-wrap: anywhere;
     }
 }

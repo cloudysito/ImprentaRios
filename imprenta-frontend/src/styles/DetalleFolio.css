@@ -139,3 +139,32 @@
     opacity: 0.5;
     cursor: not-allowed;
 }
+
+@media (max-width: 640px) {
+    .detalle-folio {
+        min-width: 0;
+        padding: 18px 14px;
+    }
+
+    .detalle-folio__datos {
+        gap: 8px;
+        margin: 12px 0;
+        padding: 12px 0;
+        font-size: 13px;
+    }
+
+    .detalle-folio__datos div {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .detalle-folio__datos dd {
+        text-align: left;
+        overflow-wrap: anywhere;
+    }
+
+    .detalle-folio__acciones {
+        padding-top: 16px;
+    }
+}

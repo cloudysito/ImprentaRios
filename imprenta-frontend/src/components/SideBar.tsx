@@ -1,160 +1,191 @@
 import {
-  Calendar,
-  AlignLeft,
-  FileText,
-  Plus,
-  LogOut,
-  Cog,
-  FolderOpen,
-  CalendarCheck,
-  ListTodo,
-  Package,
-  Wrench,
-  Users,
-  type LucideIcon,
+    Calendar,
+    AlignLeft,
+    FileText,
+    Plus,
+    LogOut,
+    Cog,
+    FolderOpen,
+    CalendarCheck,
+    ListTodo,
+    Package,
+    Wrench,
+    Users,
+    Menu,
+    X,
+    type LucideIcon,
 } from "lucide-react";
-import { NavLink } from "react-router-dom";
-import type { Rol } from "../services/authService";
+import {useState} from "react";
+import {NavLink} from "react-router-dom";
+import type {Rol} from "../services/authService";
 import "../styles/SideBar.css";
 
 interface NavItem {
-  to: string;
-  label: string;
-  icon: LucideIcon;
+    to: string;
+    label: string;
+    icon: LucideIcon;
 }
 
 interface SeccionMenu {
-  titulo?: string;
-  items: NavItem[];
+    titulo?: string;
+    items: NavItem[];
 }
 
 interface SideBarProps {
-  userName: string;
-  userRole: string;
-  rol?: Rol;
-  sidebarOpen?: boolean;
-  onCloseSidebar?: () => void;
-  onLogout?: () => void;
+    userName: string;
+    userRole: string;
+    rol?: Rol;
+    sidebarOpen?: boolean;
+    onCloseSidebar?: () => void;
+    onLogout?: () => void;
 }
 
-const calendario: NavItem = { to: "/calendario", label: "Calendario", icon: Calendar };
-const cronograma: NavItem = { to: "/cronograma", label: "Cronograma", icon: AlignLeft };
+const calendario: NavItem = {to: "/calendario", label: "Calendario", icon: Calendar};
+const cronograma: NavItem = {to: "/cronograma", label: "Cronograma", icon: AlignLeft};
 
 const MENU: Record<Rol, SeccionMenu[]> = {
-  SECRETARIA: [
-    {
-      titulo: "General",
-      items: [
-        calendario,
-        cronograma,
-        { to: "/pedidos/nuevo", label: "Capturar pedido", icon: Plus },
-        { to: "/pedidos", label: "Pedidos", icon: FileText },
-        { to: "/clientes", label: "Clientes", icon: Users },
-      ],
-    },
-  ],
-  DISENADOR: [
-    {
-      titulo: "General",
-      items: [
-        calendario,
-        cronograma,
-        { to: "/archivos-de-diseno/registrar", label: "Archivos de diseño", icon: FolderOpen },
-      ],
-    },
-  ],
-  MANUFACTURA: [{ items: [calendario, cronograma, { to: "/taller", label: "Taller", icon: Cog }] }],
-  DUENO: [
-    {
-      titulo: "General",
-      items: [calendario, cronograma] },
-    {
-      titulo: "Pedidos",
-      items: [
-        { to: "/pedidos", label: "Pedidos", icon: FileText },
-        { to: "/pedidos/nuevo", label: "Capturar pedido", icon: Plus },
-        { to: "/clientes", label: "Clientes", icon: Users },
-        { to: "/archivos-de-diseno/registrar", label: "Archivos de diseño", icon: FolderOpen },
-      ],
-    },
-    {
-      titulo: "Administración",
-      items: [
-        { to: "/cronograma/generar", label: "Programar entregas", icon: CalendarCheck },
-        { to: "/calendario/generar", label: "Calendario operativo", icon: ListTodo },
-        { to: "/inventario", label: "Inventario", icon: Package },
-        { to: "/mantenimiento", label: "Mantenimiento", icon: Wrench },
-        { to: "/empleados", label: "Empleados", icon: Users },
-      ],
-    },
-  ],
+    SECRETARIA: [
+        {
+            titulo: "General",
+            items: [
+                calendario,
+                cronograma,
+                {to: "/pedidos/nuevo", label: "Capturar pedido", icon: Plus},
+                {to: "/pedidos", label: "Pedidos", icon: FileText},
+                {to: "/clientes", label: "Clientes", icon: Users},
+            ],
+        },
+    ],
+    DISENADOR: [
+        {
+            titulo: "General",
+            items: [
+                calendario,
+                cronograma,
+                {to: "/archivos-de-diseno/registrar", label: "Archivos de diseño", icon: FolderOpen},
+            ],
+        },
+    ],
+    MANUFACTURA: [{items: [calendario, cronograma, {to: "/taller", label: "Taller", icon: Cog}]}],
+    DUENO: [
+        {
+            titulo: "General",
+            items: [calendario, cronograma]
+        },
+        {
+            titulo: "Pedidos",
+            items: [
+                {to: "/pedidos", label: "Pedidos", icon: FileText},
+                {to: "/pedidos/nuevo", label: "Capturar pedido", icon: Plus},
+                {to: "/clientes", label: "Clientes", icon: Users},
+                {to: "/archivos-de-diseno/registrar", label: "Archivos de diseño", icon: FolderOpen},
+            ],
+        },
+        {
+            titulo: "Administración",
+            items: [
+                {to: "/cronograma/generar", label: "Programar entregas", icon: CalendarCheck},
+                {to: "/calendario/generar", label: "Calendario operativo", icon: ListTodo},
+                {to: "/inventario", label: "Inventario", icon: Package},
+                {to: "/mantenimiento", label: "Mantenimiento", icon: Wrench},
+                {to: "/empleados", label: "Empleados", icon: Users},
+            ],
+        },
+    ],
 };
 
 const getInitials = (name: string) =>
-  name
-    .trim()
-    .split(/\s+/)
-    .slice(0, 2)
-    .map((part) => part.charAt(0).toUpperCase())
-    .join("");
+    name
+        .trim()
+        .split(/\s+/)
+        .slice(0, 2)
+        .map((part) => part.charAt(0).toUpperCase())
+        .join("");
 
 const Sidebar = ({
-  userName,
-  userRole,
-  rol,
-  sidebarOpen = false,
-  onCloseSidebar,
-  onLogout,
-}: SideBarProps) => {
-  const secciones = MENU[rol ?? "SECRETARIA"] ?? MENU.SECRETARIA;
+                     userName,
+                     userRole,
+                     rol,
+                     sidebarOpen = false,
+                     onCloseSidebar,
+                     onLogout,
+                 }: SideBarProps) => {
+    const secciones = MENU[rol ?? "SECRETARIA"] ?? MENU.SECRETARIA;
+    const [mobileExpanded, setMobileExpanded] = useState(false);
+    const closeMobileSidebar = () => {
+        setMobileExpanded(false);
+        onCloseSidebar?.();
+    };
 
-  return (
-    <aside className={`sidebar ${sidebarOpen ? "open" : ""}`}>
-      <div className="sidebar-brand">
-        <h1>Imprenta Ríos</h1>
-        <span>Gestión operativa</span>
-      </div>
+    return (
+        <>
+            {mobileExpanded && (
+                <button
+                    type="button"
+                    className="sidebar-backdrop"
+                    aria-label="Cerrar menú"
+                    onClick={closeMobileSidebar}
+                />
+            )}
+            <aside className={`sidebar ${sidebarOpen ? "open" : ""} ${mobileExpanded ? "mobile-expanded" : ""}`}>
+                <div className="sidebar-brand">
+                    <div className="sidebar-brand-heading">
+                        <h1>Imprenta Ríos</h1>
+                        <button
+                            type="button"
+                            className="sidebar-toggle"
+                            aria-label={mobileExpanded ? "Contraer menú" : "Expandir menú"}
+                            aria-expanded={mobileExpanded}
+                            aria-controls="sidebar-navigation"
+                            onClick={() => setMobileExpanded((expanded) => !expanded)}
+                        >
+                            {mobileExpanded ? <X size={20}/> : <Menu size={20}/>}
+                        </button>
+                    </div>
+                    <span>Gestión operativa</span>
+                </div>
 
-      <nav>
-        {secciones.map((seccion, i) => (
-          <div key={seccion.titulo ?? i} className="sidebar-grupo">
-            {seccion.titulo && <span className="sidebar-seccion">{seccion.titulo}</span>}
-            <ul className="sidebar-menu">
-              {seccion.items.map(({ to, label, icon: Icon }) => (
-                <li key={to}>
-                  <NavLink
-                    to={to}
-                    end
-                    onClick={onCloseSidebar}
-                    className={({ isActive }) => `sidebar-link ${isActive ? "active" : ""}`}
-                  >
-                    <Icon size={18} strokeWidth={1.75} />
-                    <span>{label}</span>
-                  </NavLink>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </nav>
+                <nav id="sidebar-navigation">
+                    {secciones.map((seccion, i) => (
+                        <div key={seccion.titulo ?? i} className="sidebar-grupo">
+                            {seccion.titulo && <span className="sidebar-seccion">{seccion.titulo}</span>}
+                            <ul className="sidebar-menu">
+                                {seccion.items.map(({to, label, icon: Icon}) => (
+                                    <li key={to}>
+                                        <NavLink
+                                            to={to}
+                                            end
+                                            onClick={closeMobileSidebar}
+                                            className={({isActive}) => `sidebar-link ${isActive ? "active" : ""}`}
+                                        >
+                                            <Icon size={18} strokeWidth={1.75}/>
+                                            <span>{label}</span>
+                                        </NavLink>
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    ))}
+                </nav>
 
-      <div className="sidebar-bottom">
-        <button type="button" className="sidebar-link sidebar-logout" onClick={onLogout}>
-          <LogOut size={18} strokeWidth={1.75} />
-          <span>Cerrar sesión</span>
-        </button>
+                <div className="sidebar-bottom">
+                    <button type="button" className="sidebar-link sidebar-logout" onClick={onLogout}>
+                        <LogOut size={18} strokeWidth={1.75}/>
+                        <span>Cerrar sesión</span>
+                    </button>
 
-        <div className="sidebar-footer">
-          <div className="sidebar-avatar" aria-hidden="true">
-            {getInitials(userName)}
-          </div>
-          <div className="sidebar-user">
-            <span className="sidebar-user-name">{userName}</span>
-            <span className="sidebar-user-role">{userRole}</span>
-          </div>
-        </div>
-      </div>
-    </aside>
-  );
+                    <div className="sidebar-footer">
+                        <div className="sidebar-avatar" aria-hidden="true">
+                            {getInitials(userName)}
+                        </div>
+                        <div className="sidebar-user">
+                            <span className="sidebar-user-name">{userName}</span>
+                            <span className="sidebar-user-role">{userRole}</span>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </>
+    );
 };
 export default Sidebar;

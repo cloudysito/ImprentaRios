@@ -26,7 +26,7 @@ const PedidosTabla = ({
   const mensaje = error ?? (pedidos.length === 0 ? "No hay pedidos con ese filtro" : null);
 
   return (
-    <div className="pedidos-tabla">
+    <div className="pedidos-tabla" role="region" aria-label="Lista de pedidos" tabIndex={0}>
       <table>
         <thead>
           <tr>

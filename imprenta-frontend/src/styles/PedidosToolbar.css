@@ -88,3 +88,19 @@
     color: #fff;
     font-weight: 600;
 }
+
+@media (max-width: 480px) {
+    .pedidos-toolbar__top {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .pedidos-toolbar__search {
+        max-width: none;
+    }
+
+    .pedidos-toolbar__nuevo {
+        justify-content: center;
+    }
+}

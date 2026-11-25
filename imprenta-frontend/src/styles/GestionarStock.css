@@ -57,6 +57,8 @@
 
 .stock-tabla {
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
 }
 
 .stock-tabla table {
@@ -64,6 +66,19 @@
     min-width: 600px;
     border-collapse: collapse;
     font-size: 13.5px;
+}
+
+.stock-tabla th:first-child,
+.stock-tabla td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: #fff;
+}
+
+.stock-tabla th:first-child {
+    z-index: 2;
+    background: #faf9f6;
 }
 
 .stock-tabla th {

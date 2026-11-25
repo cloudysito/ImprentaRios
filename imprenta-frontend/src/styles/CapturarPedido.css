@@ -281,6 +281,90 @@
     flex: 1;
 }
 
+@media (max-width: 900px) {
+    .capturar-pedido-container,
+    .capturar-pedido-container .content-grid,
+    .capturar-pedido-container .form-card,
+    .capturar-pedido-container .summary-sidebar {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .capturar-pedido-container .content-grid {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1rem;
+    }
+
+    .capturar-pedido-container .form-card,
+    .capturar-pedido-container .summary-card {
+        padding: 1.25rem;
+    }
+
+    .capturar-pedido-container .summary-sidebar {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .capturar-pedido-container .summary-card {
+        margin-bottom: 0;
+    }
+}
+
+@media (max-width: 640px) {
+    .capturar-pedido-container .form-row,
+    .capturar-pedido-container .form-row.three-cols {
+        grid-template-columns: minmax(0, 1fr);
+        gap: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .capturar-pedido-container .section-header {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+
+    .capturar-pedido-container .form-card,
+    .capturar-pedido-container .summary-card {
+        padding: 1rem;
+        border-radius: 10px;
+    }
+
+    .capturar-pedido-container .section-title.mt-4 {
+        margin-top: 1.25rem;
+    }
+
+    .capturar-pedido-container .producto-bloque {
+        padding: 12px;
+    }
+
+    .capturar-pedido-container .archivo-fila {
+        align-items: stretch;
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .capturar-pedido-container .archivo-fila select {
+        min-height: 96px;
+    }
+
+    .capturar-pedido-container .action-buttons {
+        gap: 0.75rem;
+    }
+
+    .capturar-pedido-container .action-buttons button,
+    .capturar-pedido-container button.btn-secondary.mt-2 {
+        width: 100%;
+    }
+
+    .capturar-pedido-container .folio-number {
+        font-size: 1.75rem;
+        overflow-wrap: anywhere;
+    }
+}
+
 .capturar-pedido-container .archivo-fila {
     display: flex;
     align-items: center;
