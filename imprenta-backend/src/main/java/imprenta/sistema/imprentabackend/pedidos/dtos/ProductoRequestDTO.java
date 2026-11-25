@@ -5,6 +5,8 @@ import imprenta.sistema.imprentabackend.pedidos.model.TipoAcabado;
 import imprenta.sistema.imprentabackend.pedidos.model.TipoTinta;
 import jakarta.validation.constraints.*;
 
+import java.util.List;
+
 public record ProductoRequestDTO(
         @Min(value = 1, message = "La cantidad a producir no debe ser 0")
         int cantidad,
@@ -31,6 +33,8 @@ public record ProductoRequestDTO(
         String tipoProductoId,
 
         @NotBlank(message = "El material es obligatorio")
-        String materialId
+        String materialId,
+
+        List<String> archivosDisenioIds
 ) {
 }

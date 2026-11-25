@@ -281,6 +281,170 @@
     flex: 1;
 }
 
+.capturar-pedido-container .archivo-dropdown {
+    position: relative;
+    flex: 1;
+    min-width: 0;
+}
+
+.capturar-pedido-container .archivo-dropdown__trigger {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    min-height: 46px;
+    padding: 0.75rem;
+    border: 1px solid #dcdcdc;
+    border-radius: 6px;
+    background: #fff;
+    color: #333;
+    font: inherit;
+    font-size: 0.95rem;
+    cursor: pointer;
+    list-style: none;
+}
+
+.capturar-pedido-container .archivo-dropdown__trigger::-webkit-details-marker {
+    display: none;
+}
+
+.capturar-pedido-container .archivo-dropdown__trigger > span {
+    overflow: hidden;
+    color: #1c1916;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.capturar-pedido-container .archivo-dropdown__trigger.is-selected > span {
+    color: #a84236;
+}
+
+.capturar-pedido-container .archivo-dropdown__trigger svg {
+    flex: 0 0 18px;
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: #777;
+    stroke-width: 1.7;
+    transition: transform 0.2s ease;
+}
+
+.capturar-pedido-container .archivo-dropdown[open] .archivo-dropdown__trigger {
+    border-color: #a84236;
+    border-bottom-right-radius: 0;
+    border-bottom-left-radius: 0;
+}
+
+.capturar-pedido-container .archivo-dropdown[open] .archivo-dropdown__trigger svg {
+    transform: rotate(180deg);
+}
+
+.capturar-pedido-container .archivo-dropdown__trigger[aria-disabled="true"] {
+    background: #f5f4f2;
+    color: #888;
+    cursor: not-allowed;
+}
+
+.capturar-pedido-container .archivo-dropdown__opciones {
+    position: absolute;
+    z-index: 5;
+    top: 100%;
+    right: 0;
+    left: 0;
+    max-height: 240px;
+    overflow-y: auto;
+    border: 1px solid #dcdcdc;
+    border-top: 0;
+    border-radius: 0 0 8px 8px;
+    background: #fff;
+    box-shadow: 0 8px 18px rgba(35, 29, 24, 0.12);
+}
+
+.capturar-pedido-container .archivo-dropdown__opcion {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    width: 100%;
+    padding: 10px 12px;
+    border: 0;
+    background: #fff;
+    color: #1c1916;
+    font: inherit;
+    text-align: left;
+    cursor: pointer;
+}
+
+.capturar-pedido-container .archivo-dropdown__opcion:not(.is-selected),
+.capturar-pedido-container .archivo-dropdown__opcion:not(.is-selected) span,
+.capturar-pedido-container .archivo-dropdown__opcion:not(.is-selected) small {
+    color: #1c1916;
+}
+
+.capturar-pedido-container .archivo-dropdown__opcion:hover {
+    background: #faf8f4;
+}
+
+.capturar-pedido-container .archivo-dropdown__opcion.is-selected {
+    background: #fff3e8;
+    color: #a84236;
+}
+
+.capturar-pedido-container .archivo-dropdown__opcion.is-selected span {
+    color: #a84236;
+}
+
+.capturar-pedido-container .archivo-dropdown__opcion.is-selected small {
+    color: #a84236;
+}
+
+.capturar-pedido-container .archivo-dropdown__opcion span {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    overflow-wrap: anywhere;
+    font-size: 0.9rem;
+}
+
+.capturar-pedido-container .archivo-dropdown__opcion small {
+    margin-top: 2px;
+    color: #888;
+    font-size: 0.75rem;
+}
+
+.capturar-pedido-container .archivo-dropdown__mensaje {
+    margin: 0;
+    padding: 12px;
+    color: #777;
+    font-size: 0.85rem;
+}
+
+.capturar-pedido-container .archivo-dropdown__limpiar {
+    width: 100%;
+    padding: 10px 12px;
+    border: 0;
+    border-top: 1px solid #eee9e2;
+    background: #fff;
+    color: #a33a2a;
+    font: inherit;
+    font-size: 0.85rem;
+    text-align: left;
+    cursor: pointer;
+}
+
+.capturar-pedido-container .archivo-dropdown__limpiar:hover {
+    background: #faf8f4;
+}
+
+.capturar-pedido-container .producto-archivo {
+    margin-bottom: 1.25rem;
+}
+
+.capturar-pedido-container .producto-archivo > small {
+    display: block;
+    margin-top: 8px;
+    line-height: 1.4;
+}
+
 @media (max-width: 900px) {
     .capturar-pedido-container,
     .capturar-pedido-container .content-grid,
@@ -347,7 +511,7 @@
     }
 
     .capturar-pedido-container .archivo-fila select {
-        min-height: 96px;
+        min-height: 44px;
     }
 
     .capturar-pedido-container .action-buttons {

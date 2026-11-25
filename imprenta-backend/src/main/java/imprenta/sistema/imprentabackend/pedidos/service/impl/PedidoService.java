@@ -70,7 +70,18 @@ public class PedidoService implements IPedidoService {
             }
             materialService.buscarMaterialPorId(p.materialId());
         }
-        validarArchivosDisenio(dto.archivosDisenioIds());
+        List<String> archivosPorProducto = dto.productos().stream()
+                .flatMap(producto -> producto.archivosDisenioIds() == null
+                        ? java.util.stream.Stream.empty()
+                        : producto.archivosDisenioIds().stream())
+                .toList();
+        if (archivosPorProducto.stream().distinct().count() != archivosPorProducto.size()) {
+            throw new NegocioException(CodigoError.ARCHIVO_DE_DISENIO_REPETIDO);
+        }
+        validarArchivosDisenio(java.util.stream.Stream.concat(
+                dto.archivosDisenioIds() == null ? java.util.stream.Stream.empty() : dto.archivosDisenioIds().stream(),
+                archivosPorProducto.stream()
+        ).distinct().toList());
     }
 
     private void validarArchivosDisenio(List<String> ids) {

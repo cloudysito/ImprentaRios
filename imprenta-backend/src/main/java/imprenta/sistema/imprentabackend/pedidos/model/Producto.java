@@ -4,6 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,4 +18,5 @@ public class Producto {
     private String observaciones;
     private String tipoProductoId;
     private String materialId;
+    private List<String> archivosDisenioIds;
 }

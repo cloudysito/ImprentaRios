@@ -26,6 +26,7 @@ export interface ProductoForm {
     tipoAcabado: string;
     prioridad: string;
     observaciones: string;
+    archivosDisenioIds?: string[];
 }
 
 export const productoVacio = (): ProductoForm => ({
@@ -87,5 +88,6 @@ export interface PedidoCompleto {
     productos: (Omit<ProductoForm, "cantidad" | "observaciones"> & {
         cantidad: number;
         observaciones: string | null;
+        archivosDisenioIds?: string[];
     })[];
 }

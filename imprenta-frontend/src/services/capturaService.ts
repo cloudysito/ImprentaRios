@@ -29,6 +29,11 @@ export const capturaService = {
         return Array.isArray(data) ? data : [];
     },
 
+    listarPedidos: async () => {
+        const { data } = await api.get<{ id: string }[]>("/pedidos");
+        return Array.isArray(data) ? data : [];
+    },
+
     obtenerPedido: async (id: string) => {
         const { data } = await api.get<PedidoCompleto>(`/pedidos/${id}`);
         return data;
