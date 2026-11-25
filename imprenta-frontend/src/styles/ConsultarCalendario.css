@@ -58,6 +58,7 @@
 .cc-grilla {
     display: grid;
     grid-template-columns: repeat(var(--columnas, 6), minmax(120px, 1fr));
+    min-width: calc(var(--columnas, 6) * 120px + (var(--columnas, 6) - 1) * 8px + 28px);
     gap: 8px;
     padding: 18px 14px 28px;
     border-radius: 16px;
@@ -66,6 +67,7 @@
 }
 .cc-grilla--mensaje {
     display: block;
+    min-width: 0;
     padding: 56px 20px;
     text-align: center;
     color: #6f6a63;
