@@ -8,9 +8,10 @@ export interface EventoCalendario {
     tipo: TipoEvento;
     titulo: string; // "Impresión", "Entrega", "Mantenimiento"
     referencia: string; // folio corto o nombre de la máquina
-    responsable: string | null; // trabajador asignado; null en mantenimiento y entregas sin asignar
+    responsable?: string | null; // nombre del empleado asignado
     inicio: Date;
     fin: Date;
+    estimado?: boolean;
 }
 
 export interface ColumnaDia {
@@ -23,7 +24,6 @@ export interface TareaHoy {
     id: string;
     titulo: string;
     detalle: string;
-    responsable: string | null;
     tipo: TipoEvento;
 }
 
@@ -54,9 +54,9 @@ export interface FilaCronograma {
     pedidoId: string | null; // null en las filas de mantenimiento
     titulo: string; // folio o nombre de máquina
     subtitulo: string;
+    responsable?: string | null; // nombre(s) del encargado
     estado: EstadoBarra;
     etiqueta: string;
-    responsables: string[]; // trabajadores distintos de las actividades del pedido
     inicio: Date;
     fin: Date;
 }

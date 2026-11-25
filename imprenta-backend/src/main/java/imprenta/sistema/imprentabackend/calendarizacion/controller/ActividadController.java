@@ -68,6 +68,23 @@ public class ActividadController {
         return ResponseEntity.ok(actividadService.listarActividades(pedidoId));
     }
 
+    @PostMapping("/cronograma/{pedidoId}")
+    public ResponseEntity<List<ActividadResponeDTO>> generarCronograma(
+            @PathVariable String pedidoId,
+            @RequestParam String empleadoId) {
+        return ResponseEntity.ok(actividadService.generarCronograma(
+                pedidoId,
+                empleadoId,
+                UsuarioActual.empleadoId()
+        ));
+    }
+
+    @DeleteMapping("/cronograma/{pedidoId}")
+    public ResponseEntity<List<ActividadResponeDTO>> eliminarCronograma(@PathVariable String pedidoId) {
+        actividadService.eliminarCronograma(pedidoId);
+        return ResponseEntity.ok(List.of());
+    }
+
     private boolean esDueno() {
         return UsuarioActual.tieneRol("DUENO");
     }

@@ -20,12 +20,14 @@ export interface PedidoResumen {
 export interface EventoBitacora {
   fecha: string;
   descripcion: string;
+  usuario: string;
 }
 
 
 export interface PedidoDetalle extends PedidoResumen {
   piezasTerminadas: number;
-  versionDisenio: string | null; 
+  versionDisenio: string | null;
+  asignadoA: string | null;
   bitacora: EventoBitacora[];
 }
 

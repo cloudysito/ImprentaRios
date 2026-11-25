@@ -10,5 +10,14 @@ export const formatFechaCorta = (iso: string) => {
 export const formatFechaLarga = (iso: string) =>
   `${formatFechaCorta(iso)} ${new Date(iso).getFullYear()}`;
 
+export const formatFechaHora = (iso: string) =>
+  new Date(iso).toLocaleString("es-MX", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+
 // 1500 -> "1,500"
 export const formatNumero = (n: number) => n.toLocaleString("es-MX");

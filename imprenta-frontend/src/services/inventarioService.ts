@@ -4,7 +4,7 @@ import type { Insumo, InsumoRequest, Movimiento, MovimientoRequest } from "../ty
 export const inventarioService = {
   listarInsumos: async () => {
     const { data } = await api.get<Insumo[]>("/insumo");
-    return data;
+    return Array.isArray(data) ? data : [];
   },
 
   crearInsumo: async (dto: InsumoRequest) => {
@@ -25,6 +25,6 @@ export const inventarioService = {
   // Sin fechas, el backend regresa los del mes actual
   listarMovimientosDelMes: async () => {
     const { data } = await api.get<Movimiento[]>("/insumo/movimientos");
-    return data;
+    return Array.isArray(data) ? data : [];
   },
 };

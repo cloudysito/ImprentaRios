@@ -49,6 +49,7 @@ const MENU: Record<Rol, SeccionMenu[]> = {
         cronograma,
         { to: "/pedidos/nuevo", label: "Capturar pedido", icon: Plus },
         { to: "/pedidos", label: "Pedidos", icon: FileText },
+        { to: "/clientes", label: "Clientes", icon: Users },
       ],
     },
   ],
@@ -72,14 +73,15 @@ const MENU: Record<Rol, SeccionMenu[]> = {
       items: [
         { to: "/pedidos", label: "Pedidos", icon: FileText },
         { to: "/pedidos/nuevo", label: "Capturar pedido", icon: Plus },
+        { to: "/clientes", label: "Clientes", icon: Users },
         { to: "/archivos-de-diseno/registrar", label: "Archivos de diseño", icon: FolderOpen },
       ],
     },
     {
       titulo: "Administración",
       items: [
-        { to: "/calendario/generar", label: "Programar entregas", icon: CalendarCheck },
-        { to: "/cronograma/generar", label: "Asignar cronograma", icon: ListTodo },
+        { to: "/cronograma/generar", label: "Programar entregas", icon: CalendarCheck },
+        { to: "/calendario/generar", label: "Calendario operativo", icon: ListTodo },
         { to: "/inventario", label: "Inventario", icon: Package },
         { to: "/mantenimiento", label: "Mantenimiento", icon: Wrench },
         { to: "/empleados", label: "Empleados", icon: Users },

@@ -5,7 +5,7 @@ export const tallerService = {
   // Las del empleado que inició sesión (lo sabe el backend por el token)
   misAsignaciones: async () => {
     const { data } = await api.get<Asignacion[]>("/actividad/mis-asignaciones");
-    return data;
+    return Array.isArray(data) ? data : [];
   },
 
   reportarAvance: async (actividadId: string, dto: ReporteAvance) => {

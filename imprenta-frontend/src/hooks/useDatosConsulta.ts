@@ -44,11 +44,20 @@ export function useDatosConsulta(incluirAsignaciones = false) {
                 } else if (pedidos.status === "rejected") {
                     setError(mensajeDeError(pedidos.reason, "No se pudieron cargar los pedidos"));
                 } else {
+                    const actividadesValor = Array.isArray(actividades.value) ? actividades.value : [];
+                    const pedidosValor = Array.isArray(pedidos.value) ? pedidos.value : [];
+                    const maquinasValor = maquinas.status === "fulfilled" && Array.isArray(maquinas.value)
+                        ? maquinas.value
+                        : [];
+                    const asignacionesValor = asignaciones.status === "fulfilled" && Array.isArray(asignaciones.value)
+                        ? asignaciones.value
+                        : [];
+
                     setDatos({
-                        actividades: actividades.value,
-                        pedidos: pedidos.value,
-                        maquinas: maquinas.status === "fulfilled" ? maquinas.value : [],
-                        asignaciones: asignaciones.status === "fulfilled" ? asignaciones.value : [],
+                        actividades: actividadesValor,
+                        pedidos: pedidosValor,
+                        maquinas: maquinasValor,
+                        asignaciones: asignacionesValor,
                     });
                 }
             })

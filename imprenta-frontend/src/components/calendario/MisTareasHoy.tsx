@@ -13,7 +13,6 @@ const MisTareasHoy = ({ tareas }: { tareas: TareaHoy[] }) => (
                     <li key={t.id} className={`cc-tarea cc-tarea--${t.tipo.toLowerCase()}`}>
                         <strong>{t.titulo}</strong>
                         <span>{t.detalle}</span>
-                        {t.responsable && <span className="cc-tarea__responsable">Responsable: {t.responsable}</span>}
                     </li>
                 ))}
             </ul>

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
 import { AlertCircle, Eye, EyeOff } from "lucide-react";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../context/AuthContext";
 import "../styles/LoginPage.css";
 
 // Fuera del componente para no llamar a Date en cada render
@@ -37,7 +37,9 @@ const LoginPage = () => {
     try {
       await login(usuario.trim(), password);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "No se pudo iniciar sesión");
+      setError(
+        err instanceof Error ? err.message : "No se pudo iniciar sesión",
+      );
       setLoading(false);
     }
   };
@@ -74,7 +76,9 @@ const LoginPage = () => {
 
           <span className="login__eyebrow">Iniciar sesión</span>
           <h2 className="login__title">Entra a tu cuenta</h2>
-          <p className="login__subtitle">Usa el usuario que te asignó la imprenta.</p>
+          <p className="login__subtitle">
+            Usa el usuario que te asignó la imprenta.
+          </p>
 
           {error && (
             <div className="login__error" role="alert">
@@ -109,7 +113,9 @@ const LoginPage = () => {
                 type="button"
                 className="login__toggle"
                 onClick={() => setShowPassword((v) => !v)}
-                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                aria-label={
+                  showPassword ? "Ocultar contraseña" : "Mostrar contraseña"
+                }
               >
                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>

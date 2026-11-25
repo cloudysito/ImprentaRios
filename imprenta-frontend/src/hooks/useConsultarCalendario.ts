@@ -1,3 +1,4 @@
+//falta el servicio
 import { useMemo, useState } from "react";
 import { useDatosConsulta } from "./useDatosConsulta";
 import { aFecha, diaMes } from "../utils/fechas";
@@ -58,12 +59,6 @@ export function useConsultarCalendario() {
         [dias, eventos, filtros, hoy],
     );
 
-    // Las asignaciones no traen el nombre, se toma de la actividad correspondiente
-    const responsables = useMemo(
-        () => new Map(actividades.map((a) => [a.id, a.empleadoNombre])),
-        [actividades],
-    );
-
     const tareasHoy = useMemo<TareaHoy[]>(
         () =>
             asignaciones
@@ -72,15 +67,15 @@ export function useConsultarCalendario() {
                     id: a.actividadId,
                     titulo: `${a.nombreActividad} ${a.folio}`,
                     detalle: `${etiquetaHoras(aFecha(a.fechaHoraInicio), aFecha(a.fechaHoraFin))} · ${a.producto} · ${formatNumero(a.piezas)} piezas`,
-                    responsable: responsables.get(a.actividadId) ?? null,
                     tipo: tipoDeActividad(a.nombreActividad),
                 })),
-        [asignaciones, hoy, responsables],
+        [asignaciones, hoy],
     );
 
     const proximasEntregas = useMemo<EntregaProxima[]>(
         () =>
             pedidos
+                .filter((p) => p && typeof p.fechaEntrega === "string")
                 .filter((p) => p.estado !== "ENTREGADO" && p.estado !== "CANCELADO")
                 .filter((p) => aFecha(p.fechaEntrega).getTime() >= hoy.getTime())
                 .sort((a, b) => aFecha(a.fechaEntrega).getTime() - aFecha(b.fechaEntrega).getTime())

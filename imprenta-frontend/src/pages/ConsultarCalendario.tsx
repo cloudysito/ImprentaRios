@@ -10,36 +10,45 @@ import type { VistaCalendario } from "../types/consulta";
 import "../styles/ConsultarCalendario.css";
 
 const VISTAS: { valor: VistaCalendario; etiqueta: string }[] = [
-    { valor: "DIA", etiqueta: "Día" },
-    { valor: "SEMANA", etiqueta: "Semana" },
+  { valor: "DIA", etiqueta: "Día" },
+  { valor: "SEMANA", etiqueta: "Semana" },
 ];
 
 const ConsultarCalendario = () => {
-    const c = useConsultarCalendario();
+  const c = useConsultarCalendario();
 
-    return (
-        <div className="cc-pantalla">
-            <section className="cc-principal">
-                <div className="cc-barra">
-                    <SelectorVista opciones={VISTAS} valor={c.vista} onChange={c.setVista} ariaLabel="Vista del calendario" />
-                    <CalendarioNavegador
-                        etiqueta={c.etiquetaPeriodo}
-                        onAnterior={() => c.navegar(-1)}
-                        onSiguiente={() => c.navegar(1)}
-                    />
-                </div>
-
-                <CalendarioFiltros filtros={c.filtros} onChange={c.cambiarFiltro} />
-                <CalendarioGrilla columnas={c.columnas} cargando={c.cargando} error={c.error} />
-            </section>
-
-            <aside className="cc-lateral">
-                <MisTareasHoy tareas={c.tareasHoy} />
-                <ProximasEntregas entregas={c.proximasEntregas} />
-                <AvisoSoloConsulta texto="Cualquier usuario consulta esta pantalla sin poder alterar los registros del cronograma." />
-            </aside>
+  return (
+    <div className="cc-pantalla">
+      <section className="cc-principal">
+        <div className="cc-barra">
+          <SelectorVista
+            opciones={VISTAS}
+            valor={c.vista}
+            onChange={c.setVista}
+            ariaLabel="Vista del calendario"
+          />
+          <CalendarioNavegador
+            etiqueta={c.etiquetaPeriodo}
+            onAnterior={() => c.navegar(-1)}
+            onSiguiente={() => c.navegar(1)}
+          />
         </div>
-    );
+
+        <CalendarioFiltros filtros={c.filtros} onChange={c.cambiarFiltro} />
+        <CalendarioGrilla
+          columnas={c.columnas}
+          cargando={c.cargando}
+          error={c.error}
+        />
+      </section>
+
+      <aside className="cc-lateral">
+        <MisTareasHoy tareas={c.tareasHoy} />
+        <ProximasEntregas entregas={c.proximasEntregas} />
+        <AvisoSoloConsulta texto="Cualquier usuario consulta esta pantalla sin poder alterar los registros del cronograma." />
+      </aside>
+    </div>
+  );
 };
 
 export default ConsultarCalendario;

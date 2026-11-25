@@ -139,15 +139,8 @@ export function useConsultarCronograma() {
     const exportar = () => {
         const fecha = (f: Date) => aInputFecha(f);
         descargarCsv(`cronograma_${desde}_${hasta}.csv`, [
-            ["Folio / Equipo", "Descripción", "Responsable", "Estatus", "Inicio", "Fin"],
-            ...filtradas.map((f) => [
-                f.titulo,
-                f.subtitulo,
-                f.responsables.join(", "),
-                f.etiqueta,
-                fecha(f.inicio),
-                fecha(f.fin),
-            ]),
+            ["Folio / Equipo", "Descripción", "Estatus", "Inicio", "Fin"],
+            ...filtradas.map((f) => [f.titulo, f.subtitulo, f.etiqueta, fecha(f.inicio), fecha(f.fin)]),
         ]);
     };
 

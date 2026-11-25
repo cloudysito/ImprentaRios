@@ -8,4 +8,6 @@ import java.util.List;
 public interface ActividadRepository extends MongoRepository<Actividad, String> {
     List<Actividad> findByEmpleadoId(String empleadoId);
     List<Actividad> findByPedidoId(String pedidoId);
+    boolean existsByEmpleadoId(String empleadoId);
+    void deleteByPedidoId(String pedidoId);
 }

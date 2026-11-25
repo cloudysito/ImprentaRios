@@ -18,4 +18,6 @@ public interface IActividadService {
     List<AsignacionDTO> misAsignaciones(String empleadoId, LocalDate fecha);
     AsignacionDTO reportarAvance(String id, ReporteAvanceDTO dto, String empleadoId, boolean esDueno);
     AsignacionDTO terminarActividad(String id, String empleadoId, boolean esDueno);
+    List<ActividadResponeDTO> generarCronograma(String pedidoId, String empleadoId, String solicitanteId);
+    List<ActividadResponeDTO> eliminarCronograma(String pedidoId);
 }

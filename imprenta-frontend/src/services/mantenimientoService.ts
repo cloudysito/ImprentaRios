@@ -9,7 +9,7 @@ import type {
 export const mantenimientoService = {
   listar: async () => {
     const { data } = await api.get<MaquinaResumen[]>("/maquinas");
-    return data;
+    return Array.isArray(data) ? data : [];
   },
 
   obtener: async (id: string) => {

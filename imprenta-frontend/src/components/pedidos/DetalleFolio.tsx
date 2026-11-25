@@ -1,6 +1,9 @@
 import type { PedidoDetalle } from "../../types/pedido";
-import { formatFechaCorta, formatFechaLarga, formatNumero } from "../../utils/formato";
+import { formatFechaHora, formatFechaLarga, formatNumero } from "../../utils/formato";
 import "../../styles/DetalleFolio.css";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import { Cargando } from "../Cargando";
 
 interface DetalleFolioProps {
   detalle: PedidoDetalle | null;
@@ -8,6 +11,7 @@ interface DetalleFolioProps {
   guardando: boolean;
   error: string | null;
   onMarcarEntregado: () => void;
+  onCancelarPedido: () => void;
   onCerrarFolio: () => void;
 }
 
@@ -17,18 +21,27 @@ const DetalleFolio = ({
   guardando,
   error,
   onMarcarEntregado,
+  onCancelarPedido,
   onCerrarFolio,
 }: DetalleFolioProps) => {
+  const navigate = useNavigate();
+  const { user } = useAuth();
   if (cargando || !detalle) {
     return (
       <aside className="detalle-folio detalle-folio--vacio">
-        {cargando ? "Cargando folio…" : "Selecciona un pedido para ver su detalle"}
+        {cargando ? <Cargando /> : "Selecciona un pedido para ver su detalle"}
       </aside>
     );
   }
 
   // Regla de negocio, solo se entrega lo que ya está terminado
   const puedeEntregar = detalle.estado === "TERMINADO";
+  const puedeCancelar = detalle.estado !== "ENTREGADO" && detalle.estado !== "CANCELADO";
+
+  // Igual que el backend: solo dueño y secretaria, y mientras el pedido siga abierto
+  const puedeEditar =
+      (user?.rol === "DUENO" || user?.rol === "SECRETARIA") &&
+      !["TERMINADO", "ENTREGADO", "CANCELADO"].includes(detalle.estado);
 
   return (
     <aside className="detalle-folio">
@@ -37,6 +50,12 @@ const DetalleFolio = ({
       <p className="detalle-folio__cliente">{detalle.clienteNombre}</p>
 
       <dl className="detalle-folio__datos">
+        <div>
+          <dt>Asignado a</dt>
+          <dd className={detalle.asignadoA ? "" : "is-muted"}>
+            {detalle.asignadoA ?? "Sin asignar"}
+          </dd>
+        </div>
         <div>
           <dt>Producto</dt>
           <dd>{detalle.producto}</dd>
@@ -67,7 +86,7 @@ const DetalleFolio = ({
       <ul className="detalle-folio__bitacora">
         {detalle.bitacora.map((evento, i) => (
           <li key={i}>
-            <strong>{formatFechaCorta(evento.fecha)}</strong> · {evento.descripcion}
+            <strong>{formatFechaHora(evento.fecha)}</strong> · {evento.descripcion} · {evento.usuario}
           </li>
         ))}
       </ul>
@@ -83,9 +102,27 @@ const DetalleFolio = ({
         >
           {guardando ? "Guardando…" : "Marcar como entregado"}
         </button>
+        <button
+          type="button"
+          className="detalle-folio__btn"
+          onClick={onCancelarPedido}
+          disabled={!puedeCancelar || guardando}
+        >
+          {guardando ? "Guardando…" : "Cancelar pedido"}
+        </button>
         <button type="button" className="detalle-folio__btn" onClick={onCerrarFolio}>
           Cerrar folio
         </button>
+        {puedeEditar && (
+            <button
+                type="button"
+                className="detalle-folio__btn"
+                onClick={() => navigate(`/pedidos/${detalle.id}/editar`)}
+                disabled={guardando}
+            >
+              Editar pedido
+            </button>
+        )}
       </div>
     </aside>
   );

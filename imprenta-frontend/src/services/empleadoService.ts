@@ -10,10 +10,14 @@ export interface NuevoEmpleado {
 
 export async function listarEmpleados(): Promise<Empleado[]> {
   const { data } = await api.get<Empleado[]>("/empleados");
-  return data;
+  return Array.isArray(data) ? data : [];
 }
 
 export async function crearEmpleado(empleado: NuevoEmpleado): Promise<Empleado> {
   const { data } = await api.post<Empleado>("/empleados", empleado);
   return data;
+}
+
+export async function eliminarEmpleado(id: string): Promise<void> {
+  await api.delete(`/empleados/${id}`);
 }

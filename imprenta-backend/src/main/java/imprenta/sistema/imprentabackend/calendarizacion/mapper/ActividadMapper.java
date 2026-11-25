@@ -20,7 +20,7 @@ public final class ActividadMapper {
         actividad.setPedidoId(dto.pedidoId());
         actividad.setEmpleadoId(dto.empleadoId());
     }
-    public static ActividadResponeDTO toResponse(Actividad actividad, String empleadoNombre){
+    public static ActividadResponeDTO toResponse(Actividad actividad){
         return new ActividadResponeDTO(
                 actividad.getId(),
                 actividad.getNombreActividad(),
@@ -29,7 +29,7 @@ public final class ActividadMapper {
                 actividad.getFechaHoraFin(),
                 actividad.getPedidoId(),
                 actividad.getEmpleadoId(),
-                empleadoNombre
+                null
         );
     }
 }

@@ -2,7 +2,7 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import Sidebar from "./SideBar";
 import Navbar from "./Navbar";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "../context/AuthContext";
 import { rolLabels } from "../services/authService";
 
 interface RouteMeta {
@@ -22,6 +22,7 @@ const routeMeta: Record<string, RouteMeta> = {
   "/taller": { seccion: "Taller", titulo: "Verificar progreso de trabajo" },
   "/inventario": { seccion: "Inventario de materiales", titulo: "Gestionar stock" },
   "/empleados": { seccion: "Administración", titulo: "Gestionar empleados" },
+  "/clientes": { seccion: "Seguimiento administrativo", titulo: "Clientes" },
   "/mantenimiento": { seccion: "Historial técnico del equipo", titulo: "Gestionar mantenimiento de maquinaria" },
 };
 
@@ -29,7 +30,10 @@ const routeMeta: Record<string, RouteMeta> = {
 const AppLayout = () => {
   const { user, logout } = useAuth();
   const location = useLocation();
-  const { seccion, titulo } = routeMeta[location.pathname] ?? { titulo: "Imprenta Ríos" };
+  const esEdicion = /^\/pedidos\/[^/]+\/editar$/.test(location.pathname);
+  const { seccion, titulo } = esEdicion
+      ? { seccion: "Pedidos", titulo: "Editar pedido" }
+      : (routeMeta[location.pathname] ?? { titulo: "Imprenta Ríos" });
 
   useEffect(() => {
     document.title = titulo == "Imprenta Ríos" ? "Imprenta Ríos" : `${titulo} | Imprenta Ríos`;

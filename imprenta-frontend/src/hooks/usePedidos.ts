@@ -60,6 +60,12 @@ export function usePedidos() {
     setPedidos((prev) => prev.map((p) => (p.id === id ? { ...p, estado } : p)));
   };
 
+  // 6. Al quitar el folio seleccionado, se muestra el primero visible
+  const quitarPedido = (id: string) => {
+    setPedidos((prev) => prev.filter((p) => p.id !== id));
+    setIdElegido((actual) => (actual === id ? null : actual));
+  };
+
   return {
     pedidosVisibles,
     conteos,
@@ -72,5 +78,6 @@ export function usePedidos() {
     seleccionadoId,
     seleccionar: setIdElegido,
     actualizarEstado,
+    quitarPedido,
   };
 }

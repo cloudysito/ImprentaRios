@@ -13,17 +13,17 @@ import type {
 export const capturaPedidoService = {
   listarTiposProducto: async () => {
     const { data } = await api.get<TipoProducto[]>("/tipo-producto");
-    return data;
+    return Array.isArray(data) ? data : [];
   },
 
   listarMateriales: async () => {
     const { data } = await api.get<Material[]>("/material");
-    return data;
+    return Array.isArray(data) ? data : [];
   },
 
   listarArchivosDisenio: async () => {
     const { data } = await api.get<ArchivoDisenio[]>("/archivo_disenio");
-    return data;
+    return Array.isArray(data) ? data : [];
   },
 
   obtenerInsumo: async (id: string) => {

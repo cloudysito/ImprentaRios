@@ -112,6 +112,24 @@
     border-radius: 14px;
     box-shadow: 0 1px 2px rgba(28, 25, 22, 0.05);
 }
+.calendario-grid--periodo { min-height: 300px; }
+.calendario-grid__estado {
+    grid-column: span 6;
+    padding: 40px;
+    text-align: center;
+    color: #6f6a63;
+}
+.calendario-grid__estado--error { color: #a63d30; }
+.cal-card__descripcion {
+    margin-top: 2px;
+    font-size: 11px;
+    opacity: 0.8;
+}
+.cal-sidebar-card__texto {
+    font-size: 13px;
+    line-height: 1.5;
+    color: #6f6a63;
+}
 
 .calendario-col__header {
     text-align: center;
@@ -164,6 +182,15 @@
 
 .cal-card strong {
     font-weight: 600;
+}
+
+.cal-card__responsable {
+    margin-top: 8px;
+    padding-top: 6px;
+    border-top: 1px solid currentColor;
+    font-size: 12px;
+    font-weight: 700;
+    opacity: 1;
 }
 
 .cal-card.produccion {

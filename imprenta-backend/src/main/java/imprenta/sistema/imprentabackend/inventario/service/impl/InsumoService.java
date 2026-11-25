@@ -11,6 +11,7 @@ import imprenta.sistema.imprentabackend.inventario.model.Insumo;
 import imprenta.sistema.imprentabackend.inventario.model.MovimientoInventario;
 import imprenta.sistema.imprentabackend.inventario.model.TipoMovimiento;
 import imprenta.sistema.imprentabackend.inventario.repository.InsumoRepository;
+import imprenta.sistema.imprentabackend.inventario.repository.MaterialRepository;
 import imprenta.sistema.imprentabackend.inventario.repository.MovimientoInventarioRepository;
 import imprenta.sistema.imprentabackend.inventario.service.IInsumoService;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,7 @@ public class InsumoService implements IInsumoService {
 
     private final InsumoRepository insumoRepository;
     private final MovimientoInventarioRepository movimientoRepository;
+    private final MaterialRepository materialRepository;
 
     @Override
     public InsumoResponseDTO agregarInsumo(InsumoRequestDTO dto) {
@@ -61,7 +63,12 @@ public class InsumoService implements IInsumoService {
 
     @Override
     public void eliminarInsumoPorId(String idInsumo) {
-        insumoRepository.delete(obtenerInsumo(idInsumo));
+        Insumo insumo = obtenerInsumo(idInsumo);
+        if (materialRepository.existsByInsumoId(idInsumo)
+                || movimientoRepository.existsByInsumoId(idInsumo)) {
+            throw new NegocioException(CodigoError.INSUMO_EN_USO);
+        }
+        insumoRepository.delete(insumo);
     }
 
     @Override

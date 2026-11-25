@@ -34,8 +34,11 @@ public class PedidoController {
     }
 
     @PutMapping({ "/{id}"})
-    public ResponseEntity<PedidoResponseDTO> actualizar(@Valid @RequestBody PedidoRequestDTO dto, @PathVariable String id) {
-        return ResponseEntity.status(HttpStatus.OK).body(pedidoService.actualizarPedido(id, dto));
+    public ResponseEntity<PedidoResponseDTO> actualizar(@Valid @RequestBody PedidoRequestDTO dto,
+                                                         @PathVariable String id,
+                                                         Authentication authentication) {
+        String empleadoId = (String) authentication.getDetails();
+        return ResponseEntity.ok(pedidoService.actualizarPedido(id, dto, empleadoId));
     }
 
     @GetMapping({ "/{id}"})
@@ -50,8 +53,10 @@ public class PedidoController {
 
     @PatchMapping("/{id}/estado")
     public ResponseEntity<PedidoDetalleDTO> cambiarEstado(@PathVariable String id,
-                                                          @Valid @RequestBody CambioEstadoDTO dto) {
-        return ResponseEntity.ok(pedidoService.cambiarEstado(id, dto.estado()));
+                                                          @Valid @RequestBody CambioEstadoDTO dto,
+                                                          Authentication authentication) {
+        String empleadoId = (String) authentication.getDetails();
+        return ResponseEntity.ok(pedidoService.cambiarEstado(id, dto.estado(), empleadoId));
     }
 
     @DeleteMapping({ "/{id}"})

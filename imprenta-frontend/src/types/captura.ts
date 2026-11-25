@@ -45,14 +45,47 @@ export interface ClienteRequest {
     correo: string;
 }
 
+export interface Cliente extends ClienteRequest {
+    id: string;
+}
+
 export interface PedidoRequest {
     nombreProyecto: string;
     fechaEntrega: string;
     clienteId: string;
     productos: (Omit<ProductoForm, "cantidad"> & { cantidad: number })[];
+    personaSolicita?: string | null;
+    precioAcordado?: number | null;
+    archivosDisenioIds?: string[];
 }
 
 export interface PedidoCreado {
     id: string;
     folio: string;
+}
+
+export interface ArchivoDisenio {
+    id: string;
+    nombreArchivo: string;
+    version: number | null;
+}
+
+export interface ClienteCompleto extends ClienteRequest {
+    id: string;
+}
+
+export interface PedidoCompleto {
+    id: string;
+    folio: string;
+    estado: string;
+    nombreProyecto: string;
+    fechaEntrega: string;
+    clienteId: string;
+    personaSolicita: string | null;
+    precioAcordado: number | null;
+    archivosDisenioIds: string[];
+    productos: (Omit<ProductoForm, "cantidad" | "observaciones"> & {
+        cantidad: number;
+        observaciones: string | null;
+    })[];
 }

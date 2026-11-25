@@ -8,15 +8,16 @@ import imprenta.sistema.imprentabackend.calendarizacion.mapper.ActividadMapper;
 import imprenta.sistema.imprentabackend.calendarizacion.model.Actividad;
 import imprenta.sistema.imprentabackend.calendarizacion.repository.ActividadRepository;
 import imprenta.sistema.imprentabackend.calendarizacion.service.IActividadService;
+import imprenta.sistema.imprentabackend.auth.UsuarioActual;
 import imprenta.sistema.imprentabackend.exceptions.CodigoError;
 import imprenta.sistema.imprentabackend.exceptions.NegocioException;
 import imprenta.sistema.imprentabackend.pedidos.dtos.PedidoDetalleDTO;
 import imprenta.sistema.imprentabackend.pedidos.model.EstadoPedido;
 import imprenta.sistema.imprentabackend.pedidos.service.IPedidoService;
-import imprenta.sistema.imprentabackend.usuarios.model.Empleado;
 import imprenta.sistema.imprentabackend.usuarios.repository.EmpleadoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -36,8 +37,9 @@ public class ActividadService implements IActividadService {
 
     @Override
     public ActividadResponeDTO agregarActividad(ActividadRequestDTO dto) {
+        pedidoService.alGenerarCronograma(dto.pedidoId(), UsuarioActual.empleadoId());
         Actividad guardado = actividadRepository.save(ActividadMapper.toEntity(dto));
-        return ActividadMapper.toResponse(guardado, nombreDeEmpleado(guardado.getEmpleadoId()));
+        return  ActividadMapper.toResponse(guardado);
     }
 
     @Override
@@ -49,27 +51,93 @@ public class ActividadService implements IActividadService {
     public ActividadResponeDTO actualizarActividad(String id, ActividadRequestDTO dto) {
         Actividad actividad = obtenerActividad(id);
         ActividadMapper.actualizarEntidad(actividad, dto);
-        Actividad guardada = actividadRepository.save(actividad);
-        return ActividadMapper.toResponse(guardada, nombreDeEmpleado(guardada.getEmpleadoId()));
+        return ActividadMapper.toResponse(actividadRepository.save(actividad));
+    }
+
+    @Override
+    @Transactional
+    public List<ActividadResponeDTO> generarCronograma(
+            String pedidoId,
+            String empleadoId,
+            String solicitanteId
+    ) {
+        PedidoDetalleDTO pedido = pedidoService.obtenerDetalle(pedidoId);
+        if (pedido.fechaEntrega() == null) {
+            throw new NegocioException(CodigoError.PEDIDO_NO_ENCONTRADO);
+        }
+        if (!empleadoRepository.existsById(empleadoId)) {
+            throw new NegocioException(CodigoError.EMPLEADO_NO_ENCONTRADO);
+        }
+
+        actividadRepository.deleteByPedidoId(pedidoId);
+        List<Actividad> creadas = calcularEtapas(pedido.fechaEntrega()).stream()
+                .map(etapa -> new Actividad(
+                        null,
+                        etapa.nombre(),
+                        etapa.nombre() + " del folio " + pedido.folio(),
+                        etapa.inicio(),
+                        etapa.fin(),
+                        pedidoId,
+                        empleadoId,
+                        null, null, null, null, null, false))
+                .toList();
+        List<Actividad> guardadas = actividadRepository.saveAll(creadas);
+        pedidoService.alGenerarCronograma(pedidoId, solicitanteId);
+        return guardadas.stream().map(ActividadMapper::toResponse).toList();
+    }
+
+    @Override
+    @Transactional
+    public List<ActividadResponeDTO> eliminarCronograma(String pedidoId) {
+        pedidoService.obtenerDetalle(pedidoId);
+        actividadRepository.deleteByPedidoId(pedidoId);
+        return List.of();
+    }
+
+    private record EtapaCronograma(String nombre, LocalDateTime inicio, LocalDateTime fin) {}
+
+    private List<EtapaCronograma> calcularEtapas(LocalDateTime entrega) {
+        LocalDate fechaFin = entrega.toLocalDate();
+        List<EtapaCronograma> etapas = new ArrayList<>();
+
+        EtapaCronograma entregaEtapa = crearEtapa("Entrega", fechaFin, 1);
+        EtapaCronograma acabado = crearEtapa("Acabado", fechaFin.minusDays(1), 2);
+        EtapaCronograma impresion = crearEtapa("Impresión", acabado.inicio().toLocalDate().minusDays(1), 3);
+        EtapaCronograma diseno = crearEtapa("Diseño", impresion.inicio().toLocalDate().minusDays(1), 2);
+
+        etapas.add(diseno);
+        etapas.add(impresion);
+        etapas.add(acabado);
+        etapas.add(entregaEtapa);
+        return etapas;
+    }
+
+    private EtapaCronograma crearEtapa(String nombre, LocalDate fechaFin, int dias) {
+        LocalDate inicio = fechaFin.minusDays(dias - 1);
+        return new EtapaCronograma(
+                nombre,
+                inicio.atTime(8, 0),
+                fechaFin.atTime(17, 0));
     }
 
     @Override
     public ActividadResponeDTO buscarActividad(String id) {
-        Actividad actividad = obtenerActividad(id);
-        return ActividadMapper.toResponse(actividad, nombreDeEmpleado(actividad.getEmpleadoId()));
+        return ActividadMapper.toResponse(obtenerActividad(id));
     }
 
     @Override
     public List<ActividadResponeDTO> listarActividades(String pedidoId) {
-        List<Actividad> actividades = actividadRepository.findAll().stream()
+        Map<String, String> nombres = new HashMap<>();
+        empleadoRepository.findAll().forEach(e -> nombres.put(e.getId(), e.getNombre()));
+
+        return actividadRepository.findAll().stream()
                 .filter(a -> pedidoId == null || pedidoId.isBlank() || pedidoId.equals(a.getPedidoId()))
                 .sorted(Comparator.comparing(Actividad::getFechaHoraInicio))
-                .toList();
-
-        // Un solo viaje a la base para todos los nombres, en lugar de uno por actividad
-        Map<String, String> nombres = nombresDeEmpleados(actividades);
-        return actividades.stream()
-                .map(a -> ActividadMapper.toResponse(a, nombres.get(a.getEmpleadoId())))
+                .map(a -> new ActividadResponeDTO(
+                        a.getId(), a.getNombreActividad(), a.getDescripcion(),
+                        a.getFechaHoraInicio(), a.getFechaHoraFin(),
+                        a.getPedidoId(), a.getEmpleadoId(),
+                        nombres.get(a.getEmpleadoId())))
                 .toList();
     }
 
@@ -117,7 +185,12 @@ public class ActividadService implements IActividadService {
         actividad.setObservaciones(textoONull(dto.observaciones()));
         actividad.setUltimoReporte(LocalDateTime.now());
 
-        return aAsignacion(actividadRepository.save(actividad), pedido);
+        Actividad guardada = actividadRepository.save(actividad);
+
+        pedidoService.iniciarProduccion(actividad.getPedidoId(), UsuarioActual.empleadoId());
+        pedido = pedidoService.obtenerDetalle(actividad.getPedidoId());   // actualiza el estado
+
+        return aAsignacion(guardada, pedido);
     }
 
     @Override
@@ -135,6 +208,11 @@ public class ActividadService implements IActividadService {
         actividad.setUltimoReporte(LocalDateTime.now());
         Actividad guardada = actividadRepository.save(actividad);
 
+        pedidoService.iniciarProduccion(actividad.getPedidoId(), UsuarioActual.empleadoId());
+        pedido = pedidoService.obtenerDetalle(actividad.getPedidoId());   // actualiza el estado
+
+        // Si ya terminaron todas las actividades del pedido, el pedido pasa a Terminado
+
         // Si ya terminaron todas las actividades del pedido, el pedido pasa a Terminado
         boolean todasTerminadas = actividadRepository.findByPedidoId(actividad.getPedidoId()).stream()
                 .allMatch(a -> Boolean.TRUE.equals(a.getTerminada()));
@@ -142,7 +220,11 @@ public class ActividadService implements IActividadService {
                 && pedido.estado() != EstadoPedido.ENTREGADO
                 && pedido.estado() != EstadoPedido.CANCELADO;
         if (todasTerminadas && puedeTerminar) {
-            pedido = pedidoService.cambiarEstado(actividad.getPedidoId(), EstadoPedido.TERMINADO);
+            pedido = pedidoService.cambiarEstado(
+                    actividad.getPedidoId(),
+                    EstadoPedido.TERMINADO,
+                    UsuarioActual.empleadoId()
+            );
         }
 
         return aAsignacion(guardada, pedido);
@@ -186,24 +268,6 @@ public class ActividadService implements IActividadService {
 
     private String textoONull(String texto) {
         return texto == null || texto.isBlank() ? null : texto.trim();
-    }
-
-    private String nombreDeEmpleado(String empleadoId) {
-        if (empleadoId == null || empleadoId.isBlank()) {
-            return null;
-        }
-        return empleadoRepository.findById(empleadoId).map(Empleado::getNombre).orElse(null);
-    }
-
-    private Map<String, String> nombresDeEmpleados(List<Actividad> actividades) {
-        List<String> ids = actividades.stream()
-                .map(Actividad::getEmpleadoId)
-                .filter(Objects::nonNull)
-                .distinct()
-                .toList();
-        Map<String, String> nombres = new HashMap<>();
-        empleadoRepository.findAllById(ids).forEach(e -> nombres.put(e.getId(), e.getNombre()));
-        return nombres;
     }
 
     private Actividad obtenerActividad(String id) {

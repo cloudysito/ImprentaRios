@@ -4,13 +4,9 @@ import { ESTADO_LABEL, type EstadoPedido, type PedidoResumen } from "../types/pe
 import type { EstadoBarra, EventoCalendario, FilaCronograma, TipoEvento } from "../types/consulta";
 import { aFecha } from "./fechas";
 import { folioCorto, inicioDeDia, sumarDias } from "./calendario";
+import { calcularEtapas } from "./calcularEtapas";
 
 export const finDeActividad = (a: ActividadResponse) => a.fechaHoraFin ?? a.fechaHoraInicio;
-
-// Nombres sin repetir y en orden de aparición
-const nombresUnicos = (acts: ActividadResponse[]) => [
-    ...new Set(acts.map((a) => a.empleadoNombre).filter((n): n is string => !!n)),
-];
 
 export const tipoDeActividad = (nombre: string): TipoEvento => {
     const n = nombre.toLowerCase();
@@ -25,9 +21,12 @@ export function construirEventos(
     pedidos: PedidoResumen[],
     maquinas: MaquinaResumen[],
 ): EventoCalendario[] {
-    const folios = new Map(pedidos.map((p) => [p.id, p.folio]));
+    const actividadesSeguras = Array.isArray(actividades) ? actividades : [];
+    const pedidosSeguros = Array.isArray(pedidos) ? pedidos : [];
+    const maquinasSeguras = Array.isArray(maquinas) ? maquinas : [];
+    const folios = new Map(pedidosSeguros.map((p) => [p.id, p.folio]));
 
-    const deActividades = actividades.map<EventoCalendario>((a) => ({
+    const deActividades = actividadesSeguras.map<EventoCalendario>((a) => ({
         id: a.id,
         tipo: tipoDeActividad(a.nombreActividad),
         titulo: a.nombreActividad,
@@ -37,7 +36,23 @@ export function construirEventos(
         fin: aFecha(finDeActividad(a)),
     }));
 
-    const deMantenimiento = maquinas
+    const pedidosConCronograma = new Set(actividadesSeguras.map((a) => a.pedidoId));
+    const deProduccionEstimada = pedidosSeguros
+        .filter((p) => p.estado !== "TERMINADO" && p.estado !== "ENTREGADO" && p.estado !== "CANCELADO")
+        .filter((p) => !pedidosConCronograma.has(p.id))
+        .flatMap<EventoCalendario>((p) =>
+            calcularEtapas(p.fechaEntrega).map((etapa, indice) => ({
+                id: `pedido-${p.id}-estimado-${indice}`,
+                tipo: tipoDeActividad(etapa.nombre),
+                titulo: etapa.nombre,
+                referencia: folioCorto(p.folio),
+                inicio: aFecha(etapa.fechaHoraInicio),
+                fin: aFecha(etapa.fechaHoraFin),
+                estimado: true,
+            })),
+        );
+
+    const deMantenimiento = maquinasSeguras
         .filter((m) => m.servicioProgramado && m.proximoServicio)
         .map<EventoCalendario>((m) => {
             const fecha = aFecha(m.proximoServicio as string);
@@ -46,13 +61,14 @@ export function construirEventos(
                 tipo: "MANTENIMIENTO",
                 titulo: "Mantenimiento",
                 referencia: m.nombre,
-                responsable: null,
                 inicio: fecha,
                 fin: fecha,
             };
         });
 
-    return [...deActividades, ...deMantenimiento].sort((a, b) => a.inicio.getTime() - b.inicio.getTime());
+    return [...deActividades, ...deProduccionEstimada, ...deMantenimiento].sort(
+        (a, b) => a.inicio.getTime() - b.inicio.getTime(),
+    );
 }
 
 // ---------- Cronograma ----------
@@ -75,14 +91,19 @@ export function construirFilas(
     pedidos: PedidoResumen[],
     maquinas: MaquinaResumen[],
 ): FilaCronograma[] {
+    const actividadesSeguras = Array.isArray(actividades) ? actividades : [];
+    const pedidosSeguros = Array.isArray(pedidos) ? pedidos : [];
+    const maquinasSeguras = Array.isArray(maquinas) ? maquinas : [];
     const porPedido = new Map<string, ActividadResponse[]>();
-    for (const a of actividades) {
+    for (const a of actividadesSeguras) {
         porPedido.set(a.pedidoId, [...(porPedido.get(a.pedidoId) ?? []), a]);
     }
 
     const filas: FilaCronograma[] = [];
 
-    for (const p of [...pedidos].sort((a, b) => a.folio.localeCompare(b.folio))) {
+    for (const p of [...pedidosSeguros]
+        .filter((pedido) => pedido && typeof pedido.folio === "string")
+        .sort((a, b) => a.folio.localeCompare(b.folio))) {
         if (p.estado === "CANCELADO") continue;
         const acts = porPedido.get(p.id) ?? [];
         const estado = estadoDeBarra(p.estado);
@@ -90,14 +111,15 @@ export function construirFilas(
         if (acts.length > 0) {
             const inicios = acts.map((a) => inicioDeDia(aFecha(a.fechaHoraInicio)).getTime());
             const fines = acts.map((a) => inicioDeDia(aFecha(finDeActividad(a))).getTime());
+            const nombres = [...new Set(acts.map((a) => a.empleadoNombre).filter((n): n is string => !!n))];
             filas.push({
                 id: p.id,
                 pedidoId: p.id,
                 titulo: p.folio,
                 subtitulo: `${p.producto} · ${p.clienteNombre}`,
+                responsable: nombres.length > 0 ? nombres.join(", ") : null,
                 estado,
                 etiqueta: ESTADO_LABEL[p.estado],
-                responsables: nombresUnicos(acts),
                 inicio: new Date(Math.min(...inicios)),
                 fin: new Date(Math.max(...fines)),
             });
@@ -111,14 +133,13 @@ export function construirFilas(
                 subtitulo: `${p.producto} · Sin programar`,
                 estado: "ESTIMADO",
                 etiqueta: "Estimado",
-                responsables: [],
                 inicio: sumarDias(entrega, -1),
                 fin: entrega,
             });
         }
     }
 
-    const paros = maquinas
+    const paros = maquinasSeguras
         .filter((m) => m.servicioProgramado && m.proximoServicio)
         .map<FilaCronograma>((m) => {
             const dia = inicioDeDia(aFecha(m.proximoServicio as string));
@@ -129,7 +150,6 @@ export function construirFilas(
                 subtitulo: "Mantenimiento",
                 estado: "PARO",
                 etiqueta: "Paro",
-                responsables: [],
                 inicio: dia,
                 fin: dia,
             };

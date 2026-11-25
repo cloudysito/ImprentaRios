@@ -17,11 +17,10 @@ export interface Actividad {
     fechaHoraFin: string;
     pedidoId: string;
     empleadoId: string;
-    empleadoNombre: string | null;
 }
 
-// Lo que se manda en POST /api/actividad (el nombre no se envía, lo calcula el backend)
-export type ActividadRequest = Omit<Actividad, "id" | "empleadoNombre">;
+// Lo que se manda en POST /api/actividad
+export type ActividadRequest = Omit<Actividad, "id">;
 
 // Un pedido mas el estado de su cronograma
 export interface CronogramaResumen extends PedidoResumen {

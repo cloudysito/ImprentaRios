@@ -36,7 +36,7 @@ export function useMantenimiento() {
     mantenimientoService
       .listar()
       .then((data) => {
-        if (!cancelado) setMaquinas(data);
+        if (!cancelado) setMaquinas(Array.isArray(data) ? data : []);
       })
       .catch((err) => {
         if (!cancelado) setError(mensajeDeError(err, "No se pudo cargar la maquinaria"));
@@ -80,7 +80,9 @@ export function useMantenimiento() {
     setMaquinas((prev) =>
       prev.some((m) => m.id === detalle.id)
         ? prev.map((m) => (m.id === detalle.id ? aResumen(detalle) : m))
-        : [...prev, aResumen(detalle)].sort((a, b) => a.nombre.localeCompare(b.nombre, "es")),
+        : [...prev, aResumen(detalle)]
+            .filter((m) => m && typeof m.nombre === "string")
+            .sort((a, b) => a.nombre.localeCompare(b.nombre, "es")),
     );
   };
 
