@@ -7,6 +7,8 @@ import java.time.LocalDate;
 public record ArchivoDisenioRequestDTO(
         @NotBlank(message = "El nombre del archivo es obligatorio")
         @Size(max = 255, message = "El nombre del archivo no puede superar 255 caracteres")
+        @Pattern(regexp = "(?i).+\\.(pdf|jpe?g|cdr)$",
+                message = "Formato no permitido. Usa PDF, JPG o CorelDRAW (.cdr)")
         String nombreArchivo,
 
         @NotNull(message = "La fecha de recepción es obligatoria")

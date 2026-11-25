@@ -4,7 +4,7 @@ import { registrarArchivoDisenio } from "../services/archivoDisenioService";
 import { hoyISO } from "../utils/fechas";
 import { mensajeDeError } from "../utils/errores";
 
-const EXTENSIONES_PERMITIDAS = [".pdf", ".ai", ".tif", ".tiff", ".eps"];
+const EXTENSIONES_PERMITIDAS = [".pdf", ".jpg", ".jpeg", ".cdr"];
 const TAMANO_MAXIMO_MB = 200;
 
 const RegistrarDisenio: React.FC = () => {
@@ -35,7 +35,7 @@ const RegistrarDisenio: React.FC = () => {
     if (!archivo) return "Selecciona un archivo antes de registrar el diseño.";
     const nombre = archivo.name.toLowerCase();
     if (!EXTENSIONES_PERMITIDAS.some((ext) => nombre.endsWith(ext))) {
-      return "Formato no permitido. Usa PDF, AI, TIFF o EPS.";
+      return "Formato no permitido. Usa PDF, JPG o CorelDRAW (.cdr).";
     }
     if (archivo.size > TAMANO_MAXIMO_MB * 1024 * 1024) {
       return `El archivo supera el máximo de ${TAMANO_MAXIMO_MB} MB.`;
@@ -60,7 +60,7 @@ const RegistrarDisenio: React.FC = () => {
         ? { ok: false, texto: "Aún no seleccionas un archivo" }
         : EXTENSIONES_PERMITIDAS.includes(extension)
             ? { ok: true, texto: `Formato ${extension.slice(1).toUpperCase()} aceptado` }
-            : { ok: false, texto: "Formato no permitido (usa PDF, AI, TIFF o EPS)" },
+            : { ok: false, texto: "Formato no permitido (usa PDF, JPG o CorelDRAW)" },
     ...(archivo
         ? [
           archivo.size <= TAMANO_MAXIMO_MB * 1024 * 1024
@@ -163,14 +163,14 @@ const RegistrarDisenio: React.FC = () => {
                   Arrastra el archivo o selecciónalo desde tu equipo
                 </strong>
                 <p>
-                  Formatos aceptados PDF, AI, TIFF y EPS · Tamaño máximo 200 MB
+                  Formatos aceptados PDF, JPG y CorelDRAW (CDR) · Tamaño máximo 200 MB
                 </p>
               </div>
               <input
                 id="archivo-disenio"
                 hidden
                 type="file"
-                accept=".pdf,.ai,.tiff,.eps"
+                accept=".pdf,.jpg,.jpeg,.cdr"
                 onChange={(e) => setArchivo(e.target.files?.[0] ?? null)}
               />
               <button
@@ -184,7 +184,7 @@ const RegistrarDisenio: React.FC = () => {
               </button>
             </div>
             <div className="uploaded-file">
-              <div className="file-icon-box pdf">PDF</div>
+              <div className="file-icon-box pdf">{extension ? extension.slice(1).toUpperCase() : "—"}</div>
               <div className="file-info">
                 <strong>
                   {archivo?.name ?? "Ningún archivo seleccionado"}
