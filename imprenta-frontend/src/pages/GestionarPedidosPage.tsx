@@ -58,11 +58,6 @@ const GestionarPedidosPage = () => {
     }
   };
 
-  const handleCerrarFolio = () => {
-    // TODO definir con el equipo qué significa "cerrar folio"
-    console.log("Cerrar folio", lista.seleccionadoId);
-  };
-
   return (
     <div className="gestionar-pedidos">
       <section className="gestionar-pedidos__lista">
@@ -90,7 +85,6 @@ const GestionarPedidosPage = () => {
         error={folio.error}
         onMarcarEntregado={handleMarcarEntregado}
         onCancelarPedido={handleCancelarPedido}
-        onCerrarFolio={handleCerrarFolio}
       />
       {pedidoPorCancelar && (
         <Modal titulo="Cancelar pedido" onCerrar={() => setPedidoPorCancelar(null)}>

@@ -12,7 +12,6 @@ interface DetalleFolioProps {
   error: string | null;
   onMarcarEntregado: () => void;
   onCancelarPedido: () => void;
-  onCerrarFolio: () => void;
 }
 
 const DetalleFolio = ({
@@ -21,8 +20,7 @@ const DetalleFolio = ({
   guardando,
   error,
   onMarcarEntregado,
-  onCancelarPedido,
-  onCerrarFolio,
+  onCancelarPedido
 }: DetalleFolioProps) => {
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -109,9 +107,6 @@ const DetalleFolio = ({
           disabled={!puedeCancelar || guardando}
         >
           {guardando ? "Guardando…" : "Cancelar pedido"}
-        </button>
-        <button type="button" className="detalle-folio__btn" onClick={onCerrarFolio}>
-          Cerrar folio
         </button>
         {puedeEditar && (
             <button
