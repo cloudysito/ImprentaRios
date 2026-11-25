@@ -611,7 +611,8 @@ const CapturarPedido = () => {
 
                                         {materiales.map((m) => (
                                             <option key={m.id} value={m.id}>
-                                                {m.nombre} ({m.gramaje} g)
+                                                {m.nombre}
+                                                {m.gramaje > 0 ? ` (${m.gramaje} g)` : ""}
                                             </option>
                                         ))}
                                     </select>

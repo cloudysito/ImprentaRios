@@ -5,7 +5,7 @@ import { mensajeDeError } from "../../utils/errores";
 
 interface NuevoInsumoModalProps {
   onCerrar: () => void;
-  onCrear: (dto: InsumoRequest) => Promise<unknown>;
+  onCrear: (dto: InsumoRequest, gramaje?: number) => Promise<unknown>;
   insumo?: Insumo;
 }
 
@@ -18,6 +18,7 @@ const NuevoInsumoModal = ({ onCerrar, onCrear, insumo }: NuevoInsumoModalProps) 
   const [unidad, setUnidad] = useState(insumo?.unidad ?? "Pliegos");
   const [existencia, setExistencia] = useState(String(insumo?.cantidadDisponible ?? 0));
   const [punto, setPunto] = useState(String(insumo?.puntoReorden ?? 0));
+  const [gramaje, setGramaje] = useState("");
   const [guardando, setGuardando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,17 +33,26 @@ const NuevoInsumoModal = ({ onCerrar, onCrear, insumo }: NuevoInsumoModalProps) 
     if (!Number.isInteger(puntoReorden) || puntoReorden < 0) {
       return setError("El punto de reorden debe ser un entero, 0 o mayor");
     }
+    if (tipo === "SUSTRATO" && !editando) {
+      const gramajeNumero = Number(gramaje);
+      if (gramaje.trim() === "" || !Number.isInteger(gramajeNumero) || gramajeNumero < 0) {
+        return setError("El gramaje debe ser un entero, 0 o mayor");
+      }
+    }
 
     setGuardando(true);
     setError(null);
     try {
-      await onCrear({
-        nombre: nombre.trim(),
-        tipoInsumo: tipo,
-        unidad: unidad.trim(),
-        cantidadDisponible: cantidad,
-        puntoReorden,
-      });
+      await onCrear(
+        {
+          nombre: nombre.trim(),
+          tipoInsumo: tipo,
+          unidad: unidad.trim(),
+          cantidadDisponible: cantidad,
+          puntoReorden,
+        },
+        tipo === "SUSTRATO" && !editando ? Number(gramaje) : undefined,
+      );
       onCerrar();
     } catch (err) {
       setError(mensajeDeError(err, "No se pudo registrar el material"));
@@ -92,6 +102,20 @@ const NuevoInsumoModal = ({ onCerrar, onCrear, insumo }: NuevoInsumoModalProps) 
               </datalist>
             </label>
           </div>
+          {tipo === "SUSTRATO" && !editando && (
+            <label className="ui-campo">
+              <span>Gramaje (g)</span>
+              <input
+                type="number"
+                min={0}
+                step={1}
+                className="ui-input"
+                placeholder="ej. 135"
+                value={gramaje}
+                onChange={(e) => setGramaje(e.target.value)}
+              />
+            </label>
+          )}
           <div className="ui-grid ui-grid--2">
             <label className="ui-campo">
               <span>Existencia inicial</span>

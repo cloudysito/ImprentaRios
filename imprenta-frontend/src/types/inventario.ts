@@ -21,6 +21,19 @@ export interface InsumoRequest {
   puntoReorden: number;
 }
 
+export interface Material {
+  id: string;
+  nombre: string;
+  gramaje: number;
+  insumoId: string | null;
+}
+
+export interface MaterialRequest {
+  nombre: string;
+  gramaje: number;
+  insumoId: string;
+}
+
 export interface MovimientoRequest {
   tipo: TipoMovimiento;
   cantidad: number;
