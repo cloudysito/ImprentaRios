@@ -22,8 +22,19 @@ public class ArchivoDisenioService implements IArchivoDisenioService {
 
     @Override
     public ArchivoDisenioResponseDTO registrarArchivoDisenio(ArchivoDisenioRequestDTO dto) {
+        ArchivoDisenio archivo = ArchivoDisenioMapper.toEntity(dto);
+        String grupoId = resolverGrupoId(dto.grupoId());
+
+        if (grupoId == null) {
+            archivo.setVersion(1);
+            archivo.setGrupoId(null);
+        } else {
+            archivo.setVersion(siguienteVersion(grupoId));
+            archivo.setGrupoId(grupoId);
+        }
+
         return ArchivoDisenioMapper.toResponse(
-                archivoDisenioRepository.save(ArchivoDisenioMapper.toEntity(dto))
+                archivoDisenioRepository.save(archivo)
         );
     }
 
@@ -49,10 +60,39 @@ public class ArchivoDisenioService implements IArchivoDisenioService {
     @Override
     public void eliminarArchivoDisenio(String id) {
         ArchivoDisenio archivo = obtenerArchivoDisenio(id);
-        if (pedidoRepository.existsByArchivoDisenioId(id)) {
+        if (pedidoRepository.existsByArchivoDisenioId(id)
+                || pedidoRepository.existsByArchivosDisenioIdsContaining(id)) {
             throw new NegocioException(CodigoError.ARCHIVO_DE_DISENIO_EN_USO);
         }
         archivoDisenioRepository.delete(archivo);
+    }
+
+    private String resolverGrupoId(String grupoIdSolicitado) {
+        if (grupoIdSolicitado == null || grupoIdSolicitado.isBlank()) {
+            return null;
+        }
+        return archivoDisenioRepository.findById(grupoIdSolicitado)
+                .map(raiz -> raiz.getGrupoId() == null ? raiz.getId() : raiz.getGrupoId())
+                .orElseGet(() -> {
+                    if (archivoDisenioRepository.findByGrupoId(grupoIdSolicitado).isEmpty()) {
+                        throw new NegocioException(CodigoError.ARCHIVO_DE_DISENIO_NO_ENCONTRADO);
+                    }
+                    return grupoIdSolicitado;
+                });
+    }
+
+    private int siguienteVersion(String grupoId) {
+        int mayor = archivoDisenioRepository.findById(grupoId)
+                .map(archivo -> archivo.getVersion() == null ? 1 : archivo.getVersion())
+                .orElse(0);
+
+        for (ArchivoDisenio version : archivoDisenioRepository.findByGrupoId(grupoId)) {
+            if (version.getVersion() != null) {
+                mayor = Math.max(mayor, version.getVersion());
+            }
+        }
+
+        return mayor + 1;
     }
 
     private ArchivoDisenio obtenerArchivoDisenio(String id) {

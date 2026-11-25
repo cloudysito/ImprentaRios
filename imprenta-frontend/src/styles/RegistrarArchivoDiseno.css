@@ -293,6 +293,13 @@
     color: #333;
 }
 
+.registrar-disenio-container .history-note {
+    margin: 0 0 1rem;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    color: #555;
+}
+
 .registrar-disenio-container .action-buttons {
     display: flex;
     flex-direction: column;

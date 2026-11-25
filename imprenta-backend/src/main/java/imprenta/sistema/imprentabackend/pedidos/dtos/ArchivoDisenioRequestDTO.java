@@ -43,7 +43,10 @@ public record ArchivoDisenioRequestDTO(
 
         @NotNull(message = "La versión es obligatoria")
         @Min(value = 1, message = "La versión debe ser mayor que cero")
-        Integer version
+        Integer version,
+
+        @NotNull(message = "El ID del pedido es obligatorio")
+        String grupoId
 ) {
         @AssertTrue(message = "La fecha de entrega no puede ser anterior a la de recepción")
         public boolean isRangoFechasValido() {

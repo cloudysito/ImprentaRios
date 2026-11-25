@@ -25,4 +25,5 @@ public class ArchivoDisenio {
     private Integer caras;
     private String prensa;
     private Integer version;
+    private String grupoId;
 }
