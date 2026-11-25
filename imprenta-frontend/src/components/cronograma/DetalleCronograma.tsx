@@ -16,6 +16,7 @@ interface DetalleCronogramaProps {
     cargando: boolean;
     guardando: boolean;
     error: string | null;
+    onReintentar: () => void;
     onGenerar: (empleadoId: string) => Promise<CronogramaDetalle | null>;
     onEliminar: () => Promise<CronogramaDetalle | null>;
 }
@@ -25,6 +26,7 @@ const DetalleCronograma = ({
                                cargando,
                                guardando,
                                error,
+                               onReintentar,
                                onGenerar,
                                onEliminar,
                            }: DetalleCronogramaProps) => {
@@ -67,7 +69,14 @@ const DetalleCronograma = ({
     if (cargando || !detalle) {
         return (
             <aside className="detalle-folio detalle-folio--vacio">
-                {cargando ? <Cargando /> : "Selecciona un pedido para generar su cronograma"}
+                {cargando ? <Cargando /> : error ? (
+                    <div className="detalle-folio__estado-error" role="alert">
+                        <p>{error}</p>
+                        <button type="button" className="detalle-folio__btn detalle-folio__btn--primario" onClick={onReintentar}>
+                            Reintentar
+                        </button>
+                    </div>
+                ) : "Selecciona un pedido para generar su cronograma"}
             </aside>
         );
     }

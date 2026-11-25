@@ -13,6 +13,7 @@ interface Resultado {
 export function useDetallePedido(id: string | null) {
   const [resultado, setResultado] = useState<Resultado | null>(null);
   const [guardando, setGuardando] = useState(false);
+  const [intentoCarga, setIntentoCarga] = useState(0);
 
   // Cada vez que cambia el id seleccionado, se pide su detalle
   useEffect(() => {
@@ -24,20 +25,30 @@ export function useDetallePedido(id: string | null) {
       .then((data) => {
         if (!cancelado) setResultado({ id, detalle: data, error: null });
       })
-      .catch(() => {
-        if (!cancelado) setResultado({ id, detalle: null, error: "No se pudo cargar el folio" });
+      .catch((err) => {
+        if (!cancelado) {
+          setResultado({
+            id,
+            detalle: null,
+            error: mensajeDeError(err, "No se pudo cargar el folio"),
+          });
+        }
       });
 
     return () => {
       cancelado = true;
     };
-  }, [id]);
+  }, [id, intentoCarga]);
 
   // Todo esto se calcula, no se guarda en estado
   const vigente = resultado && resultado.id === id ? resultado : null;
   const cargando = id !== null && vigente === null;
   const detalle = vigente?.detalle ?? null;
   const error = vigente?.error ?? null;
+  const reintentar = () => {
+    setResultado(null);
+    setIntentoCarga((intento) => intento + 1);
+  };
 
   const cambiarEstado = async (estado: EstadoPedido) => {
     if (!id) return null;
@@ -58,5 +69,5 @@ export function useDetallePedido(id: string | null) {
     }
   };
 
-  return { detalle, cargando, guardando, error, cambiarEstado };
+  return { detalle, cargando, guardando, error, cambiarEstado, reintentar };
 }

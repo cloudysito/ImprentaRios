@@ -8,9 +8,11 @@ import { Cargando } from "../Cargando";
 interface DetalleSeleccionadoProps {
     detalle: PedidoDetalle | null;
     cargando: boolean;
+    error: string | null;
+    onReintentar: () => void;
 }
 
-const DetalleSeleccionado = ({ detalle, cargando }: DetalleSeleccionadoProps) => {
+const DetalleSeleccionado = ({ detalle, cargando, error, onReintentar }: DetalleSeleccionadoProps) => {
     const porcentaje =
         detalle && detalle.piezas > 0
             ? Math.min(100, Math.round((detalle.piezasTerminadas / detalle.piezas) * 100))
@@ -22,7 +24,14 @@ const DetalleSeleccionado = ({ detalle, cargando }: DetalleSeleccionadoProps) =>
             {cargando || !detalle ? (
                 cargando
                     ? <Cargando />
-                    : <p className="cons-vacio">Selecciona un pedido del cronograma.</p>
+                    : error ? (
+                        <div className="cg-detalle__error" role="alert">
+                            <p>{error}</p>
+                            <button type="button" className="cons-boton" onClick={onReintentar}>
+                                Reintentar
+                            </button>
+                        </div>
+                    ) : <p className="cons-vacio">Selecciona un pedido del cronograma.</p>
             ) : (
                 <>
                     <p className="cg-detalle__folio">{detalle.folio}</p>

@@ -4,6 +4,7 @@ import { useDatosConsulta } from "./useDatosConsulta";
 import { aFecha } from "../utils/fechas";
 import { construirFilas } from "../utils/consulta";
 import { descargarCsv } from "../utils/exportarCsv";
+import { mensajeDeError } from "../utils/errores";
 import {
     aInputFecha,
     cubreDia,
@@ -37,6 +38,8 @@ export function useConsultarCronograma() {
     const [idElegido, setIdElegido] = useState<string | null>(null);
     const [detalle, setDetalle] = useState<PedidoDetalle | null>(null);
     const [cargandoDetalle, setCargandoDetalle] = useState(false);
+    const [errorDetalle, setErrorDetalle] = useState<string | null>(null);
+    const [intentoCargaDetalle, setIntentoCargaDetalle] = useState(0);
 
     const setVista = (nueva: VistaCronograma) => {
         setVistaInterna(nueva);
@@ -101,17 +104,24 @@ export function useConsultarCronograma() {
     useEffect(() => {
         if (!seleccionadoId) {
             setDetalle(null);
+            setErrorDetalle(null);
+            setCargandoDetalle(false);
             return;
         }
         let cancelado = false;
+        setDetalle(null);
+        setErrorDetalle(null);
         setCargandoDetalle(true);
         pedidosService
             .obtener(seleccionadoId)
             .then((d) => {
                 if (!cancelado) setDetalle(d);
             })
-            .catch(() => {
-                if (!cancelado) setDetalle(null);
+            .catch((err) => {
+                if (!cancelado) {
+                    setDetalle(null);
+                    setErrorDetalle(mensajeDeError(err, "No se pudo cargar el detalle del pedido"));
+                }
             })
             .finally(() => {
                 if (!cancelado) setCargandoDetalle(false);
@@ -119,7 +129,14 @@ export function useConsultarCronograma() {
         return () => {
             cancelado = true;
         };
-    }, [seleccionadoId]);
+    }, [seleccionadoId, intentoCargaDetalle]);
+
+    const reintentarDetalle = () => {
+        setDetalle(null);
+        setErrorDetalle(null);
+        setCargandoDetalle(true);
+        setIntentoCargaDetalle((intento) => intento + 1);
+    };
 
     // La fila seleccionada en producción muestra su avance: "En producción · 62 %"
     const filas = useMemo<FilaCronograma[]>(
@@ -161,6 +178,8 @@ export function useConsultarCronograma() {
         seleccionar,
         detalle,
         cargandoDetalle,
+        errorDetalle,
+        reintentarDetalle,
         exportar,
         rangoInvalido,
         cargando,

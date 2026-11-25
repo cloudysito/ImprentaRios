@@ -83,6 +83,7 @@ const GestionarPedidosPage = () => {
         cargando={folio.cargando}
         guardando={folio.guardando}
         error={folio.error}
+        onReintentar={folio.reintentar}
         onMarcarEntregado={handleMarcarEntregado}
         onCancelarPedido={handleCancelarPedido}
       />

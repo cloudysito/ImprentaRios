@@ -61,7 +61,12 @@ const ConsultarCronograma = () => {
 
       <aside className="cg-lateral">
         <ResumenPeriodo resumen={c.resumen} />
-        <DetalleSeleccionado detalle={c.detalle} cargando={c.cargandoDetalle} />
+        <DetalleSeleccionado
+          detalle={c.detalle}
+          cargando={c.cargandoDetalle}
+          error={c.errorDetalle}
+          onReintentar={c.reintentarDetalle}
+        />
         <AvisoSoloConsulta texto="Los filtros cambian lo que se muestra, nunca el cronograma publicado por el Dueño." />
       </aside>
     </div>

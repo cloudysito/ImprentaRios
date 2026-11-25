@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import "../styles/RegistrarArchivoDiseno.css";
 import { registrarArchivoDisenio } from "../services/archivoDisenioService";
 import { hoyISO } from "../utils/fechas";
@@ -9,6 +9,8 @@ const TAMANO_MAXIMO_MB = 200;
 
 const RegistrarDisenio: React.FC = () => {
   const [archivo, setArchivo] = useState<File | null>(null);
+  const [urlVistaPrevia, setUrlVistaPrevia] = useState<string | null>(null);
+  const urlVistaPreviaRef = useRef<string | null>(null);
   const [mensaje, setMensaje] = useState("");
   const [guardando, setGuardando] = useState(false);
   const [formulario, setFormulario] = useState({
@@ -21,6 +23,17 @@ const RegistrarDisenio: React.FC = () => {
     caras: 2,
     prensa: "Offset",
   });
+
+  useEffect(() => () => {
+    if (urlVistaPreviaRef.current) URL.revokeObjectURL(urlVistaPreviaRef.current);
+  }, []);
+
+  const seleccionarArchivo = (nuevoArchivo: File | null) => {
+    if (urlVistaPreviaRef.current) URL.revokeObjectURL(urlVistaPreviaRef.current);
+    urlVistaPreviaRef.current = nuevoArchivo ? URL.createObjectURL(nuevoArchivo) : null;
+    setUrlVistaPrevia(urlVistaPreviaRef.current);
+    setArchivo(nuevoArchivo);
+  };
 
   const actualizar = (campo: keyof typeof formulario, valor: string) => {
     setFormulario((actual) => ({
@@ -55,6 +68,7 @@ const RegistrarDisenio: React.FC = () => {
 
   const punto = archivo ? archivo.name.lastIndexOf(".") : -1;
   const extension = archivo && punto >= 0 ? archivo.name.slice(punto).toLowerCase() : "";
+  const puedePrevisualizar = extension === ".pdf" || extension === ".jpg" || extension === ".jpeg";
   const verificaciones: { ok: boolean; texto: string }[] = [
     !archivo
         ? { ok: false, texto: "Aún no seleccionas un archivo" }
@@ -171,7 +185,7 @@ const RegistrarDisenio: React.FC = () => {
                 hidden
                 type="file"
                 accept=".pdf,.jpg,.jpeg,.cdr"
-                onChange={(e) => setArchivo(e.target.files?.[0] ?? null)}
+                onChange={(e) => seleccionarArchivo(e.target.files?.[0] ?? null)}
               />
               <button
                 className="btn-secondary outline"
@@ -280,8 +294,23 @@ const RegistrarDisenio: React.FC = () => {
         <aside className="summary-sidebar">
           <div className="summary-card">
             <h3>VISTA PREVIA</h3>
-            <div className="preview-box">
-              <p>Aquí verás la primera cara de tu archivo</p>
+            <div className={`preview-box${extension === ".pdf" ? " preview-box--pdf" : ""}`}>
+              {!archivo ? (
+                <p>Selecciona un archivo para generar la vista previa.</p>
+              ) : extension === ".cdr" ? (
+                <p>No se puede generar una vista previa para archivos CDR.</p>
+              ) : puedePrevisualizar && urlVistaPrevia && extension === ".pdf" ? (
+                <object data={urlVistaPrevia} type="application/pdf" aria-label={`Vista previa de ${archivo.name}`}>
+                  <p>
+                    No se pudo mostrar el PDF en este navegador.{" "}
+                    <a href={urlVistaPrevia} target="_blank" rel="noreferrer">Abrir PDF</a>
+                  </p>
+                </object>
+              ) : puedePrevisualizar && urlVistaPrevia ? (
+                <img src={urlVistaPrevia} alt={`Vista previa de ${archivo.name}`} />
+              ) : (
+                <p>No se puede generar una vista previa para este formato.</p>
+              )}
             </div>
           </div>
           <div className="summary-card">
