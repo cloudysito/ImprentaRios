@@ -10,6 +10,7 @@ export function usePedidos() {
   const [busqueda, setBusqueda] = useState("");
   const [filtro, setFiltro] = useState<FiltroEstado>("TODOS");
   const [idElegido, setIdElegido] = useState<string | null>(null);
+  const [soloVencidos, setSoloVencidos] = useState(false);
 
   // 1. Cargar la lista una sola vez, al entrar a la página
   useEffect(() => {
@@ -39,6 +40,9 @@ export function usePedidos() {
     return resultado;
   }, [pedidos]);
 
+  // Alerta de atraso: pedidos con la entrega pasada que siguen sin terminar
+  const totalVencidos = useMemo(() => pedidos.filter((p) => p.vencido).length, [pedidos]);
+
   // 3. Los pedidos que se ven, después de aplicar filtro y búsqueda
   const pedidosVisibles = useMemo(() => {
     const texto = busqueda.trim().toLowerCase();
@@ -48,16 +52,22 @@ export function usePedidos() {
         texto === "" ||
         p.folio.toLowerCase().includes(texto) ||
         p.clienteNombre.toLowerCase().includes(texto);
-      return pasaFiltro && pasaBusqueda;
+      return pasaFiltro && pasaBusqueda && (!soloVencidos || p.vencido);
     });
-  }, [pedidos, busqueda, filtro]);
+  }, [pedidos, busqueda, filtro, soloVencidos]);
 
   // 4. Si nadie ha elegido un folio, se selecciona el primero visible
   const seleccionadoId = idElegido ?? pedidosVisibles[0]?.id ?? null;
 
   // 5. Actualiza una fila sin volver a pedir toda la lista
   const actualizarEstado = (id: string, estado: EstadoPedido) => {
-    setPedidos((prev) => prev.map((p) => (p.id === id ? { ...p, estado } : p)));
+    // Un pedido terminado, entregado o cancelado deja de estar vencido
+    const cerrado = estado === "TERMINADO" || estado === "ENTREGADO" || estado === "CANCELADO";
+    setPedidos((prev) =>
+      prev.map((p) =>
+        p.id === id ? { ...p, estado, ...(cerrado ? { vencido: false, diasAtraso: 0 } : {}) } : p,
+      ),
+    );
   };
 
   // 6. Al quitar el folio seleccionado, se muestra el primero visible
@@ -69,6 +79,9 @@ export function usePedidos() {
   return {
     pedidosVisibles,
     conteos,
+    totalVencidos,
+    soloVencidos,
+    alternarSoloVencidos: () => setSoloVencidos((v) => !v),
     cargando,
     error,
     busqueda,

@@ -1,4 +1,5 @@
 // Utilidades de fechas para las pantallas de consulta (todo en hora local)
+import { nombreMes } from "./fechas";
 const MESES = ["ene", "feb", "mar", "abr", "may", "jun", "jul", "ago", "sep", "oct", "nov", "dic"];
 const DIAS = ["DOM", "LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB"];
 
@@ -31,6 +32,23 @@ export const rangoDeDias = (desde: Date, cantidad: number) =>
 
 export const primerDiaDelMes = (f: Date) => new Date(f.getFullYear(), f.getMonth(), 1);
 export const ultimoDiaDelMes = (f: Date) => new Date(f.getFullYear(), f.getMonth() + 1, 0);
+
+// Días que se pintan en la vista Mes: semanas de lunes a sábado que cubren todo el mes
+export const diasDelMes = (f: Date) => {
+    const ultimo = ultimoDiaDelMes(f);
+    const dias: Date[] = [];
+    for (let lunes = lunesDeLaSemana(primerDiaDelMes(f)); lunes <= ultimo; lunes = sumarDias(lunes, 7)) {
+        dias.push(...rangoDeDias(lunes, 6));
+    }
+    return dias;
+};
+
+export const sumarMeses = (f: Date, n: number) => new Date(f.getFullYear(), f.getMonth() + n, 1);
+
+export const etiquetaMes = (f: Date) => {
+    const mes = nombreMes(f);
+    return `${mes.charAt(0).toUpperCase()}${mes.slice(1)} ${f.getFullYear()}`;
+};
 
 // Formato de <input type="date">: "2026-09-23"
 export const aInputFecha = (f: Date) => `${f.getFullYear()}-${dos(f.getMonth() + 1)}-${dos(f.getDate())}`;

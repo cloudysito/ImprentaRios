@@ -1,5 +1,7 @@
 .pedidos-tabla {
-    overflow-x: auto; /* en pantallas chicas la tabla se desplaza, no se rompe */
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
     border-radius: 14px;
     background: #fff;
     box-shadow: 0 1px 2px rgba(28, 25, 22, 0.05);
@@ -13,6 +15,8 @@
 }
 
 .pedidos-tabla th {
+    position: relative;
+    z-index: 1;
     padding: 14px 12px;
     background: #faf9f6;
     font-size: 11px;
@@ -40,6 +44,21 @@
     white-space: nowrap;
 }
 
+.pedidos-tabla th:first-child,
+.pedidos-tabla td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+}
+
+.pedidos-tabla th:first-child {
+    background: #faf9f6;
+}
+
+.pedidos-tabla td:first-child {
+    background: #fff;
+}
+
 .pedidos-tabla tbody tr {
     cursor: pointer;
     transition: background 0.12s;
@@ -55,7 +74,12 @@
 }
 
 .pedidos-tabla tbody tr.is-selected td:first-child {
+    background: #fbf3ee;
     box-shadow: inset 3px 0 0 #a63d30;
+}
+
+.pedidos-tabla tbody tr:hover td:first-child {
+    background: #faf8f5;
 }
 
 .pedidos-tabla tbody tr:focus-visible {
@@ -69,3 +93,48 @@
     color: #6f6a63;
     cursor: default;
 }
+
+/* ---------- Alertas de atraso ---------- */
+.pedidos-tabla tbody tr.is-vencido { background: #fdf3f1; }
+.pedidos-tabla tbody tr.is-vencido:hover { background: #fbe9e5; }
+.pedidos-tabla tbody tr.is-vencido td:first-child { box-shadow: inset 3px 0 0 #c4493a; }
+.pedidos-tabla tbody tr.is-vencido.is-selected td:first-child { box-shadow: inset 3px 0 0 #a63d30; }
+
+.pedidos-tabla__atraso {
+    display: inline-block;
+    margin-left: 8px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #fbe7e3;
+    color: #a63d30;
+    font-size: 11.5px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.alerta-atrasos {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 12px;
+    padding: 12px 14px;
+    border: 1px solid #f0c9c2;
+    border-radius: 12px;
+    background: #fdf3f1;
+    color: #a63d30;
+    font-size: 13.5px;
+    font-weight: 500;
+}
+.alerta-atrasos > span { flex: 1; }
+.alerta-atrasos__boton {
+    padding: 6px 12px;
+    border: 1px solid #c4493a;
+    border-radius: 8px;
+    background: #fff;
+    font: inherit;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: #a63d30;
+    cursor: pointer;
+}
+.alerta-atrasos__boton[aria-pressed="true"] { background: #a63d30; color: #fff; }

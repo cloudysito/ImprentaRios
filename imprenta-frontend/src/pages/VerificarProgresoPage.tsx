@@ -5,7 +5,6 @@ import { useTaller } from "../hooks/useTaller";
 import { horaMinutos } from "../utils/fechas";
 import "../styles/UI.css";
 import "../styles/VerificarProgreso.css";
-import { Cargando } from "../components/Cargando";
 
 const VerificarProgresoPage = () => {
   const taller = useTaller();
@@ -15,16 +14,22 @@ const VerificarProgresoPage = () => {
     <div className="taller">
       <section className="taller__lista">
         {taller.inicioTurno && (
-          <span className="taller__turno">Turno activo desde las {horaMinutos(taller.inicioTurno)}</span>
+          <span className="taller__turno">
+            Turno activo desde las {horaMinutos(taller.inicioTurno)}
+          </span>
         )}
-        <span className="ui-eyebrow taller__titulo-lista">Mis asignaciones de hoy</span>
+        <span className="ui-eyebrow taller__titulo-lista">
+          Mis asignaciones de hoy
+        </span>
 
         {taller.cargando ? (
-          <Cargando />
+          <p className="ui-vacio">Cargando asignaciones…</p>
         ) : taller.error ? (
           <p className="ui-error">{taller.error}</p>
         ) : taller.asignaciones.length === 0 ? (
-          <p className="ui-card ui-vacio">No tienes trabajos asignados para hoy.</p>
+          <p className="ui-card ui-vacio">
+            No tienes trabajos asignados para hoy.
+          </p>
         ) : (
           taller.asignaciones.map((a) => (
             <AsignacionCard
@@ -49,7 +54,11 @@ const VerificarProgresoPage = () => {
             />
           </>
         ) : (
-          !taller.cargando && <p className="ui-card ui-vacio">Cuando tengas una asignación, aquí podrás reportar su avance.</p>
+          !taller.cargando && (
+            <p className="ui-card ui-vacio">
+              Cuando tengas una asignación, aquí podrás reportar su avance.
+            </p>
+          )
         )}
       </section>
     </div>

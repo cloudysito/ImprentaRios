@@ -57,6 +57,8 @@
 
 .stock-tabla {
     overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
 }
 
 .stock-tabla table {
@@ -64,6 +66,19 @@
     min-width: 600px;
     border-collapse: collapse;
     font-size: 13.5px;
+}
+
+.stock-tabla th:first-child,
+.stock-tabla td:first-child {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: #fff;
+}
+
+.stock-tabla th:first-child {
+    z-index: 2;
+    background: #faf9f6;
 }
 
 .stock-tabla th {
@@ -161,4 +176,29 @@
     .stock-kpis {
         grid-template-columns: 1fr;
     }
+}
+
+/* ---------- Reporte de merma ---------- */
+.reporte-merma {
+    padding: 20px;
+    border-radius: 14px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(28, 25, 22, 0.05);
+}
+.reporte-merma__vacio { font-size: 13px; color: #8a837a; }
+.reporte-merma__kpis { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 12px 0 16px; }
+.reporte-merma__kpis > div { display: flex; flex-direction: column; gap: 2px; padding: 12px; border-radius: 10px; background: #faf8f4; }
+.reporte-merma__kpis span { font-size: 12px; color: #6f6a63; }
+.reporte-merma__kpis strong { font-size: 20px; color: #1c1916; }
+.reporte-merma__kpis .is-alto { background: #fdf3f1; }
+.reporte-merma__kpis .is-alto strong { color: #a63d30; }
+.reporte-merma__tablas { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px; }
+.reporte-merma table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.reporte-merma caption { padding-bottom: 6px; text-align: left; font-size: 12px; font-weight: 600; color: #6f6a63; }
+.reporte-merma th { padding: 6px 4px; text-align: left; font-size: 11px; font-weight: 600; color: #6f6a63; }
+.reporte-merma td { padding: 7px 4px; border-top: 1px solid #efebe5; }
+.reporte-merma .is-num { text-align: right; }
+.reporte-merma tr.is-alto td { color: #a63d30; font-weight: 600; }
+@media (max-width: 900px) {
+    .reporte-merma__tablas { grid-template-columns: 1fr; }
 }

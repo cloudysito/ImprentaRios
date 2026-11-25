@@ -1,4 +1,4 @@
-import {useEffect, useState} from "react";
+import {useEffect, useRef, useState} from "react";
 import type {FormEvent} from "react";
 import {useNavigate, useParams} from "react-router-dom";
 import "../styles/CapturarPedido.css";
@@ -21,6 +21,20 @@ const CapturarPedido = () => {
     const navigate = useNavigate();
     const {id} = useParams();
     const editando = Boolean(id);
+    const formularioRef = useRef<HTMLFormElement>(null);
+
+    useEffect(() => {
+        const cerrarAlHacerClickFuera = (event: PointerEvent) => {
+            formularioRef.current
+                ?.querySelectorAll<HTMLDetailsElement>(".archivo-dropdown[open]")
+                .forEach((dropdown) => {
+                    if (!dropdown.contains(event.target as Node)) dropdown.open = false;
+                });
+        };
+
+        document.addEventListener("pointerdown", cerrarAlHacerClickFuera);
+        return () => document.removeEventListener("pointerdown", cerrarAlHacerClickFuera);
+    }, []);
 
     const {
         tipos,
@@ -28,7 +42,7 @@ const CapturarPedido = () => {
         archivos,
         cargando,
         error: errorCatalogos,
-    } = useCatalogosPedido();
+    } = useCatalogosPedido(id);
 
     const [cliente, setCliente] = useState({
         nombre: "",
@@ -46,11 +60,13 @@ const CapturarPedido = () => {
     ]);
 
     // El backend actual maneja un solo archivo de diseño.
-    const [archivosDisenioIds, setArchivosDisenioIds] = useState<string[]>([]);
+    const [archivosPorProducto, setArchivosPorProducto] = useState<string[][]>([[]]);
 
     const [enviando, setEnviando] = useState(false);
     const [error, setError] = useState("");
     const [folio, setFolio] = useState("");
+    // Material que falta: el pedido se registró pero queda pendiente hasta que alcance el inventario
+    const [avisosInventario, setAvisosInventario] = useState<string[]>([]);
 
     // Datos necesarios para editar un pedido.
     const [clienteId, setClienteId] = useState("");
@@ -129,19 +145,28 @@ const CapturarPedido = () => {
                     fechaEntrega: pedido.fechaEntrega.slice(0, 16),
                 });
 
-                setArchivosDisenioIds(pedido.archivosDisenioIds ?? []);
-
                 setConservar({
                     personaSolicita: pedido.personaSolicita,
                     precioAcordado: pedido.precioAcordado,
                 });
 
-                setProductos(
-                    pedido.productos.map((p) => ({
-                        ...p,
-                        cantidad: String(p.cantidad),
-                        observaciones: p.observaciones ?? "",
-                    })),
+                const productosPedido = pedido.productos.map((p) => ({
+                    ...p,
+                    cantidad: String(p.cantidad),
+                    observaciones: p.observaciones ?? "",
+                }));
+                setProductos(productosPedido);
+                const archivosPorProductoGuardados = productosPedido.map(
+                    (producto) => producto.archivosDisenioIds ?? [],
+                );
+                const tieneArchivosPorProducto = archivosPorProductoGuardados.some((ids) => ids.length > 0);
+                setArchivosPorProducto(
+                    tieneArchivosPorProducto
+                        ? archivosPorProductoGuardados
+                        : [
+                            pedido.archivosDisenioIds ?? [],
+                            ...productosPedido.slice(1).map(() => []),
+                        ],
                 );
 
                 setFolioEdicion(pedido.folio);
@@ -177,14 +202,69 @@ const CapturarPedido = () => {
 
     const agregarProducto = () => {
         setProductos((prev) => [...prev, productoVacio()]);
+        setArchivosPorProducto((prev) => [...prev, []]);
     };
 
     const quitarProducto = (i: number) => {
         setProductos((prev) => prev.filter((_, idx) => idx !== i));
+        setArchivosPorProducto((prev) => prev.filter((_, idx) => idx !== i));
+    };
+
+    const REGEX_CORREO = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const REGEX_TELEFONO = /^[0-9+()\s-]{7,15}$/;
+    const REGEX_MEDIDA = /^\d+([.,]\d+)?\s*[xX×]\s*\d+([.,]\d+)?(\s*(cm|mm|m|in|pulg))?$/i;
+
+    const validar = (): string | null => {
+        if (editando || !clienteExistenteId) {
+            const nombre = cliente.nombre.trim();
+            if (!nombre) return "Escribe el nombre del cliente";
+            if (nombre.length > 100) return "El nombre del cliente no puede superar 100 caracteres";
+            if (!cliente.telefono.trim()) return "Escribe un teléfono de contacto";
+            if (!REGEX_TELEFONO.test(cliente.telefono.trim())) {
+                return "El teléfono no es válido (solo números, de 7 a 15 caracteres)";
+            }
+            if (!cliente.correo.trim()) return "Escribe el correo electrónico";
+            if (!REGEX_CORREO.test(cliente.correo.trim())) return "El correo no es válido";
+            if (cliente.correo.trim().length > 100) return "El correo no puede superar 100 caracteres";
+        }
+
+        const proyectoNombre = proyecto.nombreProyecto.trim();
+        if (proyectoNombre.length < 3) return "El nombre del proyecto debe tener al menos 3 caracteres";
+        if (proyectoNombre.length > 150) return "El nombre del proyecto no puede superar 150 caracteres";
+
+        if (!proyecto.fechaEntrega) return "Elige la fecha de entrega";
+        if (!editando && new Date(proyecto.fechaEntrega) <= new Date()) {
+            return "La fecha de entrega debe ser posterior a este momento";
+        }
+
+        if (productos.length === 0) return "Agrega al menos un producto";
+        for (let i = 0; i < productos.length; i++) {
+            const p = productos[i];
+            const n = `Producto ${i + 1}`;
+            if (!p.tipoProductoId) return `${n}: Elige el tipo de producto`;
+            const cantidad = Number(p.cantidad);
+            if (!p.cantidad || !Number.isInteger(cantidad) || cantidad < 1) {
+                return `${n}: La cantidad debe ser un número entero mayor a 0`;
+            }
+            if (!p.materialId) return `${n}: Elige el material`;
+            if (!p.medidas.trim()) return `${n}: Escribe la medida final`;
+            if (p.medidas.trim().length > 30) return `${n}: La medida no puede superar 30 caracteres`;
+            if (!REGEX_MEDIDA.test(p.medidas.trim())) return `${n}: La medida debe verse así: 21.5 x 14 cm`;
+            const numeros = p.medidas.match(/\d+([.,]\d+)?/g) ?? [];
+            if (numeros.some((x) => Number(x.replace(",", ".")) <= 0)) return `${n}: Las medidas deben ser mayores a 0`;
+            if (!p.tinta) return `${n}: Elige las tintas`;
+            if (p.observaciones.length > 500) return `${n}: Las observaciones no pueden superar 500 caracteres`;
+        }
+        return null;
     };
 
     const enviar = async (e: FormEvent) => {
         e.preventDefault();
+        const errorValidacion = validar();
+        if (errorValidacion) {
+            setError(errorValidacion);
+            return;
+        }
         setError("");
         setEnviando(true);
 
@@ -192,23 +272,30 @@ const CapturarPedido = () => {
             const datosPedido = {
                 nombreProyecto: proyecto.nombreProyecto,
                 fechaEntrega: proyecto.fechaEntrega,
-                productos: productos.map((p) => ({
+                productos: productos.map((p, indice) => ({
                     ...p,
                     cantidad: Number(p.cantidad),
+                    archivosDisenioIds: archivosPorProducto[indice] ?? [],
                 })),
-                archivosDisenioIds,
+                archivosDisenioIds: [...new Set(archivosPorProducto.flat())],
             };
 
             // Actualizar un pedido existente.
             if (id) {
                 await capturaService.actualizarCliente(clienteId, cliente);
 
-                await capturaService.actualizarPedido(id, {
+                const actualizado = await capturaService.actualizarPedido(id, {
                     ...datosPedido,
                     clienteId,
                     ...conservar,
                 });
 
+                // Si todavía falta material se quedan los avisos en pantalla; si no, se regresa a la lista
+                if (actualizado.avisosInventario?.length) {
+                    setAvisosInventario(actualizado.avisosInventario);
+                    setFolio(folioEdicion);
+                    return;
+                }
                 navigate("/pedidos");
                 return;
             }
@@ -237,6 +324,7 @@ const CapturarPedido = () => {
             });
 
             setFolio(pedido.folio);
+            setAvisosInventario(pedido.avisosInventario ?? []);
         } catch (err) {
             setError(
                 mensajeDeError(
@@ -279,7 +367,7 @@ const CapturarPedido = () => {
     );
 
     return (
-        <form className="capturar-pedido-container" onSubmit={enviar}>
+        <form ref={formularioRef} className="capturar-pedido-container" noValidate onSubmit={enviar}>
             <div className="content-grid">
                 <section className="form-card">
                     <div className="section-header">
@@ -328,14 +416,25 @@ const CapturarPedido = () => {
                     {!editando && clienteExistenteId ? (
                         <div className="cliente-seleccionado">
                             <strong>
-                                {clienteSeleccionado?.nombre ?? "Cliente seleccionado"}
+                                Nombre del cliente o razón social:
                             </strong>
-
+                            <p></p>
+                            <label>
+                                {clienteSeleccionado?.nombre ?? "Cliente seleccionado"}
+                            </label>
+                            <p></p>
+                            <strong>
+                                Teléfono de contacto:
+                            </strong>
+                            <p></p>
                             <span>{clienteSeleccionado?.telefono}</span>
-
-                            <span>
-                {clienteSeleccionado?.correo || "Sin correo registrado"}
-              </span>
+                            <p></p>
+                            <strong>
+                                Correo electrónico:
+                            </strong>
+                            <p></p>
+                            <p></p>
+                            <span> {clienteSeleccionado?.correo || "Sin correo registrado"} </span>
                         </div>
                     ) : (
                         <>
@@ -454,29 +553,6 @@ const CapturarPedido = () => {
                         </div>
                     </div>
 
-                    <div className="form-row">
-                        <div className="form-group full-width">
-                            <label htmlFor="archivos-disenio">Archivos de diseño</label>
-
-                            <div className="archivo-fila">
-                                <select
-                                    id="archivos-disenio"
-                                    multiple
-                                    value={archivosDisenioIds}
-                                    onChange={(e) => setArchivosDisenioIds(
-                                        Array.from(e.target.selectedOptions, (option) => option.value),
-                                    )}
-                                >
-                                    {(Array.isArray(archivos) ? archivos : []).map((a) => (
-                                        <option key={a.id} value={a.id}>
-                                            {a.nombreArchivo} (v{a.version ?? 1})
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
                     {productos.map((p, i) => (
                         <div className="producto-bloque" key={i}>
                             <h2 className="section-title">
@@ -547,11 +623,120 @@ const CapturarPedido = () => {
 
                                         {materiales.map((m) => (
                                             <option key={m.id} value={m.id}>
-                                                {m.nombre} ({m.gramaje} g)
+                                                {m.nombre}
+                                                {m.gramaje > 0 ? ` (${m.gramaje} g)` : ""}
                                             </option>
                                         ))}
                                     </select>
                                 </div>
+                            </div>
+
+                            <div className="form-group full-width producto-archivo">
+                                <label htmlFor={`archivo-disenio-producto-${i}`}>
+                                    Archivo(s) de diseño para este producto
+                                </label>
+                                {(() => {
+                                    const seleccionados = archivosPorProducto[i] ?? [];
+                                    const disponibles = archivos.filter((archivo) =>
+                                        !archivosPorProducto.some((otros, indice) =>
+                                            indice !== i && otros.includes(archivo.id),
+                                        ),
+                                    );
+                                    const actualizarSeleccion = (archivoId: string) => {
+                                        setArchivosPorProducto((actuales) =>
+                                            actuales.map((actual, indice) => {
+                                                if (indice !== i) return actual;
+                                                return actual.includes(archivoId)
+                                                    ? actual.filter((idArchivo) => idArchivo !== archivoId)
+                                                    : [...actual, archivoId];
+                                            }),
+                                        );
+                                    };
+
+                                    return (
+                                        <>
+                                            <details
+                                                className="archivo-dropdown"
+                                                id={`archivo-disenio-producto-${i}`}
+                                            >
+                                                <summary
+                                                    className={`archivo-dropdown__trigger${seleccionados.length ? " is-selected" : ""}`}
+                                                    aria-label={`Seleccionar archivos de diseño para el producto ${i + 1}`}
+                                                    aria-disabled={cargando || Boolean(errorCatalogos)}
+                                                    onClick={(e) => {
+                                                        if (cargando || errorCatalogos) e.preventDefault();
+                                                    }}
+                                                >
+                                                    <span>
+                                                        {seleccionados.length
+                                                            ? seleccionados
+                                                                .map((archivoId) => {
+                                                                    const archivo = archivos.find((item) => item.id === archivoId);
+                                                                    return archivo
+                                                                        ? `${archivo.nombreArchivo} (v${archivo.version ?? 1})`
+                                                                        : "Archivo vinculado";
+                                                                })
+                                                                .join(", ")
+                                                            : cargando
+                                                                ? "Cargando archivos..."
+                                                                : "Selecciona archivos de diseño"}
+                                                    </span>
+                                                    <svg viewBox="0 0 20 20" aria-hidden="true">
+                                                        <path d="m5 7.5 5 5 5-5"/>
+                                                    </svg>
+                                                </summary>
+                                                <div
+                                                    className="archivo-dropdown__opciones"
+                                                    role="group"
+                                                    aria-label={`Archivos disponibles para el producto ${i + 1}`}
+                                                >
+                                                    {errorCatalogos ? (
+                                                        <p className="archivo-dropdown__mensaje">
+                                                            No se pudieron cargar los archivos.
+                                                        </p>
+                                                    ) : disponibles.length ? (
+                                                        disponibles.map((archivo) => (
+                                                            <button
+                                                                type="button"
+                                                                className={`archivo-dropdown__opcion${seleccionados.includes(archivo.id) ? " is-selected" : ""}`}
+                                                                key={archivo.id}
+                                                                aria-pressed={seleccionados.includes(archivo.id)}
+                                                                onClick={() => actualizarSeleccion(archivo.id)}
+                                                            >
+                                                                <span>
+                                                                    {archivo.nombreArchivo}
+                                                                    <small>Versión {archivo.version ?? 1}</small>
+                                                                </span>
+                                                            </button>
+                                                        ))
+                                                    ) : (
+                                                        <p className="archivo-dropdown__mensaje">
+                                                            {cargando
+                                                                ? "Cargando archivos..."
+                                                                : "No hay archivos disponibles para este producto."}
+                                                        </p>
+                                                    )}
+                                                    {seleccionados.length > 0 && (
+                                                        <button
+                                                            type="button"
+                                                            className="archivo-dropdown__limpiar"
+                                                            onClick={() => setArchivosPorProducto((actuales) =>
+                                                                actuales.map((actual, indice) => indice === i ? [] : actual),
+                                                            )}
+                                                        >
+                                                            Quitar archivos seleccionados
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </details>
+                                            <small>
+                                                {seleccionados.length
+                                                    ? `${seleccionados.length} archivo${seleccionados.length === 1 ? "" : "s"} seleccionado${seleccionados.length === 1 ? "" : "s"}`
+                                                    : "Los archivos seleccionados en otros productos no aparecerán aquí."}
+                                            </small>
+                                        </>
+                                    );
+                                })()}
                             </div>
 
                             <div className="form-row three-cols">
@@ -672,12 +857,31 @@ const CapturarPedido = () => {
 
                         <span className={folio ? "badge" : "badge draft"}>
                             {folio
-                                ? "Pedido registrado"
+                                ? avisosInventario.length > 0
+                                    ? "Pendiente de material"
+                                    : editando
+                                        ? "Cambios guardados"
+                                        : "Pedido registrado"
                                 : editando
                                     ? "Editando pedido"
                                     : "Sin registrar"}
                         </span>
                     </div>
+
+                    {avisosInventario.length > 0 && (
+                        <div className="aviso-inventario" role="alert">
+                            <strong>No hay material suficiente para este pedido</strong>
+                            <p>
+                                El pedido quedó registrado como pendiente de material y no se descontó nada del
+                                inventario. Se liberará solo cuando entre el material que falta:
+                            </p>
+                            <ul>
+                                {avisosInventario.map((aviso) => (
+                                    <li key={aviso}>{aviso}</li>
+                                ))}
+                            </ul>
+                        </div>
+                    )}
 
                     {errorCatalogos && (
                         <p className="error-text">{errorCatalogos}</p>

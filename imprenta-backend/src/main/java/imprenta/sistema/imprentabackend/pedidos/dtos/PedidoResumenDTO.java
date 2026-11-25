@@ -11,6 +11,9 @@ public record PedidoResumenDTO(
         String producto,
         int piezas,
         LocalDateTime fechaEntrega,
-        EstadoPedido estado
+        EstadoPedido estado,
+        // Entrega ya pasada y el pedido no está terminado, entregado ni cancelado
+        boolean vencido,
+        int diasAtraso
 ) {
 }

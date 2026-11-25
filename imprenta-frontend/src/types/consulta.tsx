@@ -9,6 +9,7 @@ export interface EventoCalendario {
     titulo: string; // "Impresión", "Entrega", "Mantenimiento"
     referencia: string; // folio corto o nombre de la máquina
     responsable?: string | null; // nombre del empleado asignado
+    vencido?: boolean; // el pedido de esta actividad ya pasó su fecha de entrega
     inicio: Date;
     fin: Date;
     estimado?: boolean;
@@ -17,6 +18,7 @@ export interface EventoCalendario {
 export interface ColumnaDia {
     dia: Date;
     esHoy: boolean;
+    fueraDeMes?: boolean;
     eventos: EventoCalendario[];
 }
 
@@ -34,8 +36,15 @@ export interface EntregaProxima {
     fecha: string;
 }
 
+export interface EntregaVencida {
+    id: string;
+    folio: string;
+    cliente: string;
+    diasAtraso: number;
+}
+
 export type FiltrosCalendario = Record<TipoEvento, boolean>;
-export type VistaCalendario = "DIA" | "SEMANA";
+export type VistaCalendario = "DIA" | "SEMANA"| "MES";
 
 // ---------- Cronograma ----------
 export type EstadoBarra =
@@ -57,6 +66,7 @@ export interface FilaCronograma {
     responsable?: string | null; // nombre(s) del encargado
     estado: EstadoBarra;
     etiqueta: string;
+    diasAtraso?: number; // > 0 si el pedido está vencido
     inicio: Date;
     fin: Date;
 }
@@ -67,4 +77,5 @@ export interface ResumenDelPeriodo {
     enDiseno: number;
     entregasSemana: number;
     paros: number;
+    vencidos: number;
 }

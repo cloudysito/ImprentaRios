@@ -92,3 +92,6 @@
 }
 .cons-resumen dt { color: #4a453f; }
 .cons-resumen dd { font-weight: 700; color: #1c1916; }
+
+.cons-resumen > div.is-alerta dt,
+.cons-resumen > div.is-alerta dd { color: #a63d30; }

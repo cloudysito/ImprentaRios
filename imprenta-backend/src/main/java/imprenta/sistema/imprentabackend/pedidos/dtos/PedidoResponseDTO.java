@@ -19,6 +19,8 @@ public record PedidoResponseDTO(
         String empleadoId,
         String personaSolicita,
         BigDecimal precioAcordado,
-        List<String> archivosDisenioIds
+        List<String> archivosDisenioIds,
+        // Material que falta cuando el pedido queda pendiente. Vacío si todo se descontó bien
+        List<String> avisosInventario
 ) {
 }

@@ -33,10 +33,10 @@ const NuevaMaquinaModal = ({ onCerrar, onCrear }: NuevaMaquinaModalProps) => {
     try {
       await onCrear({
         nombre: nombre.trim(),
-        descripcion,
-        numeroSerie,
+        descripcion: descripcion.trim(),
+        numeroSerie: numeroSerie.trim(),
         anioOperacion: nAnio,
-        responsable,
+        responsable: responsable.trim(),
         periodicidadDias: nPeriodicidad,
         horasUso: nHoras,
       });
@@ -59,16 +59,16 @@ const NuevaMaquinaModal = ({ onCerrar, onCrear }: NuevaMaquinaModalProps) => {
       >
         <label className="ui-campo">
           <span>Nombre</span>
-          <input className="ui-input" autoFocus placeholder="ej. Heidelberg GTO 52" value={nombre} onChange={(e) => setNombre(e.target.value)} />
+          <input className="ui-input" maxLength={80} autoFocus placeholder="ej. Heidelberg GTO 52" value={nombre} onChange={(e) => setNombre(e.target.value)} />
         </label>
         <label className="ui-campo">
           <span>Descripción</span>
-          <input className="ui-input" placeholder="ej. Prensa offset · 4 cuerpos" value={descripcion} onChange={(e) => setDescripcion(e.target.value)} />
+          <input className="ui-input" maxLength={120} placeholder="ej. Prensa offset · 4 cuerpos" value={descripcion} onChange={(e) => setDescripcion(e.target.value)} />
         </label>
         <div className="ui-grid ui-grid--2">
           <label className="ui-campo">
             <span>Número de serie</span>
-            <input className="ui-input" value={numeroSerie} onChange={(e) => setNumeroSerie(e.target.value)} />
+            <input className="ui-input" maxLength={40} value={numeroSerie} onChange={(e) => setNumeroSerie(e.target.value)} />
           </label>
           <label className="ui-campo">
             <span>En operación desde (año)</span>
@@ -77,7 +77,7 @@ const NuevaMaquinaModal = ({ onCerrar, onCrear }: NuevaMaquinaModalProps) => {
         </div>
         <label className="ui-campo">
           <span>Responsable</span>
-          <input className="ui-input" value={responsable} onChange={(e) => setResponsable(e.target.value)} />
+          <input className="ui-input" maxLength={80} value={responsable} onChange={(e) => setResponsable(e.target.value)} />
         </label>
         <div className="ui-grid ui-grid--2">
           <label className="ui-campo">

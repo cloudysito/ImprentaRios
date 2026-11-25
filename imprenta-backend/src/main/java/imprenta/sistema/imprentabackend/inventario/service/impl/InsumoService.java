@@ -8,6 +8,7 @@ import imprenta.sistema.imprentabackend.inventario.dtos.MovimientoRequestDTO;
 import imprenta.sistema.imprentabackend.inventario.dtos.MovimientoResponseDTO;
 import imprenta.sistema.imprentabackend.inventario.mapper.InsumoMapper;
 import imprenta.sistema.imprentabackend.inventario.model.Insumo;
+import imprenta.sistema.imprentabackend.inventario.model.InventarioReabastecidoEvent;
 import imprenta.sistema.imprentabackend.inventario.model.MovimientoInventario;
 import imprenta.sistema.imprentabackend.inventario.model.TipoMovimiento;
 import imprenta.sistema.imprentabackend.inventario.repository.InsumoRepository;
@@ -15,6 +16,7 @@ import imprenta.sistema.imprentabackend.inventario.repository.MaterialRepository
 import imprenta.sistema.imprentabackend.inventario.repository.MovimientoInventarioRepository;
 import imprenta.sistema.imprentabackend.inventario.service.IInsumoService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -31,6 +33,7 @@ public class InsumoService implements IInsumoService {
     private final InsumoRepository insumoRepository;
     private final MovimientoInventarioRepository movimientoRepository;
     private final MaterialRepository materialRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public InsumoResponseDTO agregarInsumo(InsumoRequestDTO dto) {
@@ -57,8 +60,13 @@ public class InsumoService implements IInsumoService {
     @Override
     public InsumoResponseDTO actualizarInsumo(String idInsumo, InsumoRequestDTO dto) {
         Insumo insumo = obtenerInsumo(idInsumo);
+        int existenciaAnterior = insumo.getCantidadDisponible();
         InsumoMapper.actualizarEntidad(insumo, dto);
-        return InsumoMapper.toResponse(insumoRepository.save(insumo));
+        Insumo guardado = insumoRepository.save(insumo);
+        if (guardado.getCantidadDisponible() > existenciaAnterior) {
+            eventPublisher.publishEvent(new InventarioReabastecidoEvent(idInsumo));
+        }
+        return InsumoMapper.toResponse(guardado);
     }
 
     @Override
@@ -92,6 +100,10 @@ public class InsumoService implements IInsumoService {
                 null, idInsumo, dto.tipo(), dto.cantidad(), dto.fecha(),
                 dto.motivo().trim(), empleadoId, LocalDateTime.now()));
 
+        // Si entró material, los pedidos que estaban esperando pueden liberarse
+        if (dto.tipo() == TipoMovimiento.ENTRADA) {
+            eventPublisher.publishEvent(new InventarioReabastecidoEvent(idInsumo));
+        }
         return InsumoMapper.toResponse(guardado);
     }
 

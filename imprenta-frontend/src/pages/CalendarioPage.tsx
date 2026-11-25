@@ -1,6 +1,7 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useCalendario } from "../hooks/useCalendario";
-import { formatFechaCorta } from "../utils/formato";
+import { aFecha } from "../utils/fechas";
+import { diaMesCorto } from "../utils/calendario";
 // @ts-ignore
 import "../styles/Calendario.css";
 import { MensajeError } from "../components/MensajeError.tsx";
@@ -17,6 +18,10 @@ const CalendarioPage = () => {
     setFiltroEntregas,
     filtroMantenimiento,
     setFiltroMantenimiento,
+    vista,
+    setVista,
+    etiquetaPeriodo,
+    navegar,
   } = useCalendario();
 
   return (
@@ -24,18 +29,30 @@ const CalendarioPage = () => {
       <div className="calendario-main">
         <div className="calendario-toolbar">
           <div className="calendario-toolbar__top">
-            <div className="calendario-toggle">
-              <button type="button">Día</button>
-              <button type="button" className="is-active">
+            <div className="calendario-toggle" role="group" aria-label="Vista del calendario">
+              <button
+                type="button"
+                className={vista === "DIA" ? "is-active" : ""}
+                aria-pressed={vista === "DIA"}
+                onClick={() => setVista("DIA")}
+              >
+                Día
+              </button>
+              <button
+                type="button"
+                className={vista === "SEMANA" ? "is-active" : ""}
+                aria-pressed={vista === "SEMANA"}
+                onClick={() => setVista("SEMANA")}
+              >
                 Semana
               </button>
             </div>
             <div className="calendario-date-nav">
-              <button type="button">
+              <button type="button" aria-label="Periodo anterior" onClick={() => navegar(-1)}>
                 <ChevronLeft size={18} />
               </button>
-              <span>Semana actual</span>
-              <button type="button">
+              <span>{etiquetaPeriodo}</span>
+              <button type="button" aria-label="Periodo siguiente" onClick={() => navegar(1)}>
                 <ChevronRight size={18} />
               </button>
             </div>
@@ -70,46 +87,48 @@ const CalendarioPage = () => {
           </div>
         </div>
 
-        <div className="calendario-grid calendario-grid--periodo">
-          {cargando && (
-            <div className="calendario-grid__estado">
-              <Cargando />
-            </div>
-          )}
-          {!cargando && error && (
-            <div className="calendario-grid__estado calendario-grid__estado--error">
-              <MensajeError
-                mensaje={error}
-                onReintentar={() => window.location.reload()}
-              />
-            </div>
-          )}
-          {!cargando && !error && actividadesVisibles.length === 0 && (
-            <div className="calendario-grid__estado">
-              No hay actividades registradas en este periodo.
-            </div>
-          )}
-          {!cargando &&
-            !error &&
-            actividadesVisibles.map((act) => {
-              const nombre = act.nombreActividad.toLowerCase();
-              let claseTipo = "produccion";
-              if (nombre.includes("mantenimiento")) claseTipo = "mantenimiento";
-              else if (nombre.includes("entrega")) claseTipo = "entrega";
+        <div className="calendario-grid-scroll" role="region" aria-label="Actividades del calendario" tabIndex={0}>
+          <div className="calendario-grid calendario-grid--periodo">
+            {cargando && (
+              <div className="calendario-grid__estado">
+                <Cargando />
+              </div>
+            )}
+            {!cargando && error && (
+              <div className="calendario-grid__estado calendario-grid__estado--error">
+                <MensajeError
+                  mensaje={error}
+                  onReintentar={() => window.location.reload()}
+                />
+              </div>
+            )}
+            {!cargando && !error && actividadesVisibles.length === 0 && (
+              <div className="calendario-grid__estado">
+                No hay actividades registradas en este periodo.
+              </div>
+            )}
+            {!cargando &&
+              !error &&
+              actividadesVisibles.map((act) => {
+                const nombre = act.nombreActividad.toLowerCase();
+                let claseTipo = "produccion";
+                if (nombre.includes("mantenimiento")) claseTipo = "mantenimiento";
+                else if (nombre.includes("entrega")) claseTipo = "entrega";
 
-              return (
-                <div key={act.id} className={`cal-card ${claseTipo}`}>
-                  <strong>{formatFechaCorta(act.fechaHoraInicio)}</strong>
-                  <span>{act.nombreActividad}</span>
-                  <span className="cal-card__descripcion">
-                    {act.descripcion}
-                  </span>
-                  <span className="cal-card__responsable">
-                    Responsable: {act.empleadoNombre ?? "Sin asignar"}
-                  </span>
-                </div>
-              );
-            })}
+                return (
+                  <div key={act.id} className={`cal-card ${claseTipo}`}>
+                    <strong>{diaMesCorto(aFecha(act.fechaHoraInicio))}</strong>
+                    <span>{act.nombreActividad}</span>
+                    <span className="cal-card__descripcion">
+                      {act.descripcion}
+                    </span>
+                    <span className="cal-card__responsable">
+                      Responsable: {act.empleadoNombre ?? "Sin asignar"}
+                    </span>
+                  </div>
+                );
+              })}
+          </div>
         </div>
       </div>
 

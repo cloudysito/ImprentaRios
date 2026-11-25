@@ -13,6 +13,7 @@ interface GanttFilaProps {
 
 const GanttFila = ({ fila, primerDia, totalDias, seleccionada, onSeleccionar }: GanttFilaProps) => {
     const barraRef = useRef<HTMLSpanElement>(null);
+    const vencida = (fila.diasAtraso ?? 0) > 0;
     // Las barras se recortan al periodo visible. Las columnas de la cuadrícula empiezan en 1
     const colInicio = Math.max(0, diasEntre(primerDia, fila.inicio));
     const colFin = Math.min(totalDias - 1, diasEntre(primerDia, fila.fin));
@@ -24,20 +25,21 @@ const GanttFila = ({ fila, primerDia, totalDias, seleccionada, onSeleccionar }: 
     return (
         <button
             type="button"
-            className={`cg-fila ${seleccionada ? "is-selected" : ""}`}
+            className={`cg-fila ${seleccionada ? "is-selected" : ""} ${vencida ? "cg-fila--vencida" : ""}`}
             aria-pressed={seleccionada}
             disabled={fila.pedidoId === null}
             onClick={() => onSeleccionar(fila)}
         >
             <span className="cg-fila__titulo">
                 <strong>{fila.titulo}</strong>
+                {vencida && <span className="cg-fila__vencido">Vencido · {fila.diasAtraso} d</span>}
                 <small>{fila.subtitulo}</small>
                 {fila.responsable && <small>Encargado: {fila.responsable}</small>}
             </span>
             <span className="cg-pista">
                 <span
                     ref={barraRef}
-                    className={`cg-barra cg-barra--${fila.estado.toLowerCase()}`}
+                    className={`cg-barra cg-barra--${fila.estado.toLowerCase()} ${vencida ? "cg-barra--vencida" : ""}`}
                     title={fila.etiqueta}
                 >
                     {fila.etiqueta}

@@ -7,6 +7,7 @@ const FILAS: { clave: keyof ResumenDelPeriodo; etiqueta: string }[] = [
     { clave: "enDiseno", etiqueta: "En diseño" },
     { clave: "entregasSemana", etiqueta: "Entregas de la semana" },
     { clave: "paros", etiqueta: "Paros programados" },
+    { clave: "vencidos", etiqueta: "Pedidos vencidos" },
 ];
 
 const ResumenPeriodo = ({ resumen }: { resumen: ResumenDelPeriodo }) => (
@@ -14,7 +15,7 @@ const ResumenPeriodo = ({ resumen }: { resumen: ResumenDelPeriodo }) => (
         <h2 className="cons-tarjeta__titulo">Resumen del periodo</h2>
         <dl className="cons-resumen">
             {FILAS.map(({ clave, etiqueta }) => (
-                <div key={clave}>
+                <div key={clave} className={clave === "vencidos" && resumen.vencidos > 0 ? "is-alerta" : ""}>
                     <dt>{etiqueta}</dt>
                     <dd>{resumen[clave]}</dd>
                 </div>

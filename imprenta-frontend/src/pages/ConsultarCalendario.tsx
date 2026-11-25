@@ -5,6 +5,7 @@ import CalendarioFiltros from "../components/calendario/CalendarioFiltros";
 import CalendarioGrilla from "../components/calendario/CalendarioGrilla";
 import MisTareasHoy from "../components/calendario/MisTareasHoy";
 import ProximasEntregas from "../components/calendario/ProximasEntregas";
+import EntregasVencidas from "../components/calendario/EntregasVencidas";
 import AvisoSoloConsulta from "../components/calendario/AvisoSoloConsulta";
 import type { VistaCalendario } from "../types/consulta";
 import "../styles/ConsultarCalendario.css";
@@ -12,6 +13,7 @@ import "../styles/ConsultarCalendario.css";
 const VISTAS: { valor: VistaCalendario; etiqueta: string }[] = [
   { valor: "DIA", etiqueta: "Día" },
   { valor: "SEMANA", etiqueta: "Semana" },
+  { valor: "MES", etiqueta: "Mes" },
 ];
 
 const ConsultarCalendario = () => {
@@ -36,13 +38,16 @@ const ConsultarCalendario = () => {
 
         <CalendarioFiltros filtros={c.filtros} onChange={c.cambiarFiltro} />
         <CalendarioGrilla
-          columnas={c.columnas}
-          cargando={c.cargando}
-          error={c.error}
+            vista={c.vista}
+            columnas={c.columnas}
+            onSeleccionarDia={c.seleccionarDia}
+            cargando={c.cargando}
+            error={c.error}
         />
       </section>
 
       <aside className="cc-lateral">
+        <EntregasVencidas entregas={c.entregasVencidas} total={c.totalVencidas} />
         <MisTareasHoy tareas={c.tareasHoy} />
         <ProximasEntregas entregas={c.proximasEntregas} />
         <AvisoSoloConsulta texto="Cualquier usuario consulta esta pantalla sin poder alterar los registros del cronograma." />

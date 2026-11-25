@@ -1,5 +1,6 @@
 package imprenta.sistema.imprentabackend.pedidos.model;
 
+import imprenta.sistema.imprentabackend.inventario.model.ConsumoInsumo;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -32,4 +33,7 @@ public class Pedido {
     private List<String> archivosDisenioIds;
     private String archivoDisenioId;
     private List<CambioEstadoPedido> historialEstados;
+
+    // Material que ya se descontó del inventario por este pedido. Vacío = nada descontado todavía
+    private List<ConsumoInsumo> consumosInventario;
 }

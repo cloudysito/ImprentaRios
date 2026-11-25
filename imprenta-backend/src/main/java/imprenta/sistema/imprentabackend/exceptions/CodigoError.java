@@ -36,6 +36,7 @@ public enum CodigoError {
     CLIENTE_EN_USO(HttpStatus.CONFLICT, "No se puede eliminar el cliente porque tiene pedidos asociados"),
     MATERIAL_EN_USO(HttpStatus.CONFLICT, "No se puede eliminar el material porque está usado en pedidos"),
     ARCHIVO_DE_DISENIO_EN_USO(HttpStatus.CONFLICT, "No se puede eliminar el archivo porque está asociado a un pedido"),
+    ARCHIVO_DE_DISENIO_REPETIDO(HttpStatus.CONFLICT, "Un archivo de diseño no puede asignarse a más de un producto"),
     TIPO_PRODUCTO_EN_USO(HttpStatus.CONFLICT, "No se puede eliminar el tipo de producto porque está usado en pedidos"),
     INSUMO_EN_USO(HttpStatus.CONFLICT, "No se puede eliminar el insumo porque está usado en materiales o movimientos");
 

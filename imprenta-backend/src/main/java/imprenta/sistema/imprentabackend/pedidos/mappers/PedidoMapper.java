@@ -22,12 +22,24 @@ public final class PedidoMapper {
         pedido.setClienteId(dto.clienteId());
         pedido.setPersonaSolicita(dto.personaSolicita());
         pedido.setPrecioAcordado(dto.precioAcordado());
-        pedido.setArchivosDisenioIds(limpiar(dto.archivosDisenioIds()));
+        List<String> archivosPorProducto = dto.productos().stream()
+                .flatMap(producto -> producto.archivosDisenioIds() == null
+                        ? java.util.stream.Stream.empty()
+                        : producto.archivosDisenioIds().stream())
+                .toList();
+        pedido.setArchivosDisenioIds(limpiar(java.util.stream.Stream.concat(
+                dto.archivosDisenioIds() == null ? java.util.stream.Stream.empty() : dto.archivosDisenioIds().stream(),
+                archivosPorProducto.stream()
+        ).toList()));
         pedido.setArchivoDisenioId(null);
         pedido.setProductos(dto.productos().stream().map(ProductoMapper::toEntity).toList());
     }
 
     public static PedidoResponseDTO toResponse(Pedido pedido) {
+        return toResponse(pedido, List.of());
+    }
+
+    public static PedidoResponseDTO toResponse(Pedido pedido, List<String> avisosInventario) {
         if (pedido == null) {
             return null;
         }
@@ -44,7 +56,8 @@ public final class PedidoMapper {
                 pedido.getEmpleadoId(),
                 pedido.getPersonaSolicita(),
                 pedido.getPrecioAcordado(),
-                archivosDe(pedido)
+                archivosDe(pedido),
+                avisosInventario
         );
     }
 

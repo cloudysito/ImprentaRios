@@ -20,7 +20,7 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
     @ExceptionHandler(NegocioException.class)
     public ProblemDetail negocio(NegocioException e){
         CodigoError codigo = e.getCodigo();
-        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(codigo.getStatus(), codigo.getMensaje());
+        ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(codigo.getStatus(), e.getMessage());
         problemDetail.setTitle("Error de negocio");
         problemDetail.setProperty("codigo", codigo.name());
         return problemDetail;

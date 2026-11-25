@@ -3,6 +3,8 @@ package imprenta.sistema.imprentabackend.pedidos.mappers;
 import imprenta.sistema.imprentabackend.pedidos.dtos.ProductoRequestDTO;
 import imprenta.sistema.imprentabackend.pedidos.model.Producto;
 
+import java.util.List;
+
 public final class ProductoMapper {
     private ProductoMapper() {}
 
@@ -21,6 +23,9 @@ public final class ProductoMapper {
         producto.setMaterialId(dto.materialId());
         producto.setTipoAcabado(dto.tipoAcabado());
         producto.setPrioridad(dto.prioridad());
+        producto.setArchivosDisenioIds(dto.archivosDisenioIds() == null
+                ? List.of()
+                : dto.archivosDisenioIds().stream().distinct().toList());
     }
 
 }

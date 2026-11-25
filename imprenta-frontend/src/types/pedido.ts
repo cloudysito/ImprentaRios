@@ -15,6 +15,8 @@ export interface PedidoResumen {
   piezas: number;
   fechaEntrega: string; // ISO, ej. "2026-09-22T00:00:00"
   estado: EstadoPedido;
+  vencido: boolean; // la entrega ya pasó y el pedido no está terminado, entregado ni cancelado
+  diasAtraso: number;
 }
 
 export interface EventoBitacora {
@@ -26,6 +28,7 @@ export interface EventoBitacora {
 
 export interface PedidoDetalle extends PedidoResumen {
   piezasTerminadas: number;
+  materialDescontado: boolean; // el material del pedido ya se descontó del inventario
   versionDisenio: string | null;
   asignadoA: string | null;
   bitacora: EventoBitacora[];

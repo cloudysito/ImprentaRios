@@ -16,6 +16,7 @@ const routeMeta: Record<string, RouteMeta> = {
   "/cronograma": { seccion: "Línea de tiempo · Consulta sin edición", titulo: "Consultar cronograma" },
   "/pedidos": { seccion: "Seguimiento administrativo", titulo: "Gestionar pedidos" },
   "/pedidos/nuevo": { seccion: "Pedidos", titulo  : "Capturar pedido" },
+  "/archivos-de-diseno": { seccion: "Archivos de diseño", titulo: "Gestionar archivos de diseño" },
   "/archivos-de-diseno/registrar": { seccion: "Archivos de diseño", titulo: "Registrar archivo de diseño" },
   "/calendario/generar": { seccion: "Fechas límite de entrega", titulo: "Generar calendario" },
   "/cronograma/generar": { seccion: "Asignación de mano de obra", titulo: "Generar cronograma" },

@@ -26,6 +26,7 @@ export interface ProductoForm {
     tipoAcabado: string;
     prioridad: string;
     observaciones: string;
+    archivosDisenioIds?: string[];
 }
 
 export const productoVacio = (): ProductoForm => ({
@@ -62,6 +63,9 @@ export interface PedidoRequest {
 export interface PedidoCreado {
     id: string;
     folio: string;
+    estado?: string;
+    // Material que falta cuando el pedido quedó pendiente. Vacío si todo se descontó bien
+    avisosInventario?: string[];
 }
 
 export interface ArchivoDisenio {
@@ -87,5 +91,6 @@ export interface PedidoCompleto {
     productos: (Omit<ProductoForm, "cantidad" | "observaciones"> & {
         cantidad: number;
         observaciones: string | null;
+        archivosDisenioIds?: string[];
     })[];
 }

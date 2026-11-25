@@ -26,7 +26,7 @@ const PedidosTabla = ({
   const mensaje = error ?? (pedidos.length === 0 ? "No hay pedidos con ese filtro" : null);
 
   return (
-    <div className="pedidos-tabla">
+    <div className="pedidos-tabla" role="region" aria-label="Lista de pedidos" tabIndex={0}>
       <table>
         <thead>
           <tr>
@@ -56,7 +56,7 @@ const PedidosTabla = ({
             pedidos.map((p) => (
               <tr
                 key={p.id}
-                className={p.id === seleccionadoId ? "is-selected" : ""}
+                className={`${p.id === seleccionadoId ? "is-selected" : ""} ${p.vencido ? "is-vencido" : ""}`}
                 onClick={() => onSeleccionar(p.id)}
                 onKeyDown={(e) => e.key === "Enter" && onSeleccionar(p.id)}
                 tabIndex={0}
@@ -66,7 +66,14 @@ const PedidosTabla = ({
                 <td>{p.clienteNombre}</td>
                 <td>{p.producto}</td>
                 <td className="is-num">{formatNumero(p.piezas)}</td>
-                <td>{formatFechaCorta(p.fechaEntrega)}</td>
+                <td>
+                  {formatFechaCorta(p.fechaEntrega)}
+                  {p.vencido && (
+                    <span className="pedidos-tabla__atraso" title="La fecha de entrega ya pasó">
+                      Vencido · {p.diasAtraso} {p.diasAtraso === 1 ? "día" : "días"}
+                    </span>
+                  )}
+                </td>
                 <td>
                   <EstatusBadges estado={p.estado} />
                 </td>

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import PedidosToolbar from "../components/pedidos/PedidosToolbar";
 import PedidosTabla from "../components/pedidos/PedidosTabla";
+import AlertaAtrasos from "../components/pedidos/AlertaAtrasos";
 import DetalleFolio from "../components/pedidos/DetalleFolio";
 import Modal from "../components/ui/Modal";
 import { usePedidos } from "../hooks/usePedidos";
@@ -58,11 +59,6 @@ const GestionarPedidosPage = () => {
     }
   };
 
-  const handleCerrarFolio = () => {
-    // TODO definir con el equipo qué significa "cerrar folio"
-    console.log("Cerrar folio", lista.seleccionadoId);
-  };
-
   return (
     <div className="gestionar-pedidos">
       <section className="gestionar-pedidos__lista">
@@ -72,6 +68,11 @@ const GestionarPedidosPage = () => {
           filtro={lista.filtro}
           onFiltroChange={lista.setFiltro}
           conteos={lista.conteos}
+        />
+        <AlertaAtrasos
+          total={lista.totalVencidos}
+          activo={lista.soloVencidos}
+          onAlternar={lista.alternarSoloVencidos}
         />
         <PedidosTabla
           pedidos={lista.pedidosVisibles}
@@ -88,9 +89,9 @@ const GestionarPedidosPage = () => {
         cargando={folio.cargando}
         guardando={folio.guardando}
         error={folio.error}
+        onReintentar={folio.reintentar}
         onMarcarEntregado={handleMarcarEntregado}
         onCancelarPedido={handleCancelarPedido}
-        onCerrarFolio={handleCerrarFolio}
       />
       {pedidoPorCancelar && (
         <Modal titulo="Cancelar pedido" onCerrar={() => setPedidoPorCancelar(null)}>

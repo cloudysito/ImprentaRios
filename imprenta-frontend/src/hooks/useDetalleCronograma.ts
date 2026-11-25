@@ -12,6 +12,7 @@ interface Resultado {
 export function useDetalleCronograma(id: string | null) {
     const [resultado, setResultado] = useState<Resultado | null>(null);
     const [guardando, setGuardando] = useState(false);
+    const [intentoCarga, setIntentoCarga] = useState(0);
 
     useEffect(() => {
         if (!id) return;
@@ -35,12 +36,16 @@ export function useDetalleCronograma(id: string | null) {
         return () => {
             cancelado = true;
         };
-    }, [id]);
+    }, [id, intentoCarga]);
 
     const vigente = resultado && resultado.id === id ? resultado : null;
     const cargando = id !== null && vigente === null;
     const detalle = vigente?.detalle ?? null;
     const error = vigente?.error ?? null;
+    const reintentar = () => {
+        setResultado(null);
+        setIntentoCarga((intento) => intento + 1);
+    };
 
     const ejecutar = async (
         accion: (id: string) => Promise<CronogramaDetalle>,
@@ -70,5 +75,5 @@ export function useDetalleCronograma(id: string | null) {
     const eliminar = () =>
         ejecutar(cronogramaService.eliminar, "No se pudo eliminar el cronograma");
 
-    return { detalle, cargando, guardando, error, generar, eliminar };
+    return { detalle, cargando, guardando, error, generar, eliminar, reintentar };
 }

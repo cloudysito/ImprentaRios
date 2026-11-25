@@ -1,96 +1,60 @@
-//falta el servicio
-import { useMemo, useState } from "react";
-import { useDatosConsulta } from "./useDatosConsulta";
-import { aFecha, diaMes } from "../utils/fechas";
-import { formatNumero } from "../utils/formato";
-import { construirEventos, tipoDeActividad } from "../utils/consulta";
-import {
-    cubreDia,
-    etiquetaHoras,
-    etiquetaRango,
-    folioCorto,
-    hoyInicio,
-    lunesDeLaSemana,
-    mismoDia,
-    rangoDeDias,
-    sumarDias,
-} from "../utils/calendario";
-import type {
-    ColumnaDia,
-    EntregaProxima,
-    FiltrosCalendario,
-    TareaHoy,
-    TipoEvento,
-    VistaCalendario,
-} from "../types/consulta";
+import { useEffect, useMemo, useState } from "react";
+import { calendarioConsultaService as servicio } from "../services/calendarioConsultaService";
+import type { DatosConsulta } from "../services/consultaDatosService";
+import type { FiltrosCalendario, TipoEvento, VistaCalendario } from "../types/consulta";
 
-const MAX_PROXIMAS_ENTREGAS = 4;
+const SIN_DATOS: DatosConsulta = { actividades: [], pedidos: [], maquinas: [], asignaciones: [] };
 
+/**
+ * Estado de la pantalla "Consultar calendario".
+ * Aquí solo vive el estado de React; las reglas (eventos, columnas, tareas, entregas) las resuelve el servicio.
+ */
 export function useConsultarCalendario() {
-    const { actividades, pedidos, maquinas, asignaciones, cargando, error } = useDatosConsulta(true);
+    const [datos, setDatos] = useState<DatosConsulta>(SIN_DATOS);
+    const [cargando, setCargando] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    const hoy = useMemo(() => hoyInicio(), []);
+    const hoy = useMemo(() => servicio.hoy(), []);
     const [vista, setVista] = useState<VistaCalendario>("SEMANA");
     const [ancla, setAncla] = useState<Date>(hoy);
-    const [filtros, setFiltros] = useState<FiltrosCalendario>({
-        PRODUCCION: true,
-        ENTREGA: true,
-        MANTENIMIENTO: true,
-    });
+    const [filtros, setFiltros] = useState<FiltrosCalendario>(servicio.filtrosIniciales);
 
-    const eventos = useMemo(
-        () => construirEventos(actividades, pedidos, maquinas),
-        [actividades, pedidos, maquinas],
+    useEffect(() => {
+        let cancelado = false;
+        servicio
+            .cargarDatos()
+            .then((cargados) => {
+                if (!cancelado) setDatos(cargados);
+            })
+            .catch((err: unknown) => {
+                if (!cancelado) setError(err instanceof Error ? err.message : "No se pudo cargar el calendario");
+            })
+            .finally(() => {
+                if (!cancelado) setCargando(false);
+            });
+        return () => {
+            cancelado = true;
+        };
+    }, []);
+
+    const eventos = useMemo(() => servicio.construirEventos(datos), [datos]);
+    const dias = useMemo(() => servicio.diasDeLaVista(vista, ancla), [vista, ancla]);
+    const columnas = useMemo(
+        () => servicio.columnas(dias, eventos, filtros, hoy, vista, ancla),
+        [dias, eventos, filtros, hoy, vista, ancla],
     );
+    const tareasHoy = useMemo(() => servicio.tareasDeHoy(datos.asignaciones, hoy), [datos.asignaciones, hoy]);
+    const proximasEntregas = useMemo(() => servicio.proximasEntregas(datos.pedidos, hoy), [datos.pedidos, hoy]);
+    const entregasVencidas = useMemo(() => servicio.entregasVencidas(datos.pedidos), [datos.pedidos]);
+    const totalVencidas = useMemo(() => servicio.totalVencidas(datos.pedidos), [datos.pedidos]);
 
-    // Semana de lunes a sábado, o un solo día
-    const dias = useMemo(
-        () => (vista === "SEMANA" ? rangoDeDias(lunesDeLaSemana(ancla), 6) : [ancla]),
-        [vista, ancla],
-    );
+    const navegar = (direccion: -1 | 1) => setAncla((prev) => servicio.moverAncla(prev, vista, direccion, hoy));
 
-    const columnas = useMemo<ColumnaDia[]>(
-        () =>
-            dias.map((dia) => ({
-                dia,
-                esHoy: mismoDia(dia, hoy),
-                eventos: eventos.filter((e) => filtros[e.tipo] && cubreDia(e.inicio, e.fin, dia)),
-            })),
-        [dias, eventos, filtros, hoy],
-    );
-
-    const tareasHoy = useMemo<TareaHoy[]>(
-        () =>
-            asignaciones
-                .filter((a) => cubreDia(aFecha(a.fechaHoraInicio), aFecha(a.fechaHoraFin), hoy))
-                .map((a) => ({
-                    id: a.actividadId,
-                    titulo: `${a.nombreActividad} ${a.folio}`,
-                    detalle: `${etiquetaHoras(aFecha(a.fechaHoraInicio), aFecha(a.fechaHoraFin))} · ${a.producto} · ${formatNumero(a.piezas)} piezas`,
-                    tipo: tipoDeActividad(a.nombreActividad),
-                })),
-        [asignaciones, hoy],
-    );
-
-    const proximasEntregas = useMemo<EntregaProxima[]>(
-        () =>
-            pedidos
-                .filter((p) => p && typeof p.fechaEntrega === "string")
-                .filter((p) => p.estado !== "ENTREGADO" && p.estado !== "CANCELADO")
-                .filter((p) => aFecha(p.fechaEntrega).getTime() >= hoy.getTime())
-                .sort((a, b) => aFecha(a.fechaEntrega).getTime() - aFecha(b.fechaEntrega).getTime())
-                .slice(0, MAX_PROXIMAS_ENTREGAS)
-                .map((p) => ({
-                    id: p.id,
-                    folio: p.folio,
-                    cliente: p.clienteNombre,
-                    fecha: diaMes(p.fechaEntrega),
-                })),
-        [pedidos, hoy],
-    );
-
-    const navegar = (direccion: -1 | 1) =>
-        setAncla((prev) => sumarDias(prev, direccion * (vista === "SEMANA" ? 7 : 1)));
+    // Desde la vista mensual, un día lleva a su vista de día
+    const seleccionarDia = (dia: Date) => {
+        setAncla(dia);
+        setVista("DIA");
+    };
 
     const cambiarFiltro = (tipo: TipoEvento, valor: boolean) =>
         setFiltros((prev) => ({ ...prev, [tipo]: valor }));
@@ -98,15 +62,18 @@ export function useConsultarCalendario() {
     return {
         vista,
         setVista,
-        etiquetaPeriodo: etiquetaRango(dias),
+        etiquetaPeriodo: servicio.etiquetaPeriodo(dias, vista, ancla),
         navegar,
+        seleccionarDia,
         filtros,
         cambiarFiltro,
         columnas,
         tareasHoy,
         proximasEntregas,
+        entregasVencidas,
+        totalVencidas,
         cargando,
         error,
-        folioCorto,
+        folioCorto: servicio.folioCorto,
     };
 }

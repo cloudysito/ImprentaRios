@@ -25,6 +25,7 @@ export function construirEventos(
     const pedidosSeguros = Array.isArray(pedidos) ? pedidos : [];
     const maquinasSeguras = Array.isArray(maquinas) ? maquinas : [];
     const folios = new Map(pedidosSeguros.map((p) => [p.id, p.folio]));
+    const vencidos = new Map(pedidosSeguros.map((p) => [p.id, p.vencido === true]));
 
     const deActividades = actividadesSeguras.map<EventoCalendario>((a) => ({
         id: a.id,
@@ -32,6 +33,7 @@ export function construirEventos(
         titulo: a.nombreActividad,
         referencia: folioCorto(folios.get(a.pedidoId) ?? "Sin folio"),
         responsable: a.empleadoNombre,
+        vencido: vencidos.get(a.pedidoId) === true,
         inicio: aFecha(a.fechaHoraInicio),
         fin: aFecha(finDeActividad(a)),
     }));
@@ -46,6 +48,7 @@ export function construirEventos(
                 tipo: tipoDeActividad(etapa.nombre),
                 titulo: etapa.nombre,
                 referencia: folioCorto(p.folio),
+                vencido: p.vencido === true,
                 inicio: aFecha(etapa.fechaHoraInicio),
                 fin: aFecha(etapa.fechaHoraFin),
                 estimado: true,
@@ -120,6 +123,7 @@ export function construirFilas(
                 responsable: nombres.length > 0 ? nombres.join(", ") : null,
                 estado,
                 etiqueta: ESTADO_LABEL[p.estado],
+                diasAtraso: p.diasAtraso ?? 0,
                 inicio: new Date(Math.min(...inicios)),
                 fin: new Date(Math.max(...fines)),
             });
@@ -133,6 +137,7 @@ export function construirFilas(
                 subtitulo: `${p.producto} · Sin programar`,
                 estado: "ESTIMADO",
                 etiqueta: "Estimado",
+                diasAtraso: p.diasAtraso ?? 0,
                 inicio: sumarDias(entrega, -1),
                 fin: entrega,
             });

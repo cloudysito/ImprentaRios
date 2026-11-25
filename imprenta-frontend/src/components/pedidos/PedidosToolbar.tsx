@@ -14,6 +14,7 @@ interface PedidosToolbarProps {
 // Las pestañas que se muestran, en orden
 const FILTROS: { valor: FiltroEstado; label: string }[] = [
   { valor: "TODOS", label: "Todos" },
+  { valor: "PENDIENTE_DE_MATERIAL", label: "Sin material" },
   { valor: "EN_DISENIO", label: "En diseño" },
   { valor: "EN_PRODUCCION", label: "En producción" },
   { valor: "TERMINADO", label: "Terminado" },

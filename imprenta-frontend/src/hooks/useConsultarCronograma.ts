@@ -1,155 +1,118 @@
 import { useEffect, useMemo, useState } from "react";
-import { pedidosService } from "../services/pedidosService";
-import { useDatosConsulta } from "./useDatosConsulta";
-import { aFecha } from "../utils/fechas";
-import { construirFilas } from "../utils/consulta";
-import { descargarCsv } from "../utils/exportarCsv";
-import {
-    aInputFecha,
-    cubreDia,
-    desdeInputFecha,
-    diasEntre,
-    hoyInicio,
-    lunesDeLaSemana,
-    primerDiaDelMes,
-    rangoDeDias,
-    sumarDias,
-    ultimoDiaDelMes,
-} from "../utils/calendario";
+import { cronogramaConsultaService as servicio } from "../services/cronogramaConsultaService";
+import type { DatosConsulta } from "../services/consultaDatosService";
 import type { PedidoDetalle } from "../types/pedido";
-import type {
-    FilaCronograma,
-    FiltroEstadoBarra,
-    ResumenDelPeriodo,
-    VistaCronograma,
-} from "../types/consulta";
+import type { FilaCronograma, FiltroEstadoBarra, VistaCronograma } from "../types/consulta";
 
-const MAX_DIAS = 62;
+interface ResultadoDetalle {
+    id: string;
+    detalle: PedidoDetalle | null;
+    error: string | null;
+}
 
+const SIN_DATOS: DatosConsulta = { actividades: [], pedidos: [], maquinas: [], asignaciones: [] };
+
+/**
+ * Estado de la pantalla "Consultar cronograma".
+ * Aquí solo vive el estado de React; las reglas (rango, filas, filtros, resumen, exportar) las resuelve el servicio.
+ */
 export function useConsultarCronograma() {
-    const { actividades, pedidos, maquinas, cargando, error } = useDatosConsulta();
+    const [datos, setDatos] = useState<DatosConsulta>(SIN_DATOS);
+    const [cargando, setCargando] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
-    const hoy = useMemo(() => hoyInicio(), []);
+    const hoy = useMemo(() => servicio.hoy(), []);
     const [vista, setVistaInterna] = useState<VistaCronograma>("DIEZ_DIAS");
-    const [desde, setDesde] = useState(() => aInputFecha(hoy));
-    const [hasta, setHasta] = useState(() => aInputFecha(sumarDias(hoy, 9)));
+    const [rango, setRango] = useState(() => servicio.rangoDeVista("DIEZ_DIAS", hoy));
     const [estado, setEstado] = useState<FiltroEstadoBarra>("TODOS");
     const [idElegido, setIdElegido] = useState<string | null>(null);
-    const [detalle, setDetalle] = useState<PedidoDetalle | null>(null);
-    const [cargandoDetalle, setCargandoDetalle] = useState(false);
-
-    const setVista = (nueva: VistaCronograma) => {
-        setVistaInterna(nueva);
-        if (nueva === "DIEZ_DIAS") {
-            setDesde(aInputFecha(hoy));
-            setHasta(aInputFecha(sumarDias(hoy, 9)));
-        } else {
-            setDesde(aInputFecha(primerDiaDelMes(hoy)));
-            setHasta(aInputFecha(ultimoDiaDelMes(hoy)));
-        }
-    };
-
-    // Columnas del diagrama
-    const fechaDesde = desdeInputFecha(desde);
-    const fechaHasta = desdeInputFecha(hasta);
-    const rangoInvalido = !fechaDesde || !fechaHasta || diasEntre(fechaDesde, fechaHasta) < 0;
-    const dias = useMemo(
-        () =>
-            rangoInvalido
-                ? []
-                : rangoDeDias(fechaDesde as Date, Math.min(diasEntre(fechaDesde as Date, fechaHasta as Date) + 1, MAX_DIAS)),
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        [desde, hasta, rangoInvalido],
-    );
-
-    const todas = useMemo(() => construirFilas(actividades, pedidos, maquinas), [actividades, pedidos, maquinas]);
-
-    // Filas que tocan el periodo elegido (sin aplicar el filtro de estatus)
-    const delPeriodo = useMemo(() => {
-        if (dias.length === 0) return [];
-        const primero = dias[0];
-        const ultimo = dias[dias.length - 1];
-        return todas.filter((f) => diasEntre(f.inicio, ultimo) >= 0 && diasEntre(primero, f.fin) >= 0);
-    }, [todas, dias]);
-
-    const filtradas = useMemo(
-        () => (estado === "TODOS" ? delPeriodo : delPeriodo.filter((f) => f.estado === estado)),
-        [delPeriodo, estado],
-    );
-
-    const resumen = useMemo<ResumenDelPeriodo>(() => {
-        const soloPedidos = delPeriodo.filter((f) => f.pedidoId !== null);
-        const lunes = lunesDeLaSemana(hoy);
-        const domingo = sumarDias(lunes, 6);
-        return {
-            pedidosActivos: soloPedidos.filter((f) => f.estado !== "TERMINADO").length,
-            enProduccion: soloPedidos.filter((f) => f.estado === "PRODUCCION").length,
-            enDiseno: soloPedidos.filter((f) => f.estado === "DISENO").length,
-            entregasSemana: pedidos.filter(
-                (p) => p.estado !== "CANCELADO" && cubreDia(lunes, domingo, aFecha(p.fechaEntrega)),
-            ).length,
-            paros: delPeriodo.filter((f) => f.estado === "PARO").length,
-        };
-    }, [delPeriodo, pedidos, hoy]);
-
-    // Si nadie eligió fila se toma la primera de pedido
-    const seleccionadoId =
-        (idElegido && filtradas.some((f) => f.id === idElegido) ? idElegido : null) ??
-        filtradas.find((f) => f.pedidoId !== null)?.id ??
-        null;
+    // Último detalle pedido. "Cargando" se deduce: hay fila elegida y todavía no llega su respuesta
+    const [resultadoDetalle, setResultadoDetalle] = useState<ResultadoDetalle | null>(null);
+    const [intentoCargaDetalle, setIntentoCargaDetalle] = useState(0);
 
     useEffect(() => {
-        if (!seleccionadoId) {
-            setDetalle(null);
-            return;
-        }
         let cancelado = false;
-        setCargandoDetalle(true);
-        pedidosService
-            .obtener(seleccionadoId)
-            .then((d) => {
-                if (!cancelado) setDetalle(d);
+        servicio
+            .cargarDatos()
+            .then((cargados) => {
+                if (!cancelado) setDatos(cargados);
             })
-            .catch(() => {
-                if (!cancelado) setDetalle(null);
+            .catch((err: unknown) => {
+                if (!cancelado) setError(err instanceof Error ? err.message : "No se pudo cargar el cronograma");
             })
             .finally(() => {
-                if (!cancelado) setCargandoDetalle(false);
+                if (!cancelado) setCargando(false);
             });
         return () => {
             cancelado = true;
         };
-    }, [seleccionadoId]);
+    }, []);
 
-    // La fila seleccionada en producción muestra su avance: "En producción · 62 %"
-    const filas = useMemo<FilaCronograma[]>(
-        () =>
-            filtradas.map((f) =>
-                f.id === seleccionadoId && detalle && detalle.id === f.id && f.estado === "PRODUCCION" && detalle.piezas > 0
-                    ? { ...f, etiqueta: `${f.etiqueta} · ${Math.round((detalle.piezasTerminadas / detalle.piezas) * 100)} %` }
-                    : f,
-            ),
-        [filtradas, seleccionadoId, detalle],
+    const setVista = (nueva: VistaCronograma) => {
+        setVistaInterna(nueva);
+        setRango(servicio.rangoDeVista(nueva, hoy));
+    };
+    const setDesde = (desde: string) => setRango((prev) => ({ ...prev, desde }));
+    const setHasta = (hasta: string) => setRango((prev) => ({ ...prev, hasta }));
+
+    const { dias, rangoInvalido } = useMemo(
+        () => servicio.calcularDias(rango.desde, rango.hasta),
+        [rango.desde, rango.hasta],
+    );
+
+    const todas = useMemo(() => servicio.construirFilas(datos), [datos]);
+    const delPeriodo = useMemo(() => servicio.filasDelPeriodo(todas, dias), [todas, dias]);
+    const filtradas = useMemo(() => servicio.filtrarPorEstado(delPeriodo, estado), [delPeriodo, estado]);
+    const resumen = useMemo(() => servicio.calcularResumen(delPeriodo, datos.pedidos, hoy), [delPeriodo, datos.pedidos, hoy]);
+    const seleccionadoId = servicio.elegirSeleccion(filtradas, idElegido);
+
+    useEffect(() => {
+        if (!seleccionadoId) return;
+        let cancelado = false;
+        servicio
+            .obtenerDetalle(seleccionadoId)
+            .then((d) => {
+                if (!cancelado) setResultadoDetalle({ id: seleccionadoId, detalle: d, error: null });
+            })
+            .catch((err: unknown) => {
+                if (!cancelado) {
+                    const mensaje = err instanceof Error ? err.message : "No se pudo cargar el detalle del pedido";
+                    setResultadoDetalle({ id: seleccionadoId, detalle: null, error: mensaje });
+                }
+            });
+        return () => {
+            cancelado = true;
+        };
+    }, [seleccionadoId, intentoCargaDetalle]);
+
+    // Vuelve a pedir el detalle de la fila elegida
+    const reintentarDetalle = () => {
+        setResultadoDetalle(null);
+        setIntentoCargaDetalle((intento) => intento + 1);
+    };
+
+    // Sin fila elegida, o con un detalle que todavía es de otra fila, no hay detalle que mostrar
+    const detalleVisible = resultadoDetalle && resultadoDetalle.id === seleccionadoId ? resultadoDetalle.detalle : null;
+    const cargandoDetalle = seleccionadoId !== null && resultadoDetalle?.id !== seleccionadoId;
+    const errorDetalle = resultadoDetalle && resultadoDetalle.id === seleccionadoId ? resultadoDetalle.error : null;
+
+    const filas = useMemo(
+        () => servicio.conAvance(filtradas, seleccionadoId, detalleVisible),
+        [filtradas, seleccionadoId, detalleVisible],
     );
 
     const seleccionar = (fila: FilaCronograma) => {
         if (fila.pedidoId) setIdElegido(fila.id);
     };
 
-    const exportar = () => {
-        const fecha = (f: Date) => aInputFecha(f);
-        descargarCsv(`cronograma_${desde}_${hasta}.csv`, [
-            ["Folio / Equipo", "Descripción", "Estatus", "Inicio", "Fin"],
-            ...filtradas.map((f) => [f.titulo, f.subtitulo, f.etiqueta, fecha(f.inicio), fecha(f.fin)]),
-        ]);
-    };
+    const exportar = () => servicio.exportarCsv(filtradas, rango.desde, rango.hasta);
 
     return {
         vista,
         setVista,
-        desde,
+        desde: rango.desde,
         setDesde,
-        hasta,
+        hasta: rango.hasta,
         setHasta,
         estado,
         setEstado,
@@ -159,8 +122,10 @@ export function useConsultarCronograma() {
         resumen,
         seleccionadoId,
         seleccionar,
-        detalle,
+        detalle: detalleVisible,
         cargandoDetalle,
+        errorDetalle,
+        reintentarDetalle,
         exportar,
         rangoInvalido,
         cargando,

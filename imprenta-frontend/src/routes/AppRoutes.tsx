@@ -8,6 +8,7 @@ import GenerarCronogramaPage from "../pages/GenerarCronogramaPage";
 import GestionarPedidosPage from "../pages/GestionarPedidosPage";
 import CapturarPedido from "../pages/CapturarPedido";
 import RegistrarDisenio from "../pages/RegistrarArchivoDiseno";
+import GestionarArchivosDisenoPage from "../pages/GestionarArchivosDisenoPage";
 import VerificarProgresoPage from "../pages/VerificarProgresoPage";
 import GestionarStockPage from "../pages/GestionarStockPage";
 import GestionarMantenimientoPage from "../pages/GestionarMantenimientoPage";
@@ -28,6 +29,7 @@ export function AppRoutes() {
         <Route path="/cronograma/generar" element={<GenerarCronogramaPage />} />
         <Route path="/pedidos" element={<GestionarPedidosPage />} />
         <Route path="/pedidos/nuevo" element={<CapturarPedido key="nuevo" />} />
+        <Route path="/archivos-de-diseno" element={<GestionarArchivosDisenoPage />} />
         <Route path="/archivos-de-diseno/registrar" element={<RegistrarDisenio />} />
           <Route path="/pedidos/:id/editar" element={<CapturarPedido key="editar" />} />
         <Route path="/taller" element={<VerificarProgresoPage />} />

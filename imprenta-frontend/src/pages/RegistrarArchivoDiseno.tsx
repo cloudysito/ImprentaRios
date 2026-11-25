@@ -1,14 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "../styles/RegistrarArchivoDiseno.css";
 import { registrarArchivoDisenio } from "../services/archivoDisenioService";
+import { hoyISO } from "../utils/fechas";
+import { mensajeDeError } from "../utils/errores";
+
+const EXTENSIONES_PERMITIDAS = [".pdf", ".jpg", ".jpeg", ".cdr"];
+const TAMANO_MAXIMO_MB = 200;
 
 const RegistrarDisenio: React.FC = () => {
+  const navigate = useNavigate();
   const [archivo, setArchivo] = useState<File | null>(null);
+  const [urlVistaPrevia, setUrlVistaPrevia] = useState<string | null>(null);
+  const urlVistaPreviaRef = useRef<string | null>(null);
   const [mensaje, setMensaje] = useState("");
   const [guardando, setGuardando] = useState(false);
   const [formulario, setFormulario] = useState({
-    fechaRecepcion: "2026-09-21",
-    fechaEntrega: "2026-09-28",
+    fechaRecepcion: hoyISO(),
+    fechaEntrega: hoyISO(),
     resolucion: 300,
     modoColor: "CMYK",
     sangrado: 3,
@@ -16,6 +25,17 @@ const RegistrarDisenio: React.FC = () => {
     caras: 2,
     prensa: "Offset",
   });
+
+  useEffect(() => () => {
+    if (urlVistaPreviaRef.current) URL.revokeObjectURL(urlVistaPreviaRef.current);
+  }, []);
+
+  const seleccionarArchivo = (nuevoArchivo: File | null) => {
+    if (urlVistaPreviaRef.current) URL.revokeObjectURL(urlVistaPreviaRef.current);
+    urlVistaPreviaRef.current = nuevoArchivo ? URL.createObjectURL(nuevoArchivo) : null;
+    setUrlVistaPrevia(urlVistaPreviaRef.current);
+    setArchivo(nuevoArchivo);
+  };
 
   const actualizar = (campo: keyof typeof formulario, valor: string) => {
     setFormulario((actual) => ({
@@ -26,11 +46,67 @@ const RegistrarDisenio: React.FC = () => {
     }));
   };
 
+  const validar = (): string | null => {
+    if (!archivo) return "Selecciona un archivo antes de registrar el diseño.";
+    const nombre = archivo.name.toLowerCase();
+    if (!EXTENSIONES_PERMITIDAS.some((ext) => nombre.endsWith(ext))) {
+      return "Formato no permitido. Usa PDF, JPG o CorelDRAW (.cdr).";
+    }
+    if (archivo.size > TAMANO_MAXIMO_MB * 1024 * 1024) {
+      return `El archivo supera el máximo de ${TAMANO_MAXIMO_MB} MB.`;
+    }
+    if (archivo.name.length > 255) return "El nombre del archivo no puede superar 255 caracteres.";
+    if (!formulario.fechaRecepcion) return "Indica la fecha de recepción.";
+    if (!formulario.fechaEntrega) return "Indica la fecha de entrega.";
+    if (formulario.fechaEntrega < formulario.fechaRecepcion) {
+      return "La fecha de entrega no puede ser anterior a la de recepción.";
+    }
+    if (!formulario.medidaArchivo.trim()) return "Escribe la medida del archivo.";
+    if (!Number.isInteger(formulario.sangrado) || formulario.sangrado < 0) {
+      return "El sangrado debe ser un número entero, 0 o mayor.";
+    }
+    return null;
+  };
+
+  const punto = archivo ? archivo.name.lastIndexOf(".") : -1;
+  const extension = archivo && punto >= 0 ? archivo.name.slice(punto).toLowerCase() : "";
+  const puedePrevisualizar = extension === ".pdf" || extension === ".jpg" || extension === ".jpeg";
+  const verificaciones: { ok: boolean; texto: string }[] = [
+    !archivo
+        ? { ok: false, texto: "Aún no seleccionas un archivo" }
+        : EXTENSIONES_PERMITIDAS.includes(extension)
+            ? { ok: true, texto: `Formato ${extension.slice(1).toUpperCase()} aceptado` }
+            : { ok: false, texto: "Formato no permitido (usa PDF, JPG o CorelDRAW)" },
+    ...(archivo
+        ? [
+          archivo.size <= TAMANO_MAXIMO_MB * 1024 * 1024
+              ? { ok: true, texto: `Tamaño dentro del límite de ${TAMANO_MAXIMO_MB} MB` }
+              : { ok: false, texto: `El archivo supera los ${TAMANO_MAXIMO_MB} MB` },
+        ]
+        : []),
+    formulario.resolucion >= 300
+        ? { ok: true, texto: `Resolución de ${formulario.resolucion} dpi` }
+        : { ok: false, texto: `Resolución de ${formulario.resolucion} dpi: se recomienda 300 dpi como mínimo` },
+    formulario.modoColor === "CMYK"
+        ? { ok: true, texto: "Perfil de color CMYK" }
+        : { ok: false, texto: "Modo RGB: conviértelo a CMYK para imprimir" },
+    formulario.sangrado >= 3
+        ? { ok: true, texto: `Sangrado de ${formulario.sangrado} mm` }
+        : { ok: false, texto: `Sangrado de ${formulario.sangrado} mm: se recomienda al menos 3 mm` },
+    formulario.fechaRecepcion &&
+    formulario.fechaEntrega &&
+    formulario.fechaEntrega >= formulario.fechaRecepcion
+        ? { ok: true, texto: "Fechas de recepción y entrega coherentes" }
+        : { ok: false, texto: "Revisa las fechas: la entrega no puede ser anterior a la recepción" },
+  ];
+
   const registrar = async () => {
-    if (!archivo) {
-      setMensaje("Selecciona un archivo antes de registrar el diseño.");
+    const errorValidacion = validar();
+    if (errorValidacion) {
+      setMensaje(errorValidacion);
       return;
     }
+    if (!archivo) return;
 
     setGuardando(true);
     setMensaje("");
@@ -40,9 +116,9 @@ const RegistrarDisenio: React.FC = () => {
         nombreArchivo: archivo.name,
         version: 1,
       });
-      setMensaje("Diseño registrado correctamente.");
-    } catch {
-      setMensaje("No se pudo registrar el diseño.");
+      setMensaje("Diseño registrado correctamente. Ya puedes editarlo o registrar una nueva versión en Archivos de diseño.");
+    } catch (err) {
+      setMensaje(mensajeDeError(err, "No se pudo registrar el diseño."));
     } finally {
       setGuardando(false);
     }
@@ -103,15 +179,15 @@ const RegistrarDisenio: React.FC = () => {
                   Arrastra el archivo o selecciónalo desde tu equipo
                 </strong>
                 <p>
-                  Formatos aceptados PDF, AI, TIFF y EPS · Tamaño máximo 200 MB
+                  Formatos aceptados PDF, JPG y CorelDRAW (CDR) · Tamaño máximo 200 MB
                 </p>
               </div>
               <input
                 id="archivo-disenio"
                 hidden
                 type="file"
-                accept=".pdf,.ai,.tiff,.eps"
-                onChange={(e) => setArchivo(e.target.files?.[0] ?? null)}
+                accept=".pdf,.jpg,.jpeg,.cdr"
+                onChange={(e) => seleccionarArchivo(e.target.files?.[0] ?? null)}
               />
               <button
                 className="btn-secondary outline"
@@ -124,7 +200,7 @@ const RegistrarDisenio: React.FC = () => {
               </button>
             </div>
             <div className="uploaded-file">
-              <div className="file-icon-box pdf">PDF</div>
+              <div className="file-icon-box pdf">{extension ? extension.slice(1).toUpperCase() : "—"}</div>
               <div className="file-info">
                 <strong>
                   {archivo?.name ?? "Ningún archivo seleccionado"}
@@ -136,7 +212,7 @@ const RegistrarDisenio: React.FC = () => {
                 </span>
               </div>
               <div className="file-status">
-                <span className="status-dot green"></span> Listo para validar
+                {archivo ? <><span className="status-dot green"></span> Listo para validar</> : "Sin archivo"}
               </div>
             </div>
           </section>
@@ -173,6 +249,8 @@ const RegistrarDisenio: React.FC = () => {
                 <input
                   type="number"
                   name="sangrado"
+                  min={0}
+                  step={1}
                   value={formulario.sangrado}
                   onChange={(e) => actualizar("sangrado", e.target.value)}
                 />
@@ -184,6 +262,7 @@ const RegistrarDisenio: React.FC = () => {
                 <label>Medida del archivo</label>
                 <input
                   type="text"
+                  maxLength={50}
                   name="medidaArchivo"
                   value={formulario.medidaArchivo}
                   onChange={(e) => actualizar("medidaArchivo", e.target.value)}
@@ -217,42 +296,50 @@ const RegistrarDisenio: React.FC = () => {
         <aside className="summary-sidebar">
           <div className="summary-card">
             <h3>VISTA PREVIA</h3>
-            <div className="preview-box">
-              <p>Aquí verás la primera cara de tu archivo</p>
+            <div className={`preview-box${extension === ".pdf" ? " preview-box--pdf" : ""}`}>
+              {!archivo ? (
+                <p>Selecciona un archivo para generar la vista previa.</p>
+              ) : extension === ".cdr" ? (
+                <p>No se puede generar una vista previa para archivos CDR.</p>
+              ) : puedePrevisualizar && urlVistaPrevia && extension === ".pdf" ? (
+                <object data={urlVistaPrevia} type="application/pdf" aria-label={`Vista previa de ${archivo.name}`}>
+                  <p>
+                    No se pudo mostrar el PDF en este navegador.{" "}
+                    <a href={urlVistaPrevia} target="_blank" rel="noreferrer">Abrir PDF</a>
+                  </p>
+                </object>
+              ) : puedePrevisualizar && urlVistaPrevia ? (
+                <img src={urlVistaPrevia} alt={`Vista previa de ${archivo.name}`} />
+              ) : (
+                <p>No se puede generar una vista previa para este formato.</p>
+              )}
             </div>
           </div>
           <div className="summary-card">
             <h3>VALIDACIÓN AUTOMÁTICA</h3>
             <ul className="validation-list">
-              <li className="valid">
-                <span className="icon check">✓</span> Resolución mínima de 300
-                dpi
-              </li>
-              <li className="valid">
-                <span className="icon check">✓</span> Perfil de color CMYK
-              </li>
-              <li className="valid">
-                <span className="icon check">✓</span> Tipografías incrustadas
-              </li>
-              <li className="warning">
-                <span className="icon alert">!</span> Sangrado detectado de 3 mm
-                en tres lados
-              </li>
+              {verificaciones.map((v) => (
+                  <li key={v.texto} className={v.ok ? "valid" : "warning"}>
+                    <span className={`icon ${v.ok ? "check" : "alert"}`}>{v.ok ? "✓" : "!"}</span>{" "}
+                    {v.texto}
+                  </li>
+              ))}
             </ul>
           </div>
           <div className="summary-card">
-            <h3>HISTORIAL DE VERSIONES</h3>
-            <ul className="history-list">
-              <li>
-                <strong>v3</strong> · hoy 11:42 · corrección de sangrado
-              </li>
-              <li>
-                <strong>v2</strong> · 19 sep · cambio de tipografía
-              </li>
-              <li>
-                <strong>v1</strong> · 18 sep · propuesta inicial
-              </li>
-            </ul>
+            <h3>VERSIONES</h3>
+            <p className="history-note">
+              Este formulario registra la versión 1 de un diseño nuevo. Para
+              editar un archivo o registrar una nueva versión, usa la sección de
+              archivos de diseño.
+            </p>
+            <button
+              type="button"
+              className="btn-secondary outline"
+              onClick={() => navigate("/archivos-de-diseno")}
+            >
+              Ver archivos de diseño
+            </button>
           </div>
           <div className="action-buttons">
             <button

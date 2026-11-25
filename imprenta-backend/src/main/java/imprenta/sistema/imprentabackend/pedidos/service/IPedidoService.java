@@ -22,4 +22,7 @@ public interface IPedidoService {
     void alGenerarCronograma(String id, String empleadoId);
     void iniciarProduccion(String id, String empleadoId);
 
+    // Revisa los pedidos que esperan material y libera los que ya tienen existencias. Regresa cuántos liberó
+    int liberarPedidosPendientes(String empleadoId);
+
 }

@@ -10,9 +10,9 @@ interface DetalleFolioProps {
   cargando: boolean;
   guardando: boolean;
   error: string | null;
+  onReintentar: () => void;
   onMarcarEntregado: () => void;
   onCancelarPedido: () => void;
-  onCerrarFolio: () => void;
 }
 
 const DetalleFolio = ({
@@ -20,16 +20,23 @@ const DetalleFolio = ({
   cargando,
   guardando,
   error,
+  onReintentar,
   onMarcarEntregado,
-  onCancelarPedido,
-  onCerrarFolio,
+  onCancelarPedido
 }: DetalleFolioProps) => {
   const navigate = useNavigate();
   const { user } = useAuth();
   if (cargando || !detalle) {
     return (
       <aside className="detalle-folio detalle-folio--vacio">
-        {cargando ? <Cargando /> : "Selecciona un pedido para ver su detalle"}
+        {cargando ? <Cargando /> : error ? (
+          <div className="detalle-folio__estado-error" role="alert">
+            <p>{error}</p>
+            <button type="button" className="detalle-folio__btn detalle-folio__btn--primario" onClick={onReintentar}>
+              Reintentar
+            </button>
+          </div>
+        ) : "Selecciona un pedido para ver su detalle"}
       </aside>
     );
   }
@@ -48,6 +55,11 @@ const DetalleFolio = ({
       <span className="detalle-folio__eyebrow">Detalle del folio</span>
       <h2 className="detalle-folio__folio">{detalle.folio}</h2>
       <p className="detalle-folio__cliente">{detalle.clienteNombre}</p>
+      {detalle.vencido && (
+        <p className="detalle-folio__vencido" role="alert">
+          Pedido vencido: debió entregarse hace {detalle.diasAtraso} {detalle.diasAtraso === 1 ? "día" : "días"}.
+        </p>
+      )}
 
       <dl className="detalle-folio__datos">
         <div>
@@ -72,6 +84,16 @@ const DetalleFolio = ({
           <dt>Archivo de diseño</dt>
           <dd className={detalle.versionDisenio ? "is-ok" : "is-muted"}>
             {detalle.versionDisenio ? `Vinculado ${detalle.versionDisenio}` : "Sin archivo"}
+          </dd>
+        </div>
+        <div>
+          <dt>Material</dt>
+          <dd className={detalle.materialDescontado ? "is-ok" : "is-muted"}>
+            {detalle.estado === "PENDIENTE_DE_MATERIAL"
+              ? "Pendiente de material"
+              : detalle.materialDescontado
+                ? "Descontado del inventario"
+                : "Sin descontar"}
           </dd>
         </div>
         <div>
@@ -109,9 +131,6 @@ const DetalleFolio = ({
           disabled={!puedeCancelar || guardando}
         >
           {guardando ? "Guardando…" : "Cancelar pedido"}
-        </button>
-        <button type="button" className="detalle-folio__btn" onClick={onCerrarFolio}>
-          Cerrar folio
         </button>
         {puedeEditar && (
             <button
