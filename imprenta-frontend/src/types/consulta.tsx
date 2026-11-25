@@ -17,6 +17,7 @@ export interface EventoCalendario {
 export interface ColumnaDia {
     dia: Date;
     esHoy: boolean;
+    fueraDeMes?: boolean;
     eventos: EventoCalendario[];
 }
 
@@ -35,7 +36,7 @@ export interface EntregaProxima {
 }
 
 export type FiltrosCalendario = Record<TipoEvento, boolean>;
-export type VistaCalendario = "DIA" | "SEMANA";
+export type VistaCalendario = "DIA" | "SEMANA"| "MES";
 
 // ---------- Cronograma ----------
 export type EstadoBarra =

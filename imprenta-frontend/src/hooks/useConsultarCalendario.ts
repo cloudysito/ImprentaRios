@@ -6,7 +6,9 @@ import { formatNumero } from "../utils/formato";
 import { construirEventos, tipoDeActividad } from "../utils/consulta";
 import {
     cubreDia,
+    diasDelMes,
     etiquetaHoras,
+    etiquetaMes,
     etiquetaRango,
     folioCorto,
     hoyInicio,
@@ -14,6 +16,7 @@ import {
     mismoDia,
     rangoDeDias,
     sumarDias,
+    sumarMeses,
 } from "../utils/calendario";
 import type {
     ColumnaDia,
@@ -44,19 +47,20 @@ export function useConsultarCalendario() {
     );
 
     // Semana de lunes a sábado, o un solo día
-    const dias = useMemo(
-        () => (vista === "SEMANA" ? rangoDeDias(lunesDeLaSemana(ancla), 6) : [ancla]),
-        [vista, ancla],
-    );
+    const dias = useMemo(() => {
+        if (vista === "MES") return diasDelMes(ancla);
+        return vista === "SEMANA" ? rangoDeDias(lunesDeLaSemana(ancla), 6) : [ancla];
+    }, [vista, ancla]);
 
     const columnas = useMemo<ColumnaDia[]>(
         () =>
             dias.map((dia) => ({
                 dia,
                 esHoy: mismoDia(dia, hoy),
+                fueraDeMes: vista === "MES" && dia.getMonth() !== ancla.getMonth(),
                 eventos: eventos.filter((e) => filtros[e.tipo] && cubreDia(e.inicio, e.fin, dia)),
             })),
-        [dias, eventos, filtros, hoy],
+        [dias, eventos, filtros, hoy, vista, ancla],
     );
 
     const tareasHoy = useMemo<TareaHoy[]>(
@@ -90,7 +94,20 @@ export function useConsultarCalendario() {
     );
 
     const navegar = (direccion: -1 | 1) =>
-        setAncla((prev) => sumarDias(prev, direccion * (vista === "SEMANA" ? 7 : 1)));
+        setAncla((prev) => {
+            if (vista === "MES") {
+                const siguiente = sumarMeses(prev, direccion);
+                return siguiente.getFullYear() === hoy.getFullYear() && siguiente.getMonth() === hoy.getMonth()
+                    ? hoy
+                    : siguiente;
+            }
+            return sumarDias(prev, direccion * (vista === "SEMANA" ? 7 : 1));
+        });
+
+    const seleccionarDia = (dia: Date) => {
+        setAncla(dia);
+        setVista("DIA");
+    };
 
     const cambiarFiltro = (tipo: TipoEvento, valor: boolean) =>
         setFiltros((prev) => ({ ...prev, [tipo]: valor }));
@@ -98,8 +115,9 @@ export function useConsultarCalendario() {
     return {
         vista,
         setVista,
-        etiquetaPeriodo: etiquetaRango(dias),
+        etiquetaPeriodo: vista === "MES" ? etiquetaMes(ancla) : etiquetaRango(dias),
         navegar,
+        seleccionarDia,
         filtros,
         cambiarFiltro,
         columnas,

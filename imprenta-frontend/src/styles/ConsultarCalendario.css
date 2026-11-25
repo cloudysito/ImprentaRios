@@ -163,3 +163,84 @@
     gap: 4px;
     font-weight: 700;
 }
+
+/* Vista Mes */
+.cc-mes {
+    display: grid;
+    grid-template-columns: repeat(6, minmax(110px, 1fr));
+    min-width: 700px;
+    gap: 6px;
+    padding: 18px 14px 20px;
+    border-radius: 16px;
+    background: #fff;
+    box-shadow: 0 1px 2px rgba(28, 25, 22, 0.05);
+}
+.cc-mes__encabezado {
+    padding-bottom: 8px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: #6f6a63;
+}
+
+.cc-mes__dia {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+    min-height: 112px;
+    padding: 6px;
+    border: 1px solid #efebe5;
+    border-radius: 8px;
+    background: #fff;
+}
+.cc-mes__dia.is-hoy { background: #fbf8f3; border-color: #a63d30; }
+.cc-mes__dia.is-fuera { background: #f9f7f4; }
+.cc-mes__dia.is-fuera .cc-mes__numero { color: #b3ada4; }
+.cc-mes__dia.is-fuera .cc-mes__evento { opacity: 0.55; }
+
+.cc-mes__numero {
+    align-self: flex-start;
+    min-width: 24px;
+    margin-bottom: 2px;
+    padding: 1px 6px;
+    border: none;
+    border-radius: 6px;
+    background: none;
+    font: inherit;
+    font-size: 13px;
+    font-weight: 700;
+    color: #1c1916;
+    cursor: pointer;
+}
+.cc-mes__numero:hover { background: #efebe5; }
+.cc-mes__dia.is-hoy .cc-mes__numero { color: #a63d30; }
+
+.cc-mes__evento {
+    display: block;
+    padding: 2px 6px;
+    border-left: 3px solid;
+    border-radius: 4px;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-size: 11px;
+    line-height: 1.4;
+}
+.cc-mes__evento--produccion { background: #ece8f6; border-color: #57478a; color: #3d3163; }
+.cc-mes__evento--entrega { background: #e3f0ea; border-color: #2f6b52; color: #24523f; }
+.cc-mes__evento--mantenimiento { background: #f7ecdc; border-color: #b5801f; color: #6b4a14; }
+
+.cc-mes__mas {
+    align-self: flex-start;
+    padding: 0 6px;
+    border: none;
+    background: none;
+    font: inherit;
+    font-size: 11px;
+    font-weight: 600;
+    color: #6f6a63;
+    cursor: pointer;
+}
+.cc-mes__mas:hover { color: #1c1916; text-decoration: underline; }

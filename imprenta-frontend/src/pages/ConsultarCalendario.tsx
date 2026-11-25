@@ -12,6 +12,7 @@ import "../styles/ConsultarCalendario.css";
 const VISTAS: { valor: VistaCalendario; etiqueta: string }[] = [
   { valor: "DIA", etiqueta: "Día" },
   { valor: "SEMANA", etiqueta: "Semana" },
+  { valor: "MES", etiqueta: "Mes" },
 ];
 
 const ConsultarCalendario = () => {
@@ -36,9 +37,11 @@ const ConsultarCalendario = () => {
 
         <CalendarioFiltros filtros={c.filtros} onChange={c.cambiarFiltro} />
         <CalendarioGrilla
-          columnas={c.columnas}
-          cargando={c.cargando}
-          error={c.error}
+            vista={c.vista}
+            columnas={c.columnas}
+            onSeleccionarDia={c.seleccionarDia}
+            cargando={c.cargando}
+            error={c.error}
         />
       </section>
 
