@@ -106,7 +106,8 @@
 /* grid */
 .calendario-grid {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    /* Se acomoda al ancho disponible: menos columnas en pantallas chicas. */
+    grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
     gap: 12px;
     background: #fff;
     padding: 20px;
@@ -120,15 +121,16 @@
 
 .calendario-grid--periodo { min-height: 300px; }
 .calendario-grid__estado {
-    grid-column: span 6;
-    padding: 40px;
+    grid-column: 1 / -1;
+    padding: 40px 16px;
     text-align: center;
+    overflow-wrap: anywhere;
     color: #6f6a63;
 }
 .calendario-grid__estado--error { color: #a63d30; }
 .cal-card__descripcion {
     margin-top: 2px;
-    font-size: 11px;
+    font-size: 15px;
     opacity: 0.8;
 }
 .cal-sidebar-card__texto {
@@ -178,23 +180,32 @@
 
 /* Tarjetas de Actividad */
 .cal-card {
+    min-width: 0;
     padding: 10px;
     border-radius: 8px;
     font-size: 12px;
     line-height: 1.4;
+    /* Evita que folios o nombres largos rompan la tarjeta. */
+    overflow-wrap: anywhere;
     display: flex;
     flex-direction: column;
+    font-size: 18px;
 }
 
 .cal-card strong {
     font-weight: 600;
+    font-size: 18px;
+}
+
+.cal-card > * {
+    min-width: 0;
 }
 
 .cal-card__responsable {
     margin-top: 8px;
     padding-top: 6px;
     border-top: 1px solid currentColor;
-    font-size: 12px;
+    font-size: 15px;
     font-weight: 700;
     opacity: 1;
 }
@@ -203,6 +214,7 @@
     background: #ece8f6;
     color: #57478a;
     border-left: 3px solid #57478a;
+    font-size: 18px;
 }
 
 .cal-card.entrega {
@@ -309,57 +321,79 @@
     margin-bottom: 4px;
 }
 
-/* pa celular */
-@media (max-width: 1100px) {
+/* Pantallas medianas: el panel lateral se reduce antes de bajar. */
+@media (max-width: 1280px) {
     .calendario-container {
-        grid-template-columns: 1fr;
-    }
-
-    .calendario-main,
-    .calendario-sidebar {
-        min-width: 0;
-    }
-
-    .calendario-grid-scroll {
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior-x: contain;
-    }
-
-    .calendario-grid {
-        min-width: 800px;
+        grid-template-columns: minmax(0, 1fr) 260px;
+        gap: var(--cal-esp-4);
     }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 1100px) {
+    .calendario-container {
+        grid-template-columns: minmax(0, 1fr);
+    }
+}
+
+/* Todo a una columna y controles de 44px para pantallas táctiles. */
+@media (max-width: 760px) {
     .calendario-toolbar__top {
         align-items: stretch;
         flex-direction: column;
-        gap: 10px;
+        gap: var(--cal-esp-3);
     }
 
     .calendario-toggle,
     .calendario-date-nav {
-        align-self: flex-start;
-        max-width: 100%;
+        width: 100%;
+    }
+
+    .calendario-toggle button {
+        flex: 1;
+        min-height: 44px;
     }
 
     .calendario-date-nav {
-        gap: 10px;
-        font-size: 13px;
+        min-height: 44px;
+        justify-content: space-between;
     }
 
-    .calendario-filtros {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 10px;
+    .calendario-date-nav button {
+        width: 44px;
+        height: 44px;
+    }
+
+    .calendario-filtros label {
+        min-height: 44px;
+    }
+}
+
+@media (max-width: 640px) {
+    .calendario-grid {
+        gap: var(--cal-esp-3);
+        padding: var(--cal-esp-4);
+    }
+
+    .cal-card {
+        min-height: 104px;
+        padding: var(--cal-esp-3);
     }
 
     .cal-sidebar-card {
-        padding: 16px;
+        padding: var(--cal-esp-4);
     }
 
     .cal-sidebar-card h3 {
         overflow-wrap: anywhere;
+    }
+}
+
+@media (max-width: 420px) {
+    .calendario-date-nav {
+        font-size: 13px;
+    }
+
+    .calendario-grid__estado {
+        padding: 32px var(--cal-esp-3);
     }
 }

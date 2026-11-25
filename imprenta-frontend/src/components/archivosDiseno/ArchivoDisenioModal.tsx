@@ -123,7 +123,7 @@ const ArchivoDisenioModal = ({
       onCerrar={onCerrar}
     >
       <form
-        className="ui-grid"
+        className="ui-grid archivo-modal"
         noValidate
         onSubmit={(e) => {
           e.preventDefault();

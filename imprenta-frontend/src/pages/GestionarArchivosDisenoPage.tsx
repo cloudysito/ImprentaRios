@@ -112,8 +112,8 @@ const GestionarArchivosDisenoPage = () => {
                 <th>Versión</th>
                 <th>Recepción</th>
                 <th>Entrega</th>
-                <th>Medida</th>
-                <th>Prensa</th>
+                <th className="archivos-tabla__extra">Medida</th>
+                <th className="archivos-tabla__extra">Prensa</th>
                 {puedeEditar && <th aria-label="Acciones"></th>}
               </tr>
             </thead>
@@ -162,10 +162,10 @@ const GestionarArchivosDisenoPage = () => {
                         </small>
                       )}
                     </td>
-                    <td>{fechaLarga(g.actual.fechaRecepcion)}</td>
-                    <td>{fechaLarga(g.actual.fechaEntrega)}</td>
-                    <td>{g.actual.medidaArchivo}</td>
-                    <td>{g.actual.prensa}</td>
+                    <td className="archivos-tabla__fecha">{fechaLarga(g.actual.fechaRecepcion)}</td>
+                    <td className="archivos-tabla__fecha">{fechaLarga(g.actual.fechaEntrega)}</td>
+                    <td className="archivos-tabla__extra">{g.actual.medidaArchivo}</td>
+                    <td className="archivos-tabla__extra">{g.actual.prensa}</td>
                     {puedeEditar && (
                       <td>
                         <button
